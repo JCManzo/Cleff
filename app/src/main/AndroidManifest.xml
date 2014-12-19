@@ -8,10 +8,14 @@
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme" >
+        android:theme="@style/AppTheme"
+        android:name="CleffApplication"
+        >
+
         <activity
             android:name="com.freneticlabs.cleff.MainActivity"
             android:label="@string/app_name"
+            android:configChanges="orientation|keyboardHidden"
             android:launchMode="singleTop" >
 
             <intent-filter>
@@ -20,12 +24,20 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <receiver android:name=".utils.StopServiceBroadcastReceiver" >
+            <intent-filter>
+                <action android:name="com.freneticlabs.cleff.STOP_SERVICE" />
+            </intent-filter>
+        </receiver>
+
         <service
             android:name=".MusicService"
             android:enabled="true"
             android:exported="false"
             android:permission="com.freneticlabs.cleff.MY_SERVICE_PERMISSION" >
         </service>
+
     </application>
 
 </manifest>

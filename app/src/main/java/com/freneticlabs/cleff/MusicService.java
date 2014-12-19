@@ -9,13 +9,12 @@ import android.content.Intent;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
-import android.os.Binder;
-import android.os.Handler;
 import android.os.IBinder;
 import android.os.PowerManager;
 import android.provider.MediaStore;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
+import android.widget.RemoteViews;
 
 import com.freneticlabs.cleff.models.MusicLibrary;
 import com.freneticlabs.cleff.models.Song;
@@ -37,12 +36,14 @@ public class MusicService extends Service implements
     private Context mContext;
     private Service mService;
     public static String RESULT = "result";
-    public static final String SERVICEMD = "com.jcmanzo.cleff.service.receiver";
+    public static final String SERVICEMD = "com.freneticlabs.cleff.service.receiver";
+    public static final String STOP_SERVICE = "com.freneticlabs.cleff.STOP_SERVICE";
+
     public static final int UPDATE_PLAYING = -1;
     private static int NOTIFICATION_ID = 579; // just a number
 
-    //Handler object.
-    private Handler mHandler;
+    private NotificationCompat.Builder mNotificationBuilder;
+    public static final int mNotificationId = 1080;
 
     private static final String TAG = MusicService.class.getSimpleName();
     private static final String ACTION_PLAY = "com.cleff.action.PLAY";
@@ -50,8 +51,10 @@ public class MusicService extends Service implements
     // Keep track of the current song position in the Array
     private Song mCurrentSong;
     private ArrayList<Song> mSongs;
+    private CleffApplication mCleffApplication;
     private boolean      isPlaying = false;
-    private final IBinder mBinder = new LocalBinder();
+    //PrepareServiceListener instance.
+    private PrepareServiceListener mPrepareServiceListener;
 
     /**
      * Starts playing the current song in the playing queue.
@@ -59,6 +62,42 @@ public class MusicService extends Service implements
 
     public  MusicService() {
 
+    }
+
+    /**
+     * Public interface that provides access to
+     * major events during the service startup
+     * process.
+     *
+     */
+    public interface PrepareServiceListener {
+
+        /**
+         * Called when the service is up and running.
+         */
+        public void onServiceRunning(MusicService service);
+
+        /**
+         * Called when the service failed to start.
+         * Also returns the failure reason via the exception
+         * parameter.
+         */
+        public void onServiceFailed(Exception exception);
+
+    }
+
+    /**
+     * Returns an instance of the PrepareServiceListener.
+     */
+    public PrepareServiceListener getPrepareServiceListener() {
+        return mPrepareServiceListener;
+    }
+
+    /**
+     * Sets the mPrepareServiceListener object.
+     */
+    public void setPrepareServiceListener(PrepareServiceListener listener) {
+        mPrepareServiceListener = listener;
     }
 
     @Override
@@ -77,36 +116,12 @@ public class MusicService extends Service implements
 
 
 
-    public class LocalBinder extends Binder {
-        MusicService getService() {
-            // Return this instance of LocalService so clients can call public methods
-            return MusicService.this;
-        }
-    }
-
     @Override
     public IBinder onBind(Intent intent) {
-        return mBinder;
+        return null;
     }
 
-    /**
-     *  Unbinds the service from the client.
-     *
-     * @param intent
-     * @return true
-     */
-    @Override
-    public boolean onUnbind(Intent intent){
-        if(mMediaPlayer != null) {
-            if(mMediaPlayer.isPlaying()) {
-                mMediaPlayer.stop();
-            }
-            mMediaPlayer.release();
-            mMediaPlayer = null;
-        }
 
-        return true;
-    }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
@@ -114,8 +129,9 @@ public class MusicService extends Service implements
         Log.i(TAG, "Received start id " + startId + ": " + intent);
 
         mContext = getApplicationContext();
+        mCleffApplication = (CleffApplication) getApplicationContext();
+        mCleffApplication.setService((MusicService) this);
         mService = this;
-        mHandler = new Handler();
         mSongs = MusicLibrary.get(getApplicationContext()).getSongs();
 
         initMediaPlayer();
@@ -130,6 +146,9 @@ public class MusicService extends Service implements
             mService.stopSelf();
         }
 
+        //The service has been successfully started.
+        setPrepareServiceListener(mCleffApplication.getPlaybackManager());
+        getPrepareServiceListener().onServiceRunning(this);
 
         // We want this service to continue running until it is explicitly
         // stopped, so return sticky.
@@ -167,6 +186,8 @@ public class MusicService extends Service implements
      * Plays the song that was set by setSong()
      */
     public void playSong() {
+        if (mMediaPlayer != null) initMediaPlayer();
+
         // Set the URI
         Uri trackUri = ContentUris.withAppendedId(MediaStore.Audio.Media.
                 EXTERNAL_CONTENT_URI, mCurrentSong.getID());
@@ -223,28 +244,57 @@ public class MusicService extends Service implements
     public void onPrepared(MediaPlayer mediaPlayer) {
         mMediaPlayer.start();
 
+
+        Notification notification = updateNotification();
+        startForeground(NOTIFICATION_ID, notification);
+    }
+
+    /**
+     * Builds and updates the notification.
+     * @return Notification
+     */
+    public Notification updateNotification() {
+        mNotificationBuilder = new NotificationCompat.Builder(mContext);
+        mNotificationBuilder.setOngoing(true);
+        mNotificationBuilder.setAutoCancel(false);
+        mNotificationBuilder.setSmallIcon(R.drawable.ic_launcher);
+
+        //Grab the notification layouts.
+        RemoteViews notificationView = new RemoteViews(mContext.getPackageName(), R.layout.notification_custom_layout);
+
         // Set up the notification
         Intent intent = new Intent(this, MainActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
         sendBroadcast(intent);
 
+        Intent stopServiceIntent = new Intent();
+        stopServiceIntent.setAction(MusicService.STOP_SERVICE);
+        PendingIntent stopServicePendingIntent = PendingIntent.getBroadcast(mContext.getApplicationContext(), 0, stopServiceIntent, 0);
+
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent,
                 PendingIntent.FLAG_UPDATE_CURRENT);
+
+        notificationView.setOnClickPendingIntent(R.id.notification_base, stopServicePendingIntent);
 
         Notification notification = new NotificationCompat.Builder(getApplicationContext())
                 .setTicker(mCurrentSong.getTitle())
                 .setOngoing(true)
                 .setContentTitle("Playing:")
+                .setContent(notificationView)
                 .setContentText(mCurrentSong.getTitle())
                 .setSmallIcon(R.drawable.ic_launcher)
                 .setContentIntent(pendingIntent)
                 .build();
 
-        startForeground(NOTIFICATION_ID, notification);
-    }
+        notification.flags = Notification.FLAG_FOREGROUND_SERVICE |
+                Notification.FLAG_NO_CLEAR |
+                Notification.FLAG_ONGOING_EVENT;
 
+        return notification;
+    }
     @Override
     public boolean onError(MediaPlayer mediaPlayer, int i, int i2) {
+        Log.i(TAG, "ERROR in onError()");
         return false;
     }
 

@@ -27,6 +27,7 @@ public class SongListFragment extends Fragment implements
     @InjectView(R.id.recycler_view_songs) RecyclerView recyclerView;
 
     private static final String TAG = SongListFragment.class.getSimpleName();
+    private SongAdapter mSongAdapter;
     OnListViewSongListener mCallback;
 
 
@@ -42,12 +43,25 @@ public class SongListFragment extends Fragment implements
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        // Retain this fragment across configuration changes.
+        setRetainInstance(true);
         setHasOptionsMenu(true);
+
+
+
+
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        /*if (savedInstanceState != null) {
+            ArrayList<Song> values = savedInstanceState.getParcelableArrayList("songList");
+            if (values != null) {
+                mSongAdapter = new SongAdapter(values, this);
+            }
+        }*/
+
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_song_list, container, false);
         ButterKnife.inject(this, rootView);
@@ -57,8 +71,9 @@ public class SongListFragment extends Fragment implements
 
         recyclerView.setLayoutManager(layoutManager);
 
-        SongAdapter songAdapter = new SongAdapter(MusicLibrary.get(getActivity()).getSongs(), this);
-        recyclerView.setAdapter(songAdapter);
+        mSongAdapter = new SongAdapter(MusicLibrary.get(getActivity()).getSongs(), this);
+
+        recyclerView.setAdapter(mSongAdapter);
         return rootView;
     }
 
@@ -80,4 +95,6 @@ public class SongListFragment extends Fragment implements
                     + " must implement OnHeadlineSelectedListener");
         }
     }
+
+
 }

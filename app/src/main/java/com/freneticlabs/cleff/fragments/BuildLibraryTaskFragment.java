@@ -16,9 +16,9 @@ import com.freneticlabs.cleff.models.Song;
 
 
 /**
- * This Fragment manages a single background task and retains
- * itself across configuration changes. Activities that contain
- * this fragment must implement the
+ * This Fragment manages a single background task to rebuild the
+ * music library. The fragment is retained across configuration changes.
+ * Activities that contain this fragment must implement the
  * {@link BuildLibraryTaskFragment.BuildLibraryTaskCallbacks} interface
  * to handle interaction events.
  */
@@ -118,6 +118,8 @@ public class BuildLibraryTaskFragment extends Fragment {
 
         public void createSongList() {
             // Populates the ArrayList in MusicLibrary with Song objects.
+            MusicLibrary.get(getActivity()).clearLibrary();
+
             String mUnknownAlbum = getActivity().getApplicationContext().getString(R.string.unknown_album_name);
             String mUnknownArtist = getActivity().getApplicationContext().getString(R.string.unknown_artist_name);
             String mUnknownTitle = getActivity().getApplicationContext().getString(R.string.unknown_title_name);

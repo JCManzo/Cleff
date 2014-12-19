@@ -1,12 +1,8 @@
 package com.freneticlabs.cleff;
 
-import android.content.ComponentName;
-import android.content.Context;
 import android.content.Intent;
-import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.os.IBinder;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
@@ -37,7 +33,8 @@ public class MainActivity extends ActionBarActivity implements
 
     private static final String TAG_TASK_FRAGMENT = "build_library_task_fragment";
     public static final String PREFS_NAME = "ListnPrefsFile";
-    MusicService mService;
+    private MusicService mService;
+    private CleffApplication mCleffApplication;
     private boolean mBound = false;
     private Intent playIntent;
     private static final String TAG = MainActivity.class.getSimpleName();
@@ -62,7 +59,6 @@ public class MainActivity extends ActionBarActivity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.inject(this);
-
         // Set up the toolbar to act as ac action bar
         if(mToolbar != null) {
             setSupportActionBar(mToolbar);
@@ -101,17 +97,14 @@ public class MainActivity extends ActionBarActivity implements
                     .replace(R.id.container, new PageSlidingTabStripFragment())
                     .commit();
         }
+
+        mCleffApplication = (CleffApplication)getApplication();
+       mCleffApplication.getPlaybackManager().initPlayback();
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-        // Bind to LocalService
-        if(playIntent==null) {
-            playIntent = new Intent(this, MusicService.class);
-            bindService(playIntent, mConnection, Context.BIND_AUTO_CREATE);
-            startService(playIntent);
-        }
     }
 
     @Override
@@ -119,49 +112,34 @@ public class MainActivity extends ActionBarActivity implements
         super.onPause();
         MusicLibrary.get(this).saveLibrary();
 
+
     }
+
 
     @Override
     protected void onDestroy() {
         // Cancel all scheduled croutons
         super.onDestroy();
 
-        if(playIntent != null) {
-            stopService(playIntent);
-            mService = null;
-        }
-        if (mBound) {
-            unbindService(mConnection);
-            mBound = false;
-        }
     }
 
 
     @Override
     public void OnListViewSongSelected(Song song) {
         Log.i(TAG, song.getTitle());
-        mService.setSong(song);
-        mService.playSong();
+
+        // Start the service if it has been stopped.
+        if(!mCleffApplication.isServiceRunning()) {
+            mCleffApplication.getPlaybackManager().initPlayback();
+            Log.i(TAG, "SERVICE NOT RUNNING");
+
+        } else {
+            Log.i(TAG, "SERVICE IS RUNNING");
+        }
+        mCleffApplication.getService().setSong(song);
+        mCleffApplication.getService().playSong();
     }
 
-    // Connect to the smusic service ervice
-    private ServiceConnection mConnection = new ServiceConnection() {
-
-        @Override
-        public void onServiceConnected(ComponentName className,
-                                       IBinder service) {
-            // We've bound to LocalService, cast the IBinder and get LocalService instance
-            MusicService.LocalBinder binder = (MusicService.LocalBinder) service;
-            mService = binder.getService();
-            mBound = true;
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName arg0) {
-            Log.e(TAG, "onServiceDisconnected");
-            mBound = false;
-        }
-    };
 
     @Override
     public void onNavigationDrawerItemSelected(int position) {

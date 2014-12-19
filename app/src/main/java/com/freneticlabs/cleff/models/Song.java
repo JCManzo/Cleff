@@ -1,12 +1,15 @@
 package com.freneticlabs.cleff.models;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
 /**
  * Created by jcmanzo on 8/7/14.
  */
-public class Song {
+public class Song implements Parcelable{
     private static final String JSON_ID         = "id";
     private static final String JSON_TITLE      = "title";
     private static final String JSON_ARTIST     = "artist";
@@ -66,8 +69,6 @@ public class Song {
         return jsonObject;
     }
 
-
-
     public float getSongRating() {
         return mSongRating;
     }
@@ -111,4 +112,41 @@ public class Song {
     public String toString() {
      return getTitle();
     }
+
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeLong(this.mID);
+        dest.writeLong(this.mAlbumID);
+        dest.writeString(this.mTitle);
+        dest.writeString(this.mArtist);
+        dest.writeString(this.mAlbum);
+        dest.writeString(this.mGenre);
+        dest.writeFloat(this.mSongRating);
+    }
+
+    private Song(Parcel in) {
+        this.mID = in.readLong();
+        this.mAlbumID = in.readLong();
+        this.mTitle = in.readString();
+        this.mArtist = in.readString();
+        this.mAlbum = in.readString();
+        this.mGenre = in.readString();
+        this.mSongRating = in.readFloat();
+    }
+
+    public static final Creator<Song> CREATOR = new Creator<Song>() {
+        public Song createFromParcel(Parcel source) {
+            return new Song(source);
+        }
+
+        public Song[] newArray(int size) {
+            return new Song[size];
+        }
+    };
 }

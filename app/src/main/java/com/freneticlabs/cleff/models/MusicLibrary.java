@@ -125,6 +125,9 @@ public class MusicLibrary {
         }
     }
 
+    public void clearLibrary() {
+        mSongs.clear();
+    }
     public int getCount() {
         return  mSongs.size();
     }
