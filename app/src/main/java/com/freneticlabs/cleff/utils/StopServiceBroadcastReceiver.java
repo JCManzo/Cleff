@@ -12,7 +12,6 @@ import com.freneticlabs.cleff.CleffApplication;
 public class StopServiceBroadcastReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
-
         //Stop the service.
         CleffApplication app = (CleffApplication) context.getApplicationContext();
         app.getService().stopSelf();

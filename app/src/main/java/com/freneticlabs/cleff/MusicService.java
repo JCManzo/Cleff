@@ -244,7 +244,6 @@ public class MusicService extends Service implements
     public void onPrepared(MediaPlayer mediaPlayer) {
         mMediaPlayer.start();
 
-
         Notification notification = updateNotification();
         startForeground(NOTIFICATION_ID, notification);
     }

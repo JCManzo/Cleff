@@ -8,6 +8,7 @@ import android.util.Log;
  * Created by jcmanzo on 12/18/14.
  */
 public class CleffApplication extends Application {
+    
     private static final String TAG = CleffApplication.class.getSimpleName();
     private static CleffApplication sCleffApplication;
     //Context.

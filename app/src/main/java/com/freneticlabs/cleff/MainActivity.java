@@ -112,7 +112,6 @@ public class MainActivity extends ActionBarActivity implements
         super.onPause();
         MusicLibrary.get(this).saveLibrary();
 
-
     }
 
 
@@ -122,7 +121,6 @@ public class MainActivity extends ActionBarActivity implements
         super.onDestroy();
 
     }
-
 
     @Override
     public void OnListViewSongSelected(Song song) {
