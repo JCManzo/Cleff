@@ -1,35 +1,30 @@
 package com.freneticlabs.cleff.fragments;
 
-
 import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ListView;
 
 import com.freneticlabs.cleff.R;
 import com.freneticlabs.cleff.models.MusicLibrary;
 import com.freneticlabs.cleff.models.Song;
-import com.freneticlabs.cleff.views.adapters.SongAdapter;
-
-import java.util.ArrayList;
+import com.freneticlabs.cleff.views.adapters.SongsAdapter;
 
 import timber.log.Timber;
 
-/**
- * A simple {@link Fragment} subclass.
- */
-public class SongsFragment extends Fragment {
+public class SongsFragment extends Fragment implements
+        SongsAdapter.ItemClickListener {
 
-    private ArrayList<Song> mSongList;
-    private ListView mSongView;
+    //@InjectView(R.id.recycler_view_songs) RecyclerView mRecyclerView;
+    private RecyclerView mRecyclerView;
+    private static final String TAG = SongsFragment.class.getSimpleName();
+    private SongsAdapter mSongAdapter;
     OnListViewSongListener mCallback;
 
-    private static final String TAG = "SongListFragment";
 
     public SongsFragment() {
         // Required empty public constructor
@@ -43,51 +38,45 @@ public class SongsFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        // Retain this fragment across configuration changes.
         setHasOptionsMenu(true);
-        mSongList = MusicLibrary.get(getActivity()).getSongs();
-       // setRetainInstance(true);
-
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_song_list, container, false);
-        mSongList = MusicLibrary.get(getActivity()).getSongs();
 
-        Timber.d("Created");
+        // Inflate the layout for this fragment
+        View rootView = inflater.inflate(R.layout.fragment_song_list, container, false);
+        //ButterKnife.inject(this, rootView);
 
-        mSongView = (ListView)view.findViewById(R.id.list_view_songs);
+        mRecyclerView = (RecyclerView)rootView.findViewById(R.id.recycler_view_songs);
+        // use this setting to improve performance if you know that changes
+        // in content do not change the layout size of the RecyclerView
+        mRecyclerView.setHasFixedSize(true);
 
+        // Items will be shown in a vertical linear layout
+        LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
+        mRecyclerView.setLayoutManager(layoutManager);
 
-        mSongView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
-                final Song song = mSongList.get(position);
+        mSongAdapter = new SongsAdapter(MusicLibrary.get(getActivity()).getSongs(), this);
+        mRecyclerView.setAdapter(mSongAdapter);
 
-                mCallback.OnListViewSongSelected(song);
-            }
-        });
-
-
-        SongAdapter songAdt = new SongAdapter(getActivity());
-
-        mSongView.setAdapter(songAdt);
-
-        return view;
+        if(rootView == null || layoutManager == null || mSongAdapter == null || mRecyclerView == null) {
+            Timber.d("NULL IN LIST");
+        }
+        return rootView;
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
+    public void itemClicked(Song song) {
+        mCallback.OnListViewSongSelected(song);
 
-
-        return super.onOptionsItemSelected(item);
     }
 
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-
         // This makes sure that the container activity has implemented
         // the callback interface. If not, it throws an exception
         try {
@@ -97,5 +86,6 @@ public class SongsFragment extends Fragment {
                     + " must implement OnHeadlineSelectedListener");
         }
     }
+
 
 }
