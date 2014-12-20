@@ -4,7 +4,10 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 
-import com.freneticlabs.cleff.fragments.SongListFragment;
+import com.freneticlabs.cleff.fragments.AlbumsFragment;
+import com.freneticlabs.cleff.fragments.ArtistsFragment;
+import com.freneticlabs.cleff.fragments.GenresFragment;
+import com.freneticlabs.cleff.fragments.SongsFragment;
 
 /**
  * Created by jcmanzo on 12/15/14.
@@ -21,15 +24,15 @@ public class TabsPageAdapter extends FragmentPagerAdapter {
     public Fragment getItem(int index) {
         switch (index + 1) {
             case 1:
-                return new SongListFragment();
-            /*case 2:
+                return new SongsFragment();
+            case 2:
                 return new AlbumsFragment();
             case 3:
                 return new ArtistsFragment();
             case 4:
-                return new GenresFragment();*/
+                return new GenresFragment();
             default:
-                return new SongListFragment();
+                return new SongsFragment();
         }
     }
 

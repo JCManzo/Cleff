@@ -51,8 +51,9 @@ public class MusicService extends Service implements
     // Keep track of the current song position in the Array
     private Song mCurrentSong;
     private ArrayList<Song> mSongs;
-    private CleffApplication mCleffApplication;
+    private CleffApp mCleffApp;
     private boolean      isPlaying = false;
+
     //PrepareServiceListener instance.
     private PrepareServiceListener mPrepareServiceListener;
 
@@ -129,8 +130,8 @@ public class MusicService extends Service implements
         Log.i(TAG, "Received start id " + startId + ": " + intent);
 
         mContext = getApplicationContext();
-        mCleffApplication = (CleffApplication) getApplicationContext();
-        mCleffApplication.setService((MusicService) this);
+        mCleffApp = (CleffApp) getApplicationContext();
+        mCleffApp.setService((MusicService) this);
         mService = this;
         mSongs = MusicLibrary.get(getApplicationContext()).getSongs();
 
@@ -147,7 +148,7 @@ public class MusicService extends Service implements
         }
 
         //The service has been successfully started.
-        setPrepareServiceListener(mCleffApplication.getPlaybackManager());
+        setPrepareServiceListener(mCleffApp.getPlaybackManager());
         getPrepareServiceListener().onServiceRunning(this);
 
         // We want this service to continue running until it is explicitly

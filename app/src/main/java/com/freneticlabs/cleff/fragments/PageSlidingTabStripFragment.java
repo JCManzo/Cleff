@@ -12,16 +12,12 @@ import com.astuetz.PagerSlidingTabStrip;
 import com.freneticlabs.cleff.R;
 import com.freneticlabs.cleff.views.adapters.TabsPageAdapter;
 
-import butterknife.ButterKnife;
-import butterknife.InjectView;
-
 /**
  * A simple {@link Fragment} subclass.
  */
 public class PageSlidingTabStripFragment extends Fragment{
-    @InjectView(R.id.pager) ViewPager pager;
-    @InjectView(R.id.tabs) PagerSlidingTabStrip tabs;
-
+   // @InjectView(R.id.pager) ViewPager pager;
+    //@InjectView(R.id.tabs) PagerSlidingTabStrip tabs;
     public static final String TAG = PageSlidingTabStripFragment.class
             .getSimpleName();
 
@@ -39,16 +35,18 @@ public class PageSlidingTabStripFragment extends Fragment{
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_page_sliding_tab_strip, container, false);
-        ButterKnife.inject(this, view);
 
-        // Set an adapter
-        pager.setAdapter(new TabsPageAdapter(getFragmentManager()));
+        return inflater.inflate(R.layout.fragment_page_sliding_tab_strip, container, false);
+    }
+    @Override
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
 
-        // Bind the tabs to the ViewPager
+        PagerSlidingTabStrip tabs = (PagerSlidingTabStrip)view.findViewById(R.id.tabs);
+        ViewPager pager = (ViewPager) view.findViewById(R.id.pager);
+        TabsPageAdapter adapter = new TabsPageAdapter(getChildFragmentManager());
+        pager.setAdapter(adapter);
         tabs.setViewPager(pager);
-
-        return view;
     }
 
 

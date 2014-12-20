@@ -18,23 +18,24 @@ import android.widget.ProgressBar;
 import com.freneticlabs.cleff.fragments.BuildLibraryTaskFragment;
 import com.freneticlabs.cleff.fragments.NavigationDrawerFragment;
 import com.freneticlabs.cleff.fragments.PageSlidingTabStripFragment;
-import com.freneticlabs.cleff.fragments.SongListFragment;
+import com.freneticlabs.cleff.fragments.SongsFragment;
 import com.freneticlabs.cleff.models.MusicLibrary;
 import com.freneticlabs.cleff.models.Song;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
+import timber.log.Timber;
 
 
 public class MainActivity extends ActionBarActivity implements
         NavigationDrawerFragment.NavigationDrawerCallbacks,
         BuildLibraryTaskFragment.BuildLibraryTaskCallbacks,
-        SongListFragment.OnListViewSongListener{
+        SongsFragment.OnListViewSongListener{
 
     private static final String TAG_TASK_FRAGMENT = "build_library_task_fragment";
     public static final String PREFS_NAME = "ListnPrefsFile";
     private MusicService mService;
-    private CleffApplication mCleffApplication;
+    private CleffApp mCleffApp;
     private boolean mBound = false;
     private Intent playIntent;
     private static final String TAG = MainActivity.class.getSimpleName();
@@ -59,6 +60,8 @@ public class MainActivity extends ActionBarActivity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.inject(this);
+
+        Timber.d("Activity Created");
         // Set up the toolbar to act as ac action bar
         if(mToolbar != null) {
             setSupportActionBar(mToolbar);
@@ -87,7 +90,7 @@ public class MainActivity extends ActionBarActivity implements
             fm.beginTransaction()
                     .add(mBuildLibraryTaskFragment, TAG_TASK_FRAGMENT)
                     .commit();
-
+           Timber.d("running buildlibrary");
            mLinearLayout.setVisibility(View.VISIBLE);
 
         } else if (firstRun) {
@@ -96,10 +99,12 @@ public class MainActivity extends ActionBarActivity implements
             fm.beginTransaction()
                     .replace(R.id.container, new PageSlidingTabStripFragment())
                     .commit();
-        }
+           Timber.d("Mainview");
 
-        mCleffApplication = (CleffApplication)getApplication();
-       mCleffApplication.getPlaybackManager().initPlayback();
+       }
+
+        mCleffApp = (CleffApp)getApplication();
+       mCleffApp.getPlaybackManager().initPlayback();
     }
 
     @Override
@@ -122,20 +127,21 @@ public class MainActivity extends ActionBarActivity implements
 
     }
 
+
     @Override
     public void OnListViewSongSelected(Song song) {
         Log.i(TAG, song.getTitle());
 
         // Start the service if it has been stopped.
-        if(!mCleffApplication.isServiceRunning()) {
-            mCleffApplication.getPlaybackManager().initPlayback();
-            Log.i(TAG, "SERVICE NOT RUNNING");
+        if(!mCleffApp.isServiceRunning()) {
+            mCleffApp.getPlaybackManager().initPlayback();
+            Timber.i("SERVICE NOT RUNNING");
 
         } else {
-            Log.i(TAG, "SERVICE IS RUNNING");
+            Timber.i( "SERVICE IS RUNNING");
         }
-        mCleffApplication.getService().setSong(song);
-        mCleffApplication.getService().playSong();
+        mCleffApp.getService().setSong(song);
+        mCleffApp.getService().playSong();
     }
 
 

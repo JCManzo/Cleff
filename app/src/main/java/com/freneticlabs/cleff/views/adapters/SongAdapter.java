@@ -1,94 +1,131 @@
 package com.freneticlabs.cleff.views.adapters;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
-import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.BaseAdapter;
+import android.widget.Filter;
+import android.widget.Filterable;
 import android.widget.TextView;
 
 import com.freneticlabs.cleff.R;
+import com.freneticlabs.cleff.models.MusicLibrary;
 import com.freneticlabs.cleff.models.Song;
 
 import java.util.ArrayList;
 
-import butterknife.ButterKnife;
-import butterknife.InjectView;
+import timber.log.Timber;
+
 
 /**
  * Created by jcmanzo on 12/14/14.
  */
-public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
-    private ArrayList<Song> mSongList;
-    private ItemClickListener mItemClickListener;
+public class SongAdapter extends BaseAdapter implements Filterable{
+    private ArrayList<Song> mSongs;
+    private ArrayList<Song> mOrigin;
+    private LayoutInflater mSongInflater;
+    private Context mContext;
+    private static final String TAG = "SongAdapter";
 
-
-    public SongAdapter(ArrayList<Song> songList, @NonNull ItemClickListener itemClickListener) {
-        mSongList = songList;
-
-        mItemClickListener = itemClickListener;
-    }
-
-    public interface ItemClickListener {
-        public void itemClicked(Song song);
-    }
-
-    public ArrayList<Song> getValues() {
-        return mSongList;
-    }
-    @Override
-    public ViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
-        Context context = viewGroup.getContext();
-        View parent = LayoutInflater.from(context).inflate(R.layout.row_list_song, viewGroup, false);
-
-        return ViewHolder.newInstance(parent);
+    public SongAdapter(Context context){
+        mContext = context;
+        mSongs = MusicLibrary.get(context).getSongs();
+        if(mSongs == null || mSongs.isEmpty()) {
+            Timber.d("EMPTY SONGS" );
+        } else {
+            Timber.d("Songs NOT EMPTY"+ Integer.toString(mSongs.size()));
+        }
+        mSongInflater = LayoutInflater.from(context);
     }
 
     @Override
-    public void onBindViewHolder(ViewHolder viewHolder, int position) {
-        final Song song = mSongList.get(position);
-        viewHolder.setTitle(song.getTitle());
-        viewHolder.setArtist(song.getArtist());
-        viewHolder.setOnClickListener(new View.OnClickListener() {
+    public int getCount() {
+        return mSongs.size();
+    }
+
+    @Override
+    public Song getItem(int position) {
+        return mSongs.get(position);
+    }
+
+    @Override
+    public long getItemId(int position) {
+        return position;
+    }
+
+    @Override
+    public View getView(int position, View convertView, ViewGroup parent) {
+        ViewHolder holder;
+        if(convertView == null) {
+            //map to song layout
+            convertView = mSongInflater.inflate(R.layout.row_list_song, parent, false);
+
+            // Set up up the ViewHolder
+            holder = new ViewHolder();
+            holder.songName = (TextView)convertView.findViewById(R.id.list_song_title);
+            holder.artistName = (TextView)convertView.findViewById(R.id.list_song_artist);
+
+            convertView.setTag(holder);
+
+        } else {
+            // View already exists
+            holder = (ViewHolder)convertView.getTag();
+        }
+
+        //get song using position
+        final Song song = mSongs.get(position);
+
+        //get title and artist strings
+        holder.songName.setText(song.getTitle());
+        holder.artistName.setText(song.getArtist());
+
+        return convertView;
+    }
+
+    public Filter getFilter() {
+        return new Filter() {
             @Override
-            public void onClick(View view) {
-                mItemClickListener.itemClicked(song);
+            protected FilterResults performFiltering(CharSequence constraint) {
+
+                FilterResults onReturn = new FilterResults();
+                ArrayList<Song> results = new ArrayList<Song>();
+                if(mOrigin == null) {
+                    Log.i(TAG, "mOrigin is null");
+                    mOrigin = mSongs;
+                }
+                if(constraint != null) {
+                    if(mOrigin != null && mOrigin.size() > 0) {
+                        for (Song song : mOrigin) {
+                            if(song.getTitle().toLowerCase().contains(constraint.toString())) {
+                                results.add(song);
+                            }
+                        }
+                    }
+                    onReturn.values = results;
+                }
+                return onReturn;
             }
-        });
+
+            @Override
+            protected void publishResults(CharSequence charSequence, FilterResults filterResults) {
+                mSongs = (ArrayList<Song>)filterResults.values;
+
+                notifyDataSetChanged();
+            }
+        };
     }
 
-    @Override
-    public int getItemCount() {
-        return mSongList.size();
+    public void notifyDataSetChanged() {
+        super.notifyDataSetChanged();
+
     }
 
-    public static final class ViewHolder extends RecyclerView.ViewHolder {
-        private final View parent;
+    static class ViewHolder {
+        private TextView artistName;
+        private TextView songName;
 
-        @InjectView(R.id.list_song_title) TextView title;
-        @InjectView(R.id.list_song_artist) TextView artist;
 
-        public static ViewHolder newInstance(View view) {
-            return new ViewHolder(view);
-        }
-
-        public ViewHolder(View view) {
-            super(view);
-            ButterKnife.inject(this, view);
-            this.parent = view;
-        }
-
-        public void setTitle(CharSequence text) {
-            title.setText(text);
-        }
-
-        public void setArtist(CharSequence text) {
-            artist.setText(text);
-        }
-
-        public void setOnClickListener(View.OnClickListener listener) {
-            parent.setOnClickListener(listener);
-        }
     }
 }
