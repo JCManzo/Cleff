@@ -11,6 +11,8 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 
+import timber.log.Timber;
+
 /**
  * Created by jcmanzo on 8/16/14.
  */
@@ -31,7 +33,6 @@ public class MusicLibrary {
     private static final String FILENAME = "songs.json";
 
     public MusicLibrary(Context context) {
-        Log.i(TAG, "LIBRARY INIT");
         mContext = context;
         mSongs = new ArrayList<Song>();
         mCleffJSONSerializer = new CleffJSONSerializer(mContext, FILENAME);
@@ -40,7 +41,7 @@ public class MusicLibrary {
             mSongs = mCleffJSONSerializer.loadLibrary();
         } catch (Exception e) {
             mSongs = new ArrayList<Song>();
-            Log.e(TAG, "Error loading library: ", e);
+            Timber.e("Error loading library.");
         }
     }
 
@@ -117,7 +118,7 @@ public class MusicLibrary {
     public boolean saveLibrary() {
         try {
             mCleffJSONSerializer.saveLibrary(mSongs);
-            Log.i(TAG, "library saved");
+            Log.d(TAG, "Library saved.");
             return true;
         } catch (Exception e) {
             Log.e(TAG, "Error saving library: ", e);

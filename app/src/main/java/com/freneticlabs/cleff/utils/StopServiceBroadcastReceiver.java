@@ -6,6 +6,8 @@ import android.content.Intent;
 
 import com.freneticlabs.cleff.CleffApp;
 
+import timber.log.Timber;
+
 /**
  * Created by jcmanzo on 12/18/14.
  */
@@ -14,8 +16,11 @@ public class StopServiceBroadcastReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         //Stop the service.
         CleffApp app = (CleffApp) context.getApplicationContext();
-        app.getService().stopSelf();
+        //app.getService().stopSelf();
         app.setIsServiceRunning(false);
+        app.getService().stopPlayer();
+        app.getPlaybackManager().initPlayback();
+        Timber.d("Service was stopped.");
 
     }
 }

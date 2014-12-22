@@ -103,7 +103,7 @@ public class MainActivity extends ActionBarActivity implements
 
        }
 
-        mCleffApp = (CleffApp)getApplication();
+       mCleffApp = (CleffApp)getApplication();
        mCleffApp.getPlaybackManager().initPlayback();
     }
 
@@ -130,16 +130,8 @@ public class MainActivity extends ActionBarActivity implements
 
     @Override
     public void OnListViewSongSelected(Song song) {
-        Log.i(TAG, song.getTitle());
-
-        // Start the service if it has been stopped.
-        if(!mCleffApp.isServiceRunning()) {
-            mCleffApp.getPlaybackManager().initPlayback();
-            Timber.i("SERVICE NOT RUNNING");
-
-        } else {
-            Timber.i( "SERVICE IS RUNNING");
-        }
+        mCleffApp.getPlaybackManager().initPlayback();
+        Timber.d("Playback initiated.");
         mCleffApp.getService().setSong(song);
         mCleffApp.getService().playSong();
     }

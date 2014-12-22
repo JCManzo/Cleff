@@ -2,10 +2,11 @@ package com.freneticlabs.cleff.utils;
 
 import android.content.Context;
 import android.content.Intent;
-import android.util.Log;
 
 import com.freneticlabs.cleff.CleffApp;
 import com.freneticlabs.cleff.MusicService;
+
+import timber.log.Timber;
 
 /**
  * Created by jcmanzo on 12/18/14.
@@ -24,18 +25,21 @@ public class PlaybackManager implements MusicService.PrepareServiceListener {
 
         // Start the service if it isn't already running
         if(!mCleffApp.isServiceRunning()) {
-            Log.i(TAG, "Starting Service");
+            Timber.d("Service is not running.");
            startService();
         } else {
-            Log.i(TAG, "Service Already Exists");
+            Timber.d("Service already running.");
             mCleffApp.getService()
                     .getPrepareServiceListener()
                     .onServiceRunning(mCleffApp.getService());
         }
     }
 
+    public void stopPlayback() {
+        mCleffApp.getService().stopPlayer();
+    }
     private void startService() {
-        Log.i(TAG, "Service Started");
+        Timber.d("Starting service.");
         Intent intent = new Intent(mContext, MusicService.class);
         mContext.startService(intent);
 

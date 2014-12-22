@@ -21,6 +21,8 @@ import com.freneticlabs.cleff.models.Song;
 
 import java.util.ArrayList;
 
+import timber.log.Timber;
+
 /**
  * Created by jcmanzo on 12/17/14.
  */
@@ -127,15 +129,16 @@ public class MusicService extends Service implements
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         super.onStartCommand(intent, flags, startId);
-        Log.i(TAG, "Received start id " + startId + ": " + intent);
+        Timber.d("onStartCommand()");
 
         mContext = getApplicationContext();
-        mCleffApp = (CleffApp) getApplicationContext();
-        mCleffApp.setService((MusicService) this);
+
         mService = this;
         mSongs = MusicLibrary.get(getApplicationContext()).getSongs();
 
+
         initMediaPlayer();
+        initService();
 
         // Get audiofocus
         mAudioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
@@ -143,13 +146,9 @@ public class MusicService extends Service implements
                 AudioManager.AUDIOFOCUS_GAIN);
 
         if (result != AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
-            Log.e(TAG, "Could not get audio focus");
+            Timber.e("Could not get audio focus");
             mService.stopSelf();
         }
-
-        //The service has been successfully started.
-        setPrepareServiceListener(mCleffApp.getPlaybackManager());
-        getPrepareServiceListener().onServiceRunning(this);
 
         // We want this service to continue running until it is explicitly
         // stopped, so return sticky.
@@ -157,7 +156,19 @@ public class MusicService extends Service implements
     }
 
     /**
-     * Initializes the mediaplayer
+     *  Initialize the service listeners.
+     */
+    void initService() {
+        mCleffApp = (CleffApp) getApplicationContext();
+        mCleffApp.setService(this);
+
+        //The service has been successfully started.
+        setPrepareServiceListener(mCleffApp.getPlaybackManager());
+        getPrepareServiceListener().onServiceRunning((MusicService) mService);
+    }
+
+    /**
+     * Initialize the Mediaplayer
      */
     void initMediaPlayer() {
         if (mMediaPlayer  != null) {
@@ -184,11 +195,11 @@ public class MusicService extends Service implements
 
 
     /**
-     * Plays the song that was set by setSong()
+     * Play song that was set by setSong()
      */
     public void playSong() {
-        if (mMediaPlayer != null) initMediaPlayer();
-
+        if (mMediaPlayer == null) initMediaPlayer();
+        Timber.d("Playing song " + mCurrentSong.getTitle());
         // Set the URI
         Uri trackUri = ContentUris.withAppendedId(MediaStore.Audio.Media.
                 EXTERNAL_CONTENT_URI, mCurrentSong.getID());
@@ -207,6 +218,23 @@ public class MusicService extends Service implements
         }
 
        // publishResults(playSong, UPDATE_PLAYING);
+    }
+
+    /**
+     * Stop the current playing song and the service.
+     *
+     */
+    public void stopPlayer() {
+        if (isPlaying) {
+            isPlaying = false;
+            if (mMediaPlayer != null) {
+                Timber.d("Stopping player.");
+//                mMediaPlayer.stop();
+                mMediaPlayer.release();
+                mMediaPlayer = null;
+            }
+            stopForeground(true);
+        }
     }
 
     @Override
@@ -244,7 +272,7 @@ public class MusicService extends Service implements
     @Override
     public void onPrepared(MediaPlayer mediaPlayer) {
         mMediaPlayer.start();
-
+        Timber.d("onPrepared()");
         Notification notification = updateNotification();
         startForeground(NOTIFICATION_ID, notification);
     }
