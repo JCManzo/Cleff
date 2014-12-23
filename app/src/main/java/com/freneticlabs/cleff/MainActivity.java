@@ -90,7 +90,7 @@ public class MainActivity extends ActionBarActivity implements
             fm.beginTransaction()
                     .add(mBuildLibraryTaskFragment, TAG_TASK_FRAGMENT)
                     .commit();
-           Timber.d("running buildlibrary");
+           Timber.d("Building library.");
            mLinearLayout.setVisibility(View.VISIBLE);
 
         } else if (firstRun) {
@@ -99,7 +99,7 @@ public class MainActivity extends ActionBarActivity implements
             fm.beginTransaction()
                     .replace(R.id.container, new PageSlidingTabStripFragment())
                     .commit();
-           Timber.d("Mainview");
+           Timber.d("Showing mainview");
 
        }
 
@@ -116,9 +116,17 @@ public class MainActivity extends ActionBarActivity implements
     public void onPause() {
         super.onPause();
         MusicLibrary.get(this).saveLibrary();
+        CleffApp.activityPaused();
 
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        mCleffApp.getPlaybackManager().initPlayback();
+        CleffApp.activityResumed();
+
+    }
 
     @Override
     protected void onDestroy() {
@@ -129,9 +137,9 @@ public class MainActivity extends ActionBarActivity implements
 
 
     @Override
-    public void OnListViewSongSelected(Song song) {
+    public void OnListViewSongSelected(Song song, int position) {
         mCleffApp.getPlaybackManager().initPlayback();
-        Timber.d("Playback initiated.");
+        Timber.d(Integer.toString(position));
         mCleffApp.getService().setSong(song);
         mCleffApp.getService().playSong();
     }

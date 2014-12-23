@@ -20,6 +20,7 @@ import com.freneticlabs.cleff.models.MusicLibrary;
 import com.freneticlabs.cleff.models.Song;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 import timber.log.Timber;
 
@@ -54,7 +55,14 @@ public class MusicService extends Service implements
     private Song mCurrentSong;
     private ArrayList<Song> mSongs;
     private CleffApp mCleffApp;
-    private boolean      isPlaying = false;
+
+    private boolean isPlaying = false;
+    private boolean mShuffle = false;
+    private boolean mRepeat = false;
+    private Random mRandom;
+
+    // Keep track of the current song position in the Array
+    private int mSongPosition;
 
     //PrepareServiceListener instance.
     private PrepareServiceListener mPrepareServiceListener;
@@ -107,24 +115,24 @@ public class MusicService extends Service implements
     public void onCreate() {
         // Create the service
         super.onCreate();
+        Timber.d("onCreate()");
+        mSongPosition = 0;
+        mRandom = new Random();
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
+        Timber.d("onDestroy()");
         if(mMediaPlayer != null) {
             mMediaPlayer.release();
         }
     }
 
-
-
     @Override
     public IBinder onBind(Intent intent) {
         return null;
     }
-
-
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
@@ -199,7 +207,7 @@ public class MusicService extends Service implements
      */
     public void playSong() {
         if (mMediaPlayer == null) initMediaPlayer();
-        Timber.d("Playing song " + mCurrentSong.getTitle());
+        Timber.d("Playing song: " + mCurrentSong.getTitle());
         // Set the URI
         Uri trackUri = ContentUris.withAppendedId(MediaStore.Audio.Media.
                 EXTERNAL_CONTENT_URI, mCurrentSong.getID());
@@ -229,7 +237,7 @@ public class MusicService extends Service implements
             isPlaying = false;
             if (mMediaPlayer != null) {
                 Timber.d("Stopping player.");
-//                mMediaPlayer.stop();
+                mMediaPlayer.stop();
                 mMediaPlayer.release();
                 mMediaPlayer = null;
             }
@@ -237,6 +245,22 @@ public class MusicService extends Service implements
         }
     }
 
+    // Skips to the next song
+    public void playNext(){
+        if(mShuffle) {
+            /*Song newSong = mCurrentSong;
+            while (newSong.getID() == mCurrentSong) {
+                newSong = mRandom.nextInt(mSongs.size());
+            }
+            mCurrentSong = newSong;
+        } else {
+            mSongPosition++;
+            if (mSongPosition >= mSongs.size()) {
+                mSongPosition = 0;
+            }*/
+        }
+        playSong();
+    }
     @Override
     public void onAudioFocusChange(int focusChange) {
         switch (focusChange) {
@@ -329,6 +353,10 @@ public class MusicService extends Service implements
     @Override
     public void onCompletion(MediaPlayer mediaPlayer) {
         Log.i(TAG, "Song completed.");
+
+        if(mMediaPlayer.getCurrentPosition() > 0) {
+
+        }
     }
 
 

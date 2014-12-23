@@ -5,8 +5,10 @@
       tools:context=".MainActivity">
 
     <item android:id="@+id/action_example"
-          android:title="@string/action_example"
-          app:showAsAction="withText|ifRoom"/>
+          android:title="@string/action_sort"
+          app:showAsAction="ifRoom"
+          android:icon="@drawable/ic_action_sort"/>
+
     <item android:id="@+id/action_settings"
           android:title="@string/action_settings"
           android:orderInCategory="100"

@@ -14,6 +14,8 @@ import com.freneticlabs.cleff.R;
 import com.freneticlabs.cleff.models.MusicLibrary;
 import com.freneticlabs.cleff.models.Song;
 
+import timber.log.Timber;
+
 
 /**
  * This Fragment manages a single background task to rebuild the
@@ -133,14 +135,19 @@ public class BuildLibraryTaskFragment extends Fragment {
                 /** These are the columns in the music cursor that we are interested in. */
                 int idColumn = musicCursor.getColumnIndex
                         (MediaStore.Audio.Media._ID);
-                int titleColumn = musicCursor.getColumnIndexOrThrow
-                        (MediaStore.Audio.Media.TITLE);
                 int artistColumn = musicCursor.getColumnIndexOrThrow
                         (MediaStore.Audio.Media.ARTIST);
                 int albumColumn = musicCursor.getColumnIndexOrThrow
                         (MediaStore.Audio.Media.ALBUM);
+
                 int albumIdColumn = musicCursor.getColumnIndexOrThrow
                         (MediaStore.Audio.Albums.ALBUM_ID);
+                int dateAddedColumn = musicCursor.getColumnIndexOrThrow
+                        (MediaStore.Audio.Media.DATE_ADDED);
+                int durationColumn = musicCursor.getColumnIndexOrThrow
+                        (MediaStore.Audio.Media.DURATION);
+                int titleColumn = musicCursor.getColumnIndexOrThrow
+                        (MediaStore.Audio.Media.TITLE);
                 int yearColumn = musicCursor.getColumnIndexOrThrow
                         (MediaStore.Audio.Media.YEAR);
 
@@ -181,7 +188,7 @@ public class BuildLibraryTaskFragment extends Fragment {
                     boolean unknownArtist = thisArtist == null || thisArtist.equals(MediaStore.UNKNOWN_STRING);
                     boolean unknownAlbum = thisAlbum == null || thisAlbum.equals(MediaStore.UNKNOWN_STRING);
                     boolean unknownTitle = thisTitle == null || thisTitle.equals(MediaStore.UNKNOWN_STRING);
-
+                    Timber.d(Long.toString(thisAlbumId));
 
                     if(unknownArtist) thisArtist = mUnknownArtist;
                     if(unknownAlbum) thisAlbum = mUnknownAlbum;

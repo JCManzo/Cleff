@@ -22,6 +22,8 @@ public class CleffApp extends Application {
     private MusicService mService;
     private PlaybackManager mPlaybackManager;
 
+    private boolean mIsServiceRunning = false;
+    private static boolean mIsActivityVisible = false;
 
     public CleffApp() {
         sCleffApp = this;
@@ -31,7 +33,7 @@ public class CleffApp extends Application {
         return sCleffApp;
     }
 
-    private boolean mIsServiceRunning = false;
+
 
     public void setService(MusicService service) {
         mService = service;
@@ -49,6 +51,17 @@ public class CleffApp extends Application {
         mIsServiceRunning = running;
     }
 
+    public static boolean isActivityVisible() {
+        return mIsActivityVisible;
+    }
+
+    public static void activityResumed() {
+        mIsActivityVisible = true;
+    }
+
+    public static void activityPaused() {
+        mIsActivityVisible = false;
+    }
     public PlaybackManager getPlaybackManager() {
         return mPlaybackManager;
     }
