@@ -17,4 +17,11 @@
     <!-- Default name of song title that doesn't have a name in the metadata -->
     <string name="unknown_title_name">Unknown album</string>
     <string name="building_library">Building Library…</string>
+
+    <!-- Sort menu -->
+    <string name="sort_songs_name">Name</string>
+    <string name="sort_songs_artist">Artist</string>
+    <string name="sort_songs_album">Album</string>
+    <string name="sort_songs_date_added">Date Added</string>
+    <string name="sort_songs_time">Time</string>
 </resources>

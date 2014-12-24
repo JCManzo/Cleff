@@ -14,6 +14,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import com.freneticlabs.cleff.fragments.BuildLibraryTaskFragment;
 import com.freneticlabs.cleff.fragments.NavigationDrawerFragment;
@@ -21,6 +22,8 @@ import com.freneticlabs.cleff.fragments.PageSlidingTabStripFragment;
 import com.freneticlabs.cleff.fragments.SongsFragment;
 import com.freneticlabs.cleff.models.MusicLibrary;
 import com.freneticlabs.cleff.models.Song;
+import com.getbase.floatingactionbutton.FloatingActionButton;
+import com.getbase.floatingactionbutton.FloatingActionsMenu;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
@@ -199,6 +202,7 @@ public class MainActivity extends ActionBarActivity implements
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             return true;
+        } else if (id == R.id.action_sort) {
         }
 
         return super.onOptionsItemSelected(item);

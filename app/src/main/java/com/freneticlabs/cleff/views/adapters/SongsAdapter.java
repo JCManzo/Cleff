@@ -10,13 +10,11 @@ import android.widget.TextView;
 
 import com.freneticlabs.cleff.R;
 import com.freneticlabs.cleff.models.Song;
-import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
-import de.hdodenhof.circleimageview.CircleImageView;
 
 /**
  * Created by jcmanzo on 12/14/14.
@@ -68,12 +66,12 @@ public class SongsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             viewHolderItem.setTitle(song.getTitle());
             viewHolderItem.setArtist(song.getArtist());
             // Populates the imageview with the corresponding drawable
-            Picasso.with(mContext)
+           /* Picasso.with(mContext)
                     .load(R.raw.adele)
                     .placeholder(android.R.color.transparent)
                     .resize(150, 150)
                     .centerInside()
-                    .into(viewHolderItem.albumImage);
+                    .into(viewHolderItem.albumImage);*/
             viewHolderItem.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -114,7 +112,7 @@ public class SongsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
 
         @InjectView(R.id.list_song_title) TextView title;
         @InjectView(R.id.list_song_artist) TextView artist;
-        @InjectView(R.id.list_song_image) CircleImageView albumImage;
+       // @InjectView(R.id.list_song_image) CircleImageView albumImage;
 
         public static ViewHolderItem newInstance(View view) {
             return new ViewHolderItem(view);
@@ -134,9 +132,10 @@ public class SongsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             artist.setText(text);
         }
 
-        public void setAlbumImage(int image) {
+        /*public void setAlbumImage(int image) {
             albumImage.setImageResource(image);
-        }
+        }*/
+
         public void setOnClickListener(View.OnClickListener listener) {
             parent.setOnClickListener(listener);
         }

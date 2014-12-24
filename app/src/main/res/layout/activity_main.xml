@@ -26,6 +26,7 @@
             <!-- As the main content view, the view below consumes the entire
              space available using match_parent in both dimensions. -->
 
+
             <FrameLayout
             android:id="@+id/container"
             android:layout_width="match_parent"
@@ -55,6 +56,9 @@
                         android:layout_gravity="center"/>
 
                 </LinearLayout>
+
+
+
 
             </FrameLayout>
 

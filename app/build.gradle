@@ -6,7 +6,7 @@ android {
 
     defaultConfig {
         applicationId "com.freneticlabs.cleff"
-        minSdkVersion 11
+        minSdkVersion 14
         targetSdkVersion 21
         versionCode 1
         versionName "1.0"
@@ -30,4 +30,6 @@ dependencies {
     compile 'com.squareup.picasso:picasso:2.4.0'
     compile 'de.hdodenhof:circleimageview:1.2.1'
     compile 'com.jpardogo.materialtabstrip:library:1.0.6'
+    compile 'com.getbase:floatingactionbutton:1.4.0'
+
 }

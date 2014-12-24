@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+    <com.getbase.floatingactionbutton.FloatingActionsMenu
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:fab="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/floating_player_actions"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:layout_marginRight="16dp"
+        fab:fab_expandDirection="left"
+        android:layout_gravity="right|bottom">
+
+        <com.getbase.floatingactionbutton.FloatingActionButton
+            android:id="@+id/action_play"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            fab:fab_icon="@drawable/ic_play_arrow"
+            fab:fab_title="Play"
+            fab:fab_colorNormal="@color/white"
+            />
+
+        <com.getbase.floatingactionbutton.FloatingActionButton
+            android:id="@+id/action_shuffle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            fab:fab_icon="@drawable/ic_shuffle"
+            fab:fab_title="Play"
+            fab:fab_colorNormal="@color/white"
+            />
+
+        <com.getbase.floatingactionbutton.FloatingActionButton
+            android:id="@+id/action_repeat"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            fab:fab_icon="@drawable/ic_repeat"
+            fab:fab_title="Repeat"
+            fab:fab_colorNormal="@color/white"
+            />
+
+    </com.getbase.floatingactionbutton.FloatingActionsMenu>

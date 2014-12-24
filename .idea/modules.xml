@@ -4,6 +4,7 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/Cleff.iml" filepath="$PROJECT_DIR$/Cleff.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/floatingactionbutton/floatingactionbutton.iml" filepath="$PROJECT_DIR$/floatingactionbutton/floatingactionbutton.iml" />
     </modules>
   </component>
 </project>

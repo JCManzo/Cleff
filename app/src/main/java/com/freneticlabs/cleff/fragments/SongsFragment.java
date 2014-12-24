@@ -15,19 +15,20 @@ import com.freneticlabs.cleff.SongListDivider;
 import com.freneticlabs.cleff.models.MusicLibrary;
 import com.freneticlabs.cleff.models.Song;
 import com.freneticlabs.cleff.views.adapters.SongsAdapter;
+import com.getbase.floatingactionbutton.FloatingActionButton;
+import com.getbase.floatingactionbutton.FloatingActionsMenu;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
+import timber.log.Timber;
 
 public class SongsFragment extends Fragment implements
-        SongsAdapter.ItemClickListener {
+        SongsAdapter.ItemClickListener{
 
     @InjectView(R.id.recycler_view_songs) RecyclerView mRecyclerView;
-
+    @InjectView(R.id.action_repeat) FloatingActionButton mFloatingRepeatButton;
     private static final String TAG = SongsFragment.class.getSimpleName();
     OnListViewSongListener mCallback;
-
-
 
     public SongsFragment() {
         // Required empty public constructor
@@ -69,14 +70,25 @@ public class SongsFragment extends Fragment implements
         mRecyclerView.setAdapter(songAdapter);
 
 
+        FloatingActionsMenu floatingActionsMenu = (FloatingActionsMenu)rootView.findViewById(R.id.floating_player_actions);
+
+
+        mFloatingRepeatButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Timber.d("CLICKED BUTTON");
+            }
+        });
         return rootView;
     }
+
 
     @Override
     public void itemClicked(Song song, int position) {
         mCallback.OnListViewSongSelected(song, position);
-
     }
+
+
 
     @Override
     public void onAttach(Activity activity) {

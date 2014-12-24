@@ -26,7 +26,7 @@ public class SongListDivider extends RecyclerView.ItemDecoration {
     @Override
     public void onDrawOver(Canvas c, RecyclerView parent) {
 
-        int left = parent.getPaddingLeft() + 200;
+        int left = parent.getPaddingLeft();
         int right = parent.getWidth() - parent.getPaddingRight();
 
 
