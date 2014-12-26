@@ -6,9 +6,11 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.freneticlabs.cleff.R;
+import com.freneticlabs.cleff.models.MusicLibrary;
 import com.freneticlabs.cleff.models.Song;
 
 import java.util.ArrayList;
@@ -21,21 +23,25 @@ import butterknife.InjectView;
  */
 public class SongsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private ArrayList<Song> mSongList;
-    private ItemClickListener mItemClickListener;
     private final Context mContext;
-
+    private SongsListHeaderListener mSongsListHeaderListener;
     private static final int TYPE_HEADER = 0;
     private static final int TYPE_ITEM = 1;
 
 
-    public SongsAdapter(ArrayList<Song> songList, Context context, @NonNull ItemClickListener itemClickListener) {
-        mSongList = songList;
+    public SongsAdapter(Context context, @NonNull SongsListHeaderListener songsListHeaderListener) {
         mContext = context;
-        mItemClickListener = itemClickListener;
+        mSongsListHeaderListener = songsListHeaderListener;
+        mSongList = MusicLibrary.get(mContext).getSongs();
     }
 
-    public interface ItemClickListener {
-        public void itemClicked(Song song, int position);
+    /**
+     * Communicates to parent fragment when the repeat/shuffle
+     * are clicked
+     */
+    public interface SongsListHeaderListener {
+        public void repeatClicked();
+        public void shuffleClicked();
     }
 
 
@@ -51,6 +57,23 @@ public class SongsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         } else if (viewType == TYPE_HEADER) {
             //inflate your layout and pass it to view holder
             View parent = LayoutInflater.from(context).inflate(R.layout.songs_list_header, viewGroup, false);
+            ImageButton shuffleButton = (ImageButton)parent.findViewById(R.id.shuffle_button);
+            ImageButton repeatButton = (ImageButton)parent.findViewById(R.id.repeat_button);
+
+            shuffleButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    mSongsListHeaderListener.shuffleClicked();
+
+                }
+            });
+
+            repeatButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    mSongsListHeaderListener.repeatClicked();
+                }
+            });
             return ViewHolderHeader.newInstance(parent);
         }
 
@@ -72,17 +95,10 @@ public class SongsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                     .resize(150, 150)
                     .centerInside()
                     .into(viewHolderItem.albumImage);*/
-            viewHolderItem.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    mItemClickListener.itemClicked(song, position);
-                }
-            });
+
         } else if(viewHolder instanceof ViewHolderHeader) {
             ViewHolderHeader viewHolderHeader = (ViewHolderHeader) viewHolder;
-
         }
-
     }
 
     @Override
@@ -136,18 +152,22 @@ public class SongsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             albumImage.setImageResource(image);
         }*/
 
-        public void setOnClickListener(View.OnClickListener listener) {
-            parent.setOnClickListener(listener);
-        }
     }
 
     public static final class ViewHolderHeader extends RecyclerView.ViewHolder {
+        private final View parent;
+
         public ViewHolderHeader(View itemView) {
             super(itemView);
+            parent = itemView;
         }
 
         public static ViewHolderHeader newInstance(View view) {
             return new ViewHolderHeader(view);
+        }
+
+        public void setOnClickListener(View.OnClickListener listener) {
+            parent.setOnClickListener(listener);
         }
     }
 }

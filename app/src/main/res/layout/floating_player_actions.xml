@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-
     <com.getbase.floatingactionbutton.FloatingActionsMenu
         xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:fab="http://schemas.android.com/apk/res-auto"
@@ -12,30 +11,32 @@
         android:layout_gravity="right|bottom">
 
         <com.getbase.floatingactionbutton.FloatingActionButton
+            android:id="@+id/action_skip_previous"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            fab:fab_icon="@drawable/ic_skip_previous"
+            fab:fab_size="normal"
+            fab:fab_title="Skip Previous"
+            fab:fab_colorNormal="@color/white"
+            />
+
+        <com.getbase.floatingactionbutton.FloatingActionButton
             android:id="@+id/action_play"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             fab:fab_icon="@drawable/ic_play_arrow"
+            fab:fab_size="normal"
             fab:fab_title="Play"
             fab:fab_colorNormal="@color/white"
             />
 
         <com.getbase.floatingactionbutton.FloatingActionButton
-            android:id="@+id/action_shuffle"
+            android:id="@+id/action_skip_next"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            fab:fab_icon="@drawable/ic_shuffle"
-            fab:fab_title="Play"
+            fab:fab_icon="@drawable/ic_skip_next"
+            fab:fab_title="Skip Next"
+            fab:fab_size="normal"
             fab:fab_colorNormal="@color/white"
             />
-
-        <com.getbase.floatingactionbutton.FloatingActionButton
-            android:id="@+id/action_repeat"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            fab:fab_icon="@drawable/ic_repeat"
-            fab:fab_title="Repeat"
-            fab:fab_colorNormal="@color/white"
-            />
-
     </com.getbase.floatingactionbutton.FloatingActionsMenu>

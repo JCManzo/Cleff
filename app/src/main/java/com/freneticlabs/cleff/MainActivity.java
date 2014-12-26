@@ -14,16 +14,11 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
-import android.widget.Toast;
 
 import com.freneticlabs.cleff.fragments.BuildLibraryTaskFragment;
 import com.freneticlabs.cleff.fragments.NavigationDrawerFragment;
 import com.freneticlabs.cleff.fragments.PageSlidingTabStripFragment;
-import com.freneticlabs.cleff.fragments.SongsFragment;
 import com.freneticlabs.cleff.models.MusicLibrary;
-import com.freneticlabs.cleff.models.Song;
-import com.getbase.floatingactionbutton.FloatingActionButton;
-import com.getbase.floatingactionbutton.FloatingActionsMenu;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
@@ -32,8 +27,7 @@ import timber.log.Timber;
 
 public class MainActivity extends ActionBarActivity implements
         NavigationDrawerFragment.NavigationDrawerCallbacks,
-        BuildLibraryTaskFragment.BuildLibraryTaskCallbacks,
-        SongsFragment.OnListViewSongListener{
+        BuildLibraryTaskFragment.BuildLibraryTaskCallbacks {
 
     private static final String TAG_TASK_FRAGMENT = "build_library_task_fragment";
     public static final String PREFS_NAME = "ListnPrefsFile";
@@ -137,16 +131,6 @@ public class MainActivity extends ActionBarActivity implements
         super.onDestroy();
 
     }
-
-
-    @Override
-    public void OnListViewSongSelected(Song song, int position) {
-        mCleffApp.getPlaybackManager().initPlayback();
-        Timber.d(Integer.toString(position));
-        mCleffApp.getService().setSong(song);
-        mCleffApp.getService().playSong();
-    }
-
 
     @Override
     public void onNavigationDrawerItemSelected(int position) {

@@ -1,16 +1,19 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
              xmlns:tools="http://schemas.android.com/tools"
+             xmlns:app="http://schemas.android.com/apk/res-auto"
              android:layout_width="match_parent"
              android:layout_height="match_parent"
              android:tag="All Songs FragMent"
              tools:context="com.freneticlabs.cleff.fragments.SongsFragment">
 
-    <android.support.v7.widget.RecyclerView
+    <org.lucasr.twowayview.widget.TwoWayView
 
         android:id="@+id/recycler_view_songs"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:scrollbars="vertical" />
+        style="@style/TwoWayView"
+        app:twowayview_layoutManager="ListLayoutManager"
+        />
 
     <include layout="@layout/floating_player_actions" />
 

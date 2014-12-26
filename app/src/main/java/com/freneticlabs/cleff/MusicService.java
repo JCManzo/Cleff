@@ -13,7 +13,6 @@ import android.os.IBinder;
 import android.os.PowerManager;
 import android.provider.MediaStore;
 import android.support.v4.app.NotificationCompat;
-import android.util.Log;
 import android.widget.RemoteViews;
 
 import com.freneticlabs.cleff.models.MusicLibrary;
@@ -48,11 +47,7 @@ public class MusicService extends Service implements
     private NotificationCompat.Builder mNotificationBuilder;
     public static final int mNotificationId = 1080;
 
-    private static final String TAG = MusicService.class.getSimpleName();
-    private static final String ACTION_PLAY = "com.cleff.action.PLAY";
 
-    // Keep track of the current song position in the Array
-    private Song mCurrentSong;
     private ArrayList<Song> mSongs;
     private CleffApp mCleffApp;
 
@@ -62,7 +57,9 @@ public class MusicService extends Service implements
     private Random mRandom;
 
     // Keep track of the current song position in the Array
-    private int mSongPosition;
+    private int mCurrentSongPosition;
+
+    private int mPreviousSongPosition;
 
     //PrepareServiceListener instance.
     private PrepareServiceListener mPrepareServiceListener;
@@ -116,7 +113,6 @@ public class MusicService extends Service implements
         // Create the service
         super.onCreate();
         Timber.d("onCreate()");
-        mSongPosition = 0;
         mRandom = new Random();
     }
 
@@ -140,7 +136,7 @@ public class MusicService extends Service implements
         Timber.d("onStartCommand()");
 
         mContext = getApplicationContext();
-
+        mCurrentSongPosition = 0;
         mService = this;
         mSongs = MusicLibrary.get(getApplicationContext()).getSongs();
 
@@ -192,13 +188,13 @@ public class MusicService extends Service implements
             mMediaPlayer.setWakeMode(mContext, PowerManager.PARTIAL_WAKE_LOCK);
 
         } catch (Exception e) {
-            Log.e(TAG, "Error setting wake mode in initMusicPLayer()");
+            Timber.e("Error setting wake mode in initMusicPLayer()");
             mMediaPlayer = new MediaPlayer();
         }
     }
 
-    public void setSong(Song song){
-        mCurrentSong = song;
+    public void setSong(int songPosition){
+        mCurrentSongPosition = songPosition;
     }
 
 
@@ -207,10 +203,12 @@ public class MusicService extends Service implements
      */
     public void playSong() {
         if (mMediaPlayer == null) initMediaPlayer();
-        Timber.d("Playing song: " + mCurrentSong.getTitle());
-        // Set the URI
+
+        Song currentSong = mSongs.get(mCurrentSongPosition);
+        Timber.d("Playing song: " + currentSong.getTitle());
+
         Uri trackUri = ContentUris.withAppendedId(MediaStore.Audio.Media.
-                EXTERNAL_CONTENT_URI, mCurrentSong.getID());
+                EXTERNAL_CONTENT_URI, currentSong.getID());
 
         try {
             mMediaPlayer.reset();
@@ -222,7 +220,7 @@ public class MusicService extends Service implements
             isPlaying = true;
 
         } catch (Exception e) {
-            Log.e(TAG, "Error setting the data source", e);
+            Timber.d("Error setting the data source", e);
         }
 
        // publishResults(playSong, UPDATE_PLAYING);
@@ -245,22 +243,87 @@ public class MusicService extends Service implements
         }
     }
 
-    // Skips to the next song
+    /**
+     * Plays the next song in the MusicLibrary list.
+     * If mShuffle is true, a random song is played.
+     */
     public void playNext(){
         if(mShuffle) {
-            /*Song newSong = mCurrentSong;
-            while (newSong.getID() == mCurrentSong) {
+            int newSong = mCurrentSongPosition;
+            while (newSong == mCurrentSongPosition) {
                 newSong = mRandom.nextInt(mSongs.size());
             }
-            mCurrentSong = newSong;
+            mCurrentSongPosition = newSong;
         } else {
-            mSongPosition++;
-            if (mSongPosition >= mSongs.size()) {
-                mSongPosition = 0;
-            }*/
+            mCurrentSongPosition++;
+            if (mCurrentSongPosition >= mSongs.size()) {
+                mCurrentSongPosition = 0;
+            }
         }
-        playSong();
+
+        if(isPlaying) {
+            playSong();
+        }
     }
+
+    /**
+     *
+     */
+    public void playPrevious() {
+        mCurrentSongPosition--;
+        if(mCurrentSongPosition < 0) {
+            mCurrentSongPosition = mSongs.size() - 1;
+        }
+
+        if(isPlaying) {
+            playSong();
+        }
+    }
+    /**
+     * Builds and updates the notification.
+     * @return Notification
+     */
+    public Notification updateNotification() {
+        mNotificationBuilder = new NotificationCompat.Builder(mContext);
+        mNotificationBuilder.setOngoing(true);
+        mNotificationBuilder.setAutoCancel(false);
+        mNotificationBuilder.setSmallIcon(R.drawable.ic_launcher);
+
+        Song currentSong = mSongs.get(mCurrentSongPosition);
+        //Grab the notification layouts.
+        RemoteViews notificationView = new RemoteViews(mContext.getPackageName(), R.layout.notification_custom_layout);
+
+        // Set up the notification
+        Intent intent = new Intent(this, MainActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        sendBroadcast(intent);
+
+        Intent stopServiceIntent = new Intent();
+        stopServiceIntent.setAction(MusicService.STOP_SERVICE);
+        PendingIntent stopServicePendingIntent = PendingIntent.getBroadcast(mContext.getApplicationContext(), 0, stopServiceIntent, 0);
+
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent,
+                PendingIntent.FLAG_UPDATE_CURRENT);
+
+        notificationView.setOnClickPendingIntent(R.id.notification_base, stopServicePendingIntent);
+
+        Notification notification = new NotificationCompat.Builder(getApplicationContext())
+                .setTicker(currentSong.getTitle())
+                .setOngoing(true)
+                .setContentTitle("Playing:")
+                .setContent(notificationView)
+                .setContentText(currentSong.getTitle())
+                .setSmallIcon(R.drawable.ic_launcher)
+                .setContentIntent(pendingIntent)
+                .build();
+
+        notification.flags = Notification.FLAG_FOREGROUND_SERVICE |
+                Notification.FLAG_NO_CLEAR |
+                Notification.FLAG_ONGOING_EVENT;
+
+        return notification;
+    }
+
     @Override
     public void onAudioFocusChange(int focusChange) {
         switch (focusChange) {
@@ -301,63 +364,17 @@ public class MusicService extends Service implements
         startForeground(NOTIFICATION_ID, notification);
     }
 
-    /**
-     * Builds and updates the notification.
-     * @return Notification
-     */
-    public Notification updateNotification() {
-        mNotificationBuilder = new NotificationCompat.Builder(mContext);
-        mNotificationBuilder.setOngoing(true);
-        mNotificationBuilder.setAutoCancel(false);
-        mNotificationBuilder.setSmallIcon(R.drawable.ic_launcher);
-
-        //Grab the notification layouts.
-        RemoteViews notificationView = new RemoteViews(mContext.getPackageName(), R.layout.notification_custom_layout);
-
-        // Set up the notification
-        Intent intent = new Intent(this, MainActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-        sendBroadcast(intent);
-
-        Intent stopServiceIntent = new Intent();
-        stopServiceIntent.setAction(MusicService.STOP_SERVICE);
-        PendingIntent stopServicePendingIntent = PendingIntent.getBroadcast(mContext.getApplicationContext(), 0, stopServiceIntent, 0);
-
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent,
-                PendingIntent.FLAG_UPDATE_CURRENT);
-
-        notificationView.setOnClickPendingIntent(R.id.notification_base, stopServicePendingIntent);
-
-        Notification notification = new NotificationCompat.Builder(getApplicationContext())
-                .setTicker(mCurrentSong.getTitle())
-                .setOngoing(true)
-                .setContentTitle("Playing:")
-                .setContent(notificationView)
-                .setContentText(mCurrentSong.getTitle())
-                .setSmallIcon(R.drawable.ic_launcher)
-                .setContentIntent(pendingIntent)
-                .build();
-
-        notification.flags = Notification.FLAG_FOREGROUND_SERVICE |
-                Notification.FLAG_NO_CLEAR |
-                Notification.FLAG_ONGOING_EVENT;
-
-        return notification;
-    }
     @Override
     public boolean onError(MediaPlayer mediaPlayer, int i, int i2) {
-        Log.i(TAG, "ERROR in onError()");
+        Timber.e("ERROR in onError()");
         return false;
     }
 
     @Override
     public void onCompletion(MediaPlayer mediaPlayer) {
-        Log.i(TAG, "Song completed.");
-
+        Timber.d("Song completed.");
         if(mMediaPlayer.getCurrentPosition() > 0) {
-
+            playNext();
         }
     }
-
-
 }
