@@ -22,7 +22,7 @@
             android:id="@+id/list_song_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textColor="@color/black"
+            android:textColor="@color/text_primary"
             android:textSize="20sp"
             android:textStyle="bold" />
 
@@ -30,7 +30,7 @@
             android:id="@+id/list_song_artist"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textColor="@color/grey"
+            android:textColor="@color/text_secondary"
             android:textSize="18sp" />
     </LinearLayout>
 </LinearLayout>

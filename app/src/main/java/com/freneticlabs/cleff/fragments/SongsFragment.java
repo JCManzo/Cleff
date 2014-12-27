@@ -84,6 +84,7 @@ public class SongsFragment extends Fragment implements
                     mCleffApp.getPlaybackManager().initPlayback();
                     mCleffApp.getService().setSong((position - 1));
                     mCleffApp.getService().playSong();
+                    updatePlayerActionsUi();
                 }
             }
         });
@@ -102,7 +103,6 @@ public class SongsFragment extends Fragment implements
 
             }
         });
-
         initListeners();
         return rootView;
     }
@@ -142,10 +142,10 @@ public class SongsFragment extends Fragment implements
     public void updatePlayerActionsUi() {
         if(mCleffApp.getService().isPlaying().equals(MusicService.PlayerState.PLAYING)) {
             Timber.d("PLAYER UI CHANGED TO PLAY");
-            mFloatingPlayButton.setIcon(R.drawable.ic_pause);
+            mFloatingPlayButton.setIcon(R.drawable.ic_orange_pause);
         } else {
             Timber.d("PLAYER UI CHANGED TO PAUSED");
-            mFloatingPlayButton.setIcon(R.drawable.ic_play_arrow);
+            mFloatingPlayButton.setIcon(R.drawable.ic_orange_play_arrow);
         }
     }
 

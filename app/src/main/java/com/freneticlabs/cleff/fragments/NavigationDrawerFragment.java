@@ -127,7 +127,7 @@ public class NavigationDrawerFragment extends Fragment {
 
         // set a custom shadow that overlays the main content when the drawer opens
         //mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.START);
-        mDrawerLayout.setStatusBarBackgroundColor(getResources().getColor(R.color.colorPrimary));
+        mDrawerLayout.setStatusBarBackgroundColor(getResources().getColor(R.color.primary));
         // set up the drawer's list view with items and click listener
 
         ActionBar actionBar = getActionBar();
