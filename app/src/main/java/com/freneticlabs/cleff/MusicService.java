@@ -290,6 +290,26 @@ public class MusicService extends Service implements
             }
         }
 
+        togglePlayer();
+    }
+
+    /**
+     * Plays the previous song in the MusicLibrary list.
+     */
+    public void playPrevious() {
+        mCurrentSongPosition--;
+        if(mCurrentSongPosition < 0) {
+            mCurrentSongPosition = mSongs.size() - 1;
+        }
+
+        togglePlayer();
+    }
+
+    /**
+     * Play and pause button is one entity. Toggle back and forth
+     * depending on the player state.
+     */
+    public void togglePlayer() {
         if(mPlayerSate.equals(PlayerState.PLAYING)) {
             playSong();
         } else {
@@ -299,23 +319,8 @@ public class MusicService extends Service implements
     }
 
     /**
-     * Plays the previous song in the MusicLibrary list.
-     *
+     * Pauses the player if it is in a playing state.
      */
-    public void playPrevious() {
-        mCurrentSongPosition--;
-        if(mCurrentSongPosition < 0) {
-            mCurrentSongPosition = mSongs.size() - 1;
-        }
-
-        if(mPlayerSate.equals(PlayerState.PLAYING)) {
-            playSong();
-        } else {
-           mMediaPlayer.reset();
-            mPlayerSate = PlayerState.IDLE;
-        }
-    }
-
     public void pausePlayer() {
         if(mPlayerSate.equals(PlayerState.PLAYING)) {
             mMediaPlayer.pause();
@@ -323,10 +328,14 @@ public class MusicService extends Service implements
         }
     }
 
+    /**
+     * Resumes the player if was previously paused.
+     */
     public void resumePlayer() {
         mMediaPlayer.start();
         mPlayerSate = PlayerState.PLAYING;
     }
+
     /**
      * Builds and updates the notification.
      * @return Notification
@@ -374,7 +383,7 @@ public class MusicService extends Service implements
 
     @Override
     public void onAudioFocusChange(int focusChange) {
-        switch (focusChange) {
+        /*switch (focusChange) {
             case AudioManager.AUDIOFOCUS_GAIN:
                 // resume playback
                 if (mMediaPlayer == null) initMediaPlayer();
@@ -384,9 +393,9 @@ public class MusicService extends Service implements
 
             case AudioManager.AUDIOFOCUS_LOSS:
                 // Lost focus for an unbounded amount of time: stop playback and release media player
-               /* if (mMediaPlayer.mmIsPlaying()) mMediaPlayer.stop();
+               *//* if (mMediaPlayer.mmIsPlaying()) mMediaPlayer.stop();
                 mMediaPlayer.release();
-                mMediaPlayer = null;*/
+                mMediaPlayer = null;*//*
                 break;
 
             case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT:
@@ -401,7 +410,7 @@ public class MusicService extends Service implements
                 // at an attenuated level
                 if (mMediaPlayer.isPlaying()) mMediaPlayer.setVolume(0.1f, 0.1f);
                 break;
-        }
+        }*/
     }
 
     @Override

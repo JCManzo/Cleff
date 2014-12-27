@@ -20,13 +20,13 @@ android {
 
     repositories {
         maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
+
     }
 }
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile project(':libraries:floatingactionbutton')
-
     compile 'com.android.support:appcompat-v7:21.0.3'
     compile 'com.android.support:support-v4:21.0.3'
     compile 'com.android.support:recyclerview-v7:21.0.0'
@@ -39,5 +39,6 @@ dependencies {
     compile 'com.squareup.picasso:picasso:2.4.0'
     compile 'de.hdodenhof:circleimageview:1.2.1'
     compile 'com.jpardogo.materialtabstrip:library:1.0.6'
+
 
 }

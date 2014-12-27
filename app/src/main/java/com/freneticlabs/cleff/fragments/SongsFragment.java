@@ -117,22 +117,8 @@ public class SongsFragment extends Fragment implements
         mFloatingPlayButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+            updatePlayer();
 
-                if(mCleffApp.getService().isPlaying().equals(MusicService.PlayerState.PLAYING)) {
-                    mCleffApp.getService().pausePlayer();
-                    Timber.d("PLAYER IS NOW PAUSED");
-                    mFloatingPlayButton.setIcon(R.drawable.ic_play_arrow);
-                } else {
-                    if(mCleffApp.getService().isPaused().equals(MusicService.PlayerState.PAUSED)) {
-                        mCleffApp.getService().resumePlayer();
-                        Timber.d("RESUMING PLAYER");
-                    } else {
-                        mCleffApp.getPlaybackManager().initPlayback();
-                        Timber.d("PLAYER IS NOW PLAYING");
-                        mCleffApp.getService().playSong();
-                    }
-                    mFloatingPlayButton.setIcon(R.drawable.ic_pause);
-                }
             }
         });
 
@@ -153,6 +139,33 @@ public class SongsFragment extends Fragment implements
         });
     }
 
+    public void updatePlayerActionsUi() {
+        if(mCleffApp.getService().isPlaying().equals(MusicService.PlayerState.PLAYING)) {
+            Timber.d("PLAYER UI CHANGED TO PLAY");
+            mFloatingPlayButton.setIcon(R.drawable.ic_pause);
+        } else {
+            Timber.d("PLAYER UI CHANGED TO PAUSED");
+            mFloatingPlayButton.setIcon(R.drawable.ic_play_arrow);
+        }
+    }
+
+    public void updatePlayer (){
+        if(mCleffApp.getService().isPlaying().equals(MusicService.PlayerState.PLAYING)) {
+            mCleffApp.getService().pausePlayer();
+            Timber.d("PLAYER IS NOW PAUSED");
+        } else {
+            if(mCleffApp.getService().isPaused().equals(MusicService.PlayerState.PAUSED)) {
+                mCleffApp.getService().resumePlayer();
+                Timber.d("RESUMING PLAYER");
+            } else {
+                mCleffApp.getPlaybackManager().initPlayback();
+                Timber.d("PLAYER IS NOW PLAYING");
+                mCleffApp.getService().playSong();
+            }
+        }
+
+        updatePlayerActionsUi();
+    }
     @Override
     public void repeatClicked() {
         if(mCleffApp.getService().isRepeat()) {
