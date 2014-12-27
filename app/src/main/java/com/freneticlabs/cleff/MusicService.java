@@ -259,7 +259,7 @@ public class MusicService extends Service implements
      *
      */
     public void stopPlayer() {
-        if (mPlayerSate.equals(PlayerState.PLAYING)) {
+        if (mPlayerSate.equals(PlayerState.PLAYING) || mPlayerSate.equals(PlayerState.PAUSED)) {
             //mIsPlaying = false;
             mPlayerSate = PlayerState.IDLE;
             if (mMediaPlayer != null) {
