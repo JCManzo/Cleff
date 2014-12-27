@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.freneticlabs.cleff.CleffApp;
+import com.freneticlabs.cleff.MusicService;
 import com.freneticlabs.cleff.R;
 import com.freneticlabs.cleff.SongListDivider;
 import com.freneticlabs.cleff.views.adapters.SongsAdapter;
@@ -117,17 +118,20 @@ public class SongsFragment extends Fragment implements
             @Override
             public void onClick(View view) {
 
-                if(mCleffApp.getService().isPlaying()) {
+                if(mCleffApp.getService().isPlaying().equals(MusicService.PlayerState.PLAYING)) {
                     mCleffApp.getService().pausePlayer();
                     Timber.d("PLAYER IS NOW PAUSED");
                     mFloatingPlayButton.setIcon(R.drawable.ic_play_arrow);
                 } else {
-                    if(!mCleffApp.getService().isPaused()) {
+                    if(mCleffApp.getService().isPaused().equals(MusicService.PlayerState.PAUSED)) {
+                        mCleffApp.getService().resumePlayer();
+                        Timber.d("RESUMING PLAYER");
+                    } else {
                         mCleffApp.getPlaybackManager().initPlayback();
+                        Timber.d("PLAYER IS NOW PLAYING");
+                        mCleffApp.getService().playSong();
                     }
-                    Timber.d("PLAYER IS NOW PLAYING");
                     mFloatingPlayButton.setIcon(R.drawable.ic_pause);
-                    mCleffApp.getService().playSong();
                 }
             }
         });
@@ -151,17 +155,35 @@ public class SongsFragment extends Fragment implements
 
     @Override
     public void repeatClicked() {
-        SnackbarManager.show(
-                Snackbar.with(getActivity())
-                        .text("Repeat on")
-                        .attachToRecyclerView(mRecyclerView));
+        if(mCleffApp.getService().isRepeat()) {
+            SnackbarManager.show(
+                    Snackbar.with(getActivity())
+                            .text("Repeat off")
+                            .attachToRecyclerView(mRecyclerView));
+        } else {
+            SnackbarManager.show(
+                    Snackbar.with(getActivity())
+                            .text("Repeat on")
+                            .attachToRecyclerView(mRecyclerView));
+        }
+
+        mCleffApp.getService().setRepeat();
     }
 
     @Override
     public void shuffleClicked() {
-        SnackbarManager.show(
-                Snackbar.with(getActivity())
-                        .text("Shuffle on")
-                        .attachToRecyclerView(mRecyclerView));
+        if(mCleffApp.getService().isShuffle()) {
+            SnackbarManager.show(
+                    Snackbar.with(getActivity())
+                            .text("Shuffle off")
+                            .attachToRecyclerView(mRecyclerView));
+        } else {
+            SnackbarManager.show(
+                    Snackbar.with(getActivity())
+                            .text("Shuffle on")
+                            .attachToRecyclerView(mRecyclerView));
+        }
+
+        mCleffApp.getService().setShuffle();
     }
 }

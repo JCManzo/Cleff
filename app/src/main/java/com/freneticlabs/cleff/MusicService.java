@@ -51,8 +51,12 @@ public class MusicService extends Service implements
     private ArrayList<Song> mSongs;
     private CleffApp mCleffApp;
 
-    private boolean mIsPlaying = false;
-    private boolean mIsPaused = false;
+    public   enum PlayerState {
+        IDLE, PAUSED, PLAYING
+    }
+
+    PlayerState mPlayerSate = PlayerState.IDLE;
+
     private boolean mShuffle = false;
     private boolean mRepeat = false;
     private Random mRandom;
@@ -198,12 +202,29 @@ public class MusicService extends Service implements
         mCurrentSongPosition = songPosition;
     }
 
-    public boolean isPlaying() {
-        return mIsPlaying;
+    public void setShuffle() {
+        if(mShuffle) mShuffle=false;
+        else mShuffle=true;
     }
 
-    public boolean isPaused() {
-        return mIsPaused;
+    public boolean isShuffle() {
+        return mShuffle;
+    }
+    public void setRepeat() {
+        if(mRepeat) mRepeat=false;
+        else mRepeat=true;
+    }
+
+    public boolean isRepeat() {
+        return mRepeat;
+    }
+
+    public PlayerState isPlaying() {
+        return mPlayerSate;
+    }
+
+    public PlayerState isPaused() {
+        return mPlayerSate;
     }
     /**
      * Play song that was set by setSong()
@@ -224,8 +245,7 @@ public class MusicService extends Service implements
             mMediaPlayer.setOnErrorListener(this);
             mMediaPlayer.setOnCompletionListener(this);
             mMediaPlayer.prepareAsync();
-            mIsPlaying = true;
-            mIsPaused = false;
+            mPlayerSate = PlayerState.PLAYING;
 
         } catch (Exception e) {
             Timber.d("Error setting the data source", e);
@@ -239,8 +259,9 @@ public class MusicService extends Service implements
      *
      */
     public void stopPlayer() {
-        if (mIsPlaying) {
-            mIsPlaying = false;
+        if (mPlayerSate.equals(PlayerState.PLAYING)) {
+            //mIsPlaying = false;
+            mPlayerSate = PlayerState.IDLE;
             if (mMediaPlayer != null) {
                 Timber.d("Stopping player.");
                 mMediaPlayer.stop();
@@ -269,8 +290,11 @@ public class MusicService extends Service implements
             }
         }
 
-        if(mIsPlaying) {
+        if(mPlayerSate.equals(PlayerState.PLAYING)) {
             playSong();
+        } else {
+            mMediaPlayer.reset();
+            mPlayerSate = PlayerState.IDLE;
         }
     }
 
@@ -284,17 +308,24 @@ public class MusicService extends Service implements
             mCurrentSongPosition = mSongs.size() - 1;
         }
 
-        if(mIsPlaying) {
+        if(mPlayerSate.equals(PlayerState.PLAYING)) {
             playSong();
+        } else {
+           mMediaPlayer.reset();
+            mPlayerSate = PlayerState.IDLE;
         }
     }
 
     public void pausePlayer() {
-        if(mIsPlaying) {
+        if(mPlayerSate.equals(PlayerState.PLAYING)) {
             mMediaPlayer.pause();
-            mIsPaused = true;
-            mIsPlaying = false;
+            mPlayerSate = PlayerState.PAUSED;
         }
+    }
+
+    public void resumePlayer() {
+        mMediaPlayer.start();
+        mPlayerSate = PlayerState.PLAYING;
     }
     /**
      * Builds and updates the notification.
@@ -391,7 +422,11 @@ public class MusicService extends Service implements
     public void onCompletion(MediaPlayer mediaPlayer) {
         Timber.d("Song completed.");
         if(mediaPlayer.getCurrentPosition() > 0) {
-            playNext();
+            if(mRepeat) {
+             playSong();
+            } else {
+                playNext();
+            }
         }
     }
 }
