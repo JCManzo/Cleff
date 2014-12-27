@@ -75,8 +75,8 @@ public class SongsFragment extends Fragment implements
             @Override
             public void onItemClick(RecyclerView parent, View child, int position, long id) {
                 Timber.d("Item clicked: " + position);
-                if(mCleffApp.isServiceRunning() == false) {
-                    Timber.d("NOT RUNNING YO");
+                if(!mCleffApp.isServiceRunning()) {
+                    Timber.d("SERVICE NOT RUNNING YO");
                 }
 
                 if(position > 0) {
@@ -112,11 +112,23 @@ public class SongsFragment extends Fragment implements
     }
 
     private void initListeners() {
+
         mFloatingPlayButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Timber.d("CLICKED PLAY");
-                mCleffApp.getService().playSong();
+
+                if(mCleffApp.getService().isPlaying()) {
+                    mCleffApp.getService().pausePlayer();
+                    Timber.d("PLAYER IS NOW PAUSED");
+                    mFloatingPlayButton.setIcon(R.drawable.ic_play_arrow);
+                } else {
+                    if(!mCleffApp.getService().isPaused()) {
+                        mCleffApp.getPlaybackManager().initPlayback();
+                    }
+                    Timber.d("PLAYER IS NOW PLAYING");
+                    mFloatingPlayButton.setIcon(R.drawable.ic_pause);
+                    mCleffApp.getService().playSong();
+                }
             }
         });
 
@@ -141,13 +153,15 @@ public class SongsFragment extends Fragment implements
     public void repeatClicked() {
         SnackbarManager.show(
                 Snackbar.with(getActivity())
-                        .text("Repeat on"));
+                        .text("Repeat on")
+                        .attachToRecyclerView(mRecyclerView));
     }
 
     @Override
     public void shuffleClicked() {
         SnackbarManager.show(
                 Snackbar.with(getActivity())
-                        .text("Shuffle on"));
+                        .text("Shuffle on")
+                        .attachToRecyclerView(mRecyclerView));
     }
 }

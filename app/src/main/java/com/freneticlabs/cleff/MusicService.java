@@ -51,7 +51,8 @@ public class MusicService extends Service implements
     private ArrayList<Song> mSongs;
     private CleffApp mCleffApp;
 
-    private boolean isPlaying = false;
+    private boolean mIsPlaying = false;
+    private boolean mIsPaused = false;
     private boolean mShuffle = false;
     private boolean mRepeat = false;
     private Random mRandom;
@@ -197,7 +198,13 @@ public class MusicService extends Service implements
         mCurrentSongPosition = songPosition;
     }
 
+    public boolean isPlaying() {
+        return mIsPlaying;
+    }
 
+    public boolean isPaused() {
+        return mIsPaused;
+    }
     /**
      * Play song that was set by setSong()
      */
@@ -209,7 +216,7 @@ public class MusicService extends Service implements
 
         Uri trackUri = ContentUris.withAppendedId(MediaStore.Audio.Media.
                 EXTERNAL_CONTENT_URI, currentSong.getID());
-
+        Timber.d(trackUri.toString());
         try {
             mMediaPlayer.reset();
             mMediaPlayer.setDataSource(getApplicationContext(), trackUri);
@@ -217,7 +224,8 @@ public class MusicService extends Service implements
             mMediaPlayer.setOnErrorListener(this);
             mMediaPlayer.setOnCompletionListener(this);
             mMediaPlayer.prepareAsync();
-            isPlaying = true;
+            mIsPlaying = true;
+            mIsPaused = false;
 
         } catch (Exception e) {
             Timber.d("Error setting the data source", e);
@@ -231,8 +239,8 @@ public class MusicService extends Service implements
      *
      */
     public void stopPlayer() {
-        if (isPlaying) {
-            isPlaying = false;
+        if (mIsPlaying) {
+            mIsPlaying = false;
             if (mMediaPlayer != null) {
                 Timber.d("Stopping player.");
                 mMediaPlayer.stop();
@@ -261,12 +269,13 @@ public class MusicService extends Service implements
             }
         }
 
-        if(isPlaying) {
+        if(mIsPlaying) {
             playSong();
         }
     }
 
     /**
+     * Plays the previous song in the MusicLibrary list.
      *
      */
     public void playPrevious() {
@@ -275,8 +284,16 @@ public class MusicService extends Service implements
             mCurrentSongPosition = mSongs.size() - 1;
         }
 
-        if(isPlaying) {
+        if(mIsPlaying) {
             playSong();
+        }
+    }
+
+    public void pausePlayer() {
+        if(mIsPlaying) {
+            mMediaPlayer.pause();
+            mIsPaused = true;
+            mIsPlaying = false;
         }
     }
     /**
@@ -336,7 +353,7 @@ public class MusicService extends Service implements
 
             case AudioManager.AUDIOFOCUS_LOSS:
                 // Lost focus for an unbounded amount of time: stop playback and release media player
-               /* if (mMediaPlayer.isPlaying()) mMediaPlayer.stop();
+               /* if (mMediaPlayer.mmIsPlaying()) mMediaPlayer.stop();
                 mMediaPlayer.release();
                 mMediaPlayer = null;*/
                 break;
@@ -358,7 +375,7 @@ public class MusicService extends Service implements
 
     @Override
     public void onPrepared(MediaPlayer mediaPlayer) {
-        mMediaPlayer.start();
+        mediaPlayer.start();
         Timber.d("onPrepared()");
         Notification notification = updateNotification();
         startForeground(NOTIFICATION_ID, notification);
@@ -366,14 +383,14 @@ public class MusicService extends Service implements
 
     @Override
     public boolean onError(MediaPlayer mediaPlayer, int i, int i2) {
-        Timber.e("ERROR in onError()");
+        Timber.e("ERROR in onError()" + Integer.toString(i) + " " + Integer.toString(i2));
         return false;
     }
 
     @Override
     public void onCompletion(MediaPlayer mediaPlayer) {
         Timber.d("Song completed.");
-        if(mMediaPlayer.getCurrentPosition() > 0) {
+        if(mediaPlayer.getCurrentPosition() > 0) {
             playNext();
         }
     }
