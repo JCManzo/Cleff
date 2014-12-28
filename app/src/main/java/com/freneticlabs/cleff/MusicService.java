@@ -15,6 +15,7 @@ import android.provider.MediaStore;
 import android.support.v4.app.NotificationCompat;
 import android.widget.RemoteViews;
 
+import com.freneticlabs.cleff.activities.MainActivity;
 import com.freneticlabs.cleff.models.MusicLibrary;
 import com.freneticlabs.cleff.models.Song;
 

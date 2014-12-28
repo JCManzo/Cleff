@@ -1,4 +1,4 @@
-package com.freneticlabs.cleff;
+package com.freneticlabs.cleff.activities;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -14,6 +14,9 @@ import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 
+import com.freneticlabs.cleff.CleffApp;
+import com.freneticlabs.cleff.MusicService;
+import com.freneticlabs.cleff.R;
 import com.freneticlabs.cleff.fragments.BuildLibraryTaskFragment;
 import com.freneticlabs.cleff.fragments.NavigationDrawerFragment;
 import com.freneticlabs.cleff.fragments.PageSlidingTabStripFragment;

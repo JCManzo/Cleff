@@ -1,7 +1,7 @@
 package com.freneticlabs.cleff.models;
 
 import android.content.Context;
-import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.util.Log;
 
 import com.freneticlabs.cleff.utils.CleffJSONSerializer;
@@ -19,7 +19,7 @@ import timber.log.Timber;
 public class MusicLibrary {
 
     private ArrayList<Song> mSongs;
-    private HashMap<Long, String> mAlbumArt;
+    private HashMap<Long, Uri> mAlbumArtCache;
 
     private static MusicLibrary sMusicLibrary;
 
@@ -28,13 +28,13 @@ public class MusicLibrary {
 
 
     private static final String TAG = MusicLibrary.class.getSimpleName();
-    private HashMap<Integer, Drawable> mAlbumArtCache;
 
     private static final String FILENAME = "songs.json";
 
     public MusicLibrary(Context context) {
         mContext = context;
-        mSongs = new ArrayList<Song>();
+        mSongs = new ArrayList<>();
+        mAlbumArtCache = new HashMap<>();
         mCleffJSONSerializer = new CleffJSONSerializer(mContext, FILENAME);
 
         try {
@@ -49,6 +49,15 @@ public class MusicLibrary {
         mSongs.add(song);
     }
 
+    public void addAlumbArtPair(long albumId, Uri albumArtPath) {
+        if(mAlbumArtCache.get(albumId) != null) {
+            Timber.d("Key exists");
+        } else {
+            Timber.d("Key does not exist in map, adding...");
+            mAlbumArtCache.put(albumId, albumArtPath);
+
+        }
+    }
     public static MusicLibrary get(Context context) {
         if(sMusicLibrary == null) {
             sMusicLibrary = new MusicLibrary(context.getApplicationContext());
@@ -60,8 +69,8 @@ public class MusicLibrary {
         return mSongs;
     }
 
-    public HashMap<Long, String> getAlbumArt() {
-        return mAlbumArt;
+    public HashMap<Long, Uri> getAlbumArt() {
+        return mAlbumArtCache;
     }
 
     public Song getSong(long id) {

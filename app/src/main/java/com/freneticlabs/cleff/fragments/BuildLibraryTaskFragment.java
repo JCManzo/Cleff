@@ -2,6 +2,7 @@ package com.freneticlabs.cleff.fragments;
 
 import android.app.Activity;
 import android.content.ContentResolver;
+import android.content.ContentUris;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -129,7 +130,9 @@ public class BuildLibraryTaskFragment extends Fragment {
             ContentResolver musicResolver = getActivity().getContentResolver();
             Uri musicUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
 
-            Cursor musicCursor = musicResolver.query(musicUri, null, null, null, null);
+            String where = MediaStore.Audio.Media.IS_MUSIC + "=1";
+
+            Cursor musicCursor = musicResolver.query(musicUri, null, where, null, null);
             if(musicCursor!=null && musicCursor.moveToFirst()){
 
                 /** These are the columns in the music cursor that we are interested in. */
@@ -170,6 +173,13 @@ public class BuildLibraryTaskFragment extends Fragment {
                     String thisAlbum = musicCursor.getString(albumColumn);
                     String thisGenre = "";
 
+                    Uri sArtworkUri = Uri
+                            .parse("content://media/external/audio/albumart");
+                    Uri albumArtUri = ContentUris.withAppendedId(sArtworkUri, thisAlbumId);
+
+                    // Get album art
+                    Timber.d(albumArtUri.toString());
+
                     /* TODO find an alternative to getContentUriForAudioID in order to use it in lower versions*/
                     Uri songGenreUri = MediaStore.Audio.Genres.getContentUriForAudioId("external", thisSongId);
                     Cursor genresCursor = musicResolver.query(songGenreUri, genresProjection, null, null, null);
@@ -195,8 +205,10 @@ public class BuildLibraryTaskFragment extends Fragment {
                     if(unknownTitle) thisTitle = mUnknownTitle;
 
                     Song song = new Song(thisSongId, thisTitle, thisArtist,
-                                         thisAlbum, thisGenre);
+                                         thisAlbum, thisAlbumId, thisGenre);
+
                     MusicLibrary.get(getActivity()).addSong(song);
+                    MusicLibrary.get(getActivity()).addAlumbArtPair(thisAlbumId, albumArtUri);
                 }
                 while (musicCursor.moveToNext());
             }
