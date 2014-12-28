@@ -20,20 +20,24 @@ public class TabsPageAdapter extends FragmentPagerAdapter {
 
     private final String[] TITLES = { "Songs", "Albums", "Artists",
             "Genres" };
+
     @Override
     public Fragment getItem(int index) {
-        switch (index + 1) {
-            case 1:
-                return new SongsFragment();
-            case 2:
-                return new AlbumsFragment();
-            case 3:
-                return new ArtistsFragment();
-            case 4:
-                return new GenresFragment();
-            default:
-                return new SongsFragment();
+        Fragment fragment = null;
+
+        if(index == 0) {
+            fragment = new SongsFragment();
+        } else if(index == 1) {
+            fragment = new AlbumsFragment();
+
+        } else if(index == 2) {
+            fragment = new ArtistsFragment();
+
+        } else if(index == 3) {
+            fragment = new GenresFragment();
+
         }
+        return fragment;
     }
 
     @Override

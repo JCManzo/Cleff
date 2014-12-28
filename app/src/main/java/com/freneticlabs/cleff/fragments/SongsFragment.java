@@ -1,5 +1,6 @@
 package com.freneticlabs.cleff.fragments;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -33,6 +34,9 @@ public class SongsFragment extends Fragment implements
     @InjectView(R.id.action_play) FloatingActionButton mFloatingPlayButton;
     @InjectView(R.id.action_skip_next) FloatingActionButton mFloatingNextButton;
     @InjectView(R.id.action_skip_previous) FloatingActionButton mFloatingPreviousButton;
+    @InjectView(R.id.floating_player_actions) FloatingActionsMenu mFloatingActionsMenu;
+
+    SharedPreferences mSettings;
 
     private CleffApp mCleffApp;
 
@@ -43,11 +47,9 @@ public class SongsFragment extends Fragment implements
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        // Retain this fragment across configuration changes.
         setHasOptionsMenu(true);
-
         mCleffApp = (CleffApp)getActivity().getApplication();
-
+        mSettings = mCleffApp.getSharedPreferences();
     }
 
     @Override
@@ -58,11 +60,9 @@ public class SongsFragment extends Fragment implements
         View rootView = inflater.inflate(R.layout.fragment_song_list, container, false);
         ButterKnife.inject(this, rootView);
 
-
         // use this setting to improve performance if you know that changes
         // in content do not change the layout size of the RecyclerView
         mRecyclerView.setHasFixedSize(true);
-
 
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
         mRecyclerView.addItemDecoration(new SongListDivider(getActivity()));
@@ -70,28 +70,39 @@ public class SongsFragment extends Fragment implements
         SongsAdapter songAdapter = new SongsAdapter(getActivity(), this);
         mRecyclerView.setAdapter(songAdapter);
 
+        initListeners();
+        return rootView;
+    }
+
+    @Override
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        updatePlayerActionsUi();
+    }
+
+    private void initListeners() {
         final ItemClickSupport itemClick = ItemClickSupport.addTo(mRecyclerView);
 
         itemClick.setOnItemClickListener(new ItemClickSupport.OnItemClickListener() {
             @Override
             public void onItemClick(RecyclerView parent, View child, int position, long id) {
                 Timber.d("Item clicked: " + position);
-                if(!mCleffApp.isServiceRunning()) {
-                    Timber.d("SERVICE NOT RUNNING YO");
+                if (!mCleffApp.isServiceRunning()) {
+                    Timber.e("SERVICE NOT RUNNING YO");
                 }
 
-                if(position > 0) {
+                if (position > 0) {
                     mCleffApp.getPlaybackManager().initPlayback();
                     mCleffApp.getService().setSong((position - 1));
                     mCleffApp.getService().playSong();
                     updatePlayerActionsUi();
                 }
+
             }
         });
 
         // Set up the floating player action listeners
-        final FloatingActionsMenu floatingActionsMenu = (FloatingActionsMenu)rootView.findViewById(R.id.floating_player_actions);
-        floatingActionsMenu.setOnFloatingActionsMenuUpdateListener(new FloatingActionsMenu.OnFloatingActionsMenuUpdateListener() {
+        mFloatingActionsMenu.setOnFloatingActionsMenuUpdateListener(new FloatingActionsMenu.OnFloatingActionsMenuUpdateListener() {
             @Override
             public void onMenuExpanded() {
                 Timber.d("EXPANDED");
@@ -103,16 +114,6 @@ public class SongsFragment extends Fragment implements
 
             }
         });
-        initListeners();
-        return rootView;
-    }
-
-    @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-    }
-
-    private void initListeners() {
 
         mFloatingPlayButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -166,6 +167,7 @@ public class SongsFragment extends Fragment implements
 
         updatePlayerActionsUi();
     }
+
     @Override
     public void repeatClicked() {
         if(mCleffApp.getService().isRepeat()) {

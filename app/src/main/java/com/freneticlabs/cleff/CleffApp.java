@@ -2,6 +2,7 @@ package com.freneticlabs.cleff;
 
 import android.app.Application;
 import android.content.Context;
+import android.content.SharedPreferences;
 
 import com.freneticlabs.cleff.utils.PlaybackManager;
 
@@ -24,6 +25,14 @@ public class CleffApp extends Application {
 
     private boolean mIsServiceRunning = false;
     private static boolean mIsActivityVisible = false;
+    private static SharedPreferences mSharedPreferences;
+
+    //SharedPreferences keys.
+    public static final String REPEAT_MODE = "RepeatMode";
+    public static final String SERVICE_RUNNING = "ServiceRunning";
+    public static final String SHUFFLE_ON = "ShuffleOn";
+    public static final String PLAYER_ACTIONS_EXPANDED = "PlayerActionsExpanded";
+    public static final String FIRST_RUN = "FirstRun";
 
     public CleffApp() {
         sCleffApp = this;
@@ -32,8 +41,6 @@ public class CleffApp extends Application {
     public static CleffApp getCleffApp() {
         return sCleffApp;
     }
-
-
 
     public void setService(MusicService service) {
         mService = service;
@@ -62,19 +69,27 @@ public class CleffApp extends Application {
     public static void activityPaused() {
         mIsActivityVisible = false;
     }
+
     public PlaybackManager getPlaybackManager() {
         return mPlaybackManager;
+    }
+
+    public SharedPreferences getSharedPreferences() {
+        return mSharedPreferences;
     }
 
     @Override
     public void onCreate() {
         super.onCreate();
+        mSharedPreferences = this.getSharedPreferences("com.freneticlabs.cleff", Context.MODE_PRIVATE);
 
         if (BuildConfig.DEBUG) {
             Timber.plant(new Timber.DebugTree());
         } else {
             Timber.plant(new CrashReportingTree());
         }
+
+
 
         mContext = getApplicationContext();
         mPlaybackManager = new PlaybackManager(this.getApplicationContext());

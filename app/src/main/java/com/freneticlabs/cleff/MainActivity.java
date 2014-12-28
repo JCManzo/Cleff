@@ -1,6 +1,5 @@
 package com.freneticlabs.cleff;
 
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
@@ -30,12 +29,8 @@ public class MainActivity extends ActionBarActivity implements
         BuildLibraryTaskFragment.BuildLibraryTaskCallbacks {
 
     private static final String TAG_TASK_FRAGMENT = "build_library_task_fragment";
-    public static final String PREFS_NAME = "ListnPrefsFile";
     private MusicService mService;
     private CleffApp mCleffApp;
-    private boolean mBound = false;
-    private Intent playIntent;
-    private static final String TAG = MainActivity.class.getSimpleName();
     /**
      * Fragment managing the behaviors, interactions and presentation of the navigation drawer.
      */
@@ -67,6 +62,7 @@ public class MainActivity extends ActionBarActivity implements
         mNavigationDrawerFragment = (NavigationDrawerFragment)
                 getSupportFragmentManager().findFragmentById(R.id.navigation_drawer);
         mTitle = getTitle();
+        mCleffApp = (CleffApp)getApplication();
 
         // Set up the drawer.
         mNavigationDrawerFragment.setUp(
@@ -77,12 +73,12 @@ public class MainActivity extends ActionBarActivity implements
         mBuildLibraryTaskFragment = (BuildLibraryTaskFragment) fm.findFragmentByTag(TAG_TASK_FRAGMENT);
 
         // Restore preferences
-        SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
-        boolean firstRun = settings.getBoolean("firstRun", false);
+        SharedPreferences settings = mCleffApp.getSharedPreferences();
+        boolean firstRun = settings.getBoolean(CleffApp.FIRST_RUN, false);
 
         // If the Fragment is non-null, then it is currently being
         // retained across a configuration change.
-       if (mBuildLibraryTaskFragment == null && !firstRun) {
+       if (mBuildLibraryTaskFragment == null && firstRun) {
             mBuildLibraryTaskFragment = new BuildLibraryTaskFragment();
             fm.beginTransaction()
                     .add(mBuildLibraryTaskFragment, TAG_TASK_FRAGMENT)
@@ -90,7 +86,7 @@ public class MainActivity extends ActionBarActivity implements
            Timber.d("Building library.");
            mLinearLayout.setVisibility(View.VISIBLE);
 
-        } else if (firstRun) {
+        } else if (!firstRun) {
             // Library has been built. Show main fragment.
             mLinearLayout.setVisibility(View.GONE);
             fm.beginTransaction()
@@ -100,7 +96,6 @@ public class MainActivity extends ActionBarActivity implements
 
        }
 
-       mCleffApp = (CleffApp)getApplication();
        mCleffApp.getPlaybackManager().initPlayback();
     }
 
@@ -209,10 +204,12 @@ public class MainActivity extends ActionBarActivity implements
 
         mLinearLayout.setVisibility(View.GONE);
         Log.i("TASK", "Main onPostExecute");
+
         // Library has been created. No need to run this fragment again.
-        SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
+        SharedPreferences settings = mCleffApp.getSharedPreferences();
+
         SharedPreferences.Editor editor = settings.edit();
-        editor.putBoolean("firstRun", true);
+        editor.putBoolean(CleffApp.FIRST_RUN, true);
 
         // Commit the edits!
         editor.apply();
