@@ -74,8 +74,9 @@ public class MainActivity extends ActionBarActivity implements
 
         // Restore preferences
         SharedPreferences settings = mCleffApp.getSharedPreferences();
-        boolean firstRun = settings.getBoolean(CleffApp.FIRST_RUN, false);
+        boolean firstRun = settings.getBoolean(CleffApp.FIRST_RUN, true);
 
+        Timber.d(String.valueOf(firstRun));
         // If the Fragment is non-null, then it is currently being
         // retained across a configuration change.
        if (mBuildLibraryTaskFragment == null && firstRun) {
@@ -209,7 +210,7 @@ public class MainActivity extends ActionBarActivity implements
         SharedPreferences settings = mCleffApp.getSharedPreferences();
 
         SharedPreferences.Editor editor = settings.edit();
-        editor.putBoolean(CleffApp.FIRST_RUN, true);
+        editor.putBoolean(CleffApp.FIRST_RUN, false);
 
         // Commit the edits!
         editor.apply();
