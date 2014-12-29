@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 
 import com.freneticlabs.cleff.utils.PlaybackManager;
+import com.squareup.picasso.Picasso;
 
 import timber.log.Timber;
 
@@ -22,7 +23,7 @@ public class CleffApp extends Application {
     //Service reference and flags.
     private MusicService mService;
     private PlaybackManager mPlaybackManager;
-
+    private Picasso mPicasso;
     private boolean mIsServiceRunning = false;
     private static boolean mIsActivityVisible = false;
     private static SharedPreferences mSharedPreferences;
@@ -33,6 +34,7 @@ public class CleffApp extends Application {
     public static final String SHUFFLE_ON = "ShuffleOn";
     public static final String PLAYER_ACTIONS_EXPANDED = "PlayerActionsExpanded";
     public static final String FIRST_RUN = "FirstRun";
+
 
     public CleffApp() {
         sCleffApp = this;
@@ -78,6 +80,10 @@ public class CleffApp extends Application {
         return mSharedPreferences;
     }
 
+    public Picasso getPicasso() {
+        return mPicasso;
+    }
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -92,6 +98,7 @@ public class CleffApp extends Application {
 
 
         mContext = getApplicationContext();
+        mPicasso = new Picasso.Builder(mContext).build();
         mPlaybackManager = new PlaybackManager(this.getApplicationContext());
     }
 

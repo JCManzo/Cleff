@@ -1,7 +1,6 @@
 package com.freneticlabs.cleff.models;
 
 import android.content.Context;
-import android.net.Uri;
 import android.util.Log;
 
 import com.freneticlabs.cleff.utils.CleffJSONSerializer;
@@ -17,9 +16,11 @@ import timber.log.Timber;
  * Created by jcmanzo on 8/16/14.
  */
 public class MusicLibrary {
-
-    private ArrayList<Song> mSongs;
-    private HashMap<Long, Uri> mAlbumArtCache;
+    private ArrayList<Song> mSongsList;
+    private ArrayList<Album> mAlbumsList;
+    private HashMap<String, String> mGenresHashMap = new HashMap<String, String>();
+    private HashMap<String, Integer> mGenresSongCountHashMap = new HashMap<String, Integer>();
+    private HashMap<String, Integer> mAlbumsCountMap = new HashMap<String, Integer>();
 
     private static MusicLibrary sMusicLibrary;
 
@@ -28,36 +29,23 @@ public class MusicLibrary {
 
 
     private static final String TAG = MusicLibrary.class.getSimpleName();
-
     private static final String FILENAME = "songs.json";
 
     public MusicLibrary(Context context) {
+
         mContext = context;
-        mSongs = new ArrayList<>();
-        mAlbumArtCache = new HashMap<>();
+        mSongsList = new ArrayList<>();
+        mAlbumsList = new ArrayList<>();
         mCleffJSONSerializer = new CleffJSONSerializer(mContext, FILENAME);
 
         try {
-            mSongs = mCleffJSONSerializer.loadLibrary();
+            mSongsList = mCleffJSONSerializer.loadLibrary();
         } catch (Exception e) {
-            mSongs = new ArrayList<Song>();
+            mSongsList = new ArrayList<>();
             Timber.e("Error loading library.");
         }
     }
 
-    public void addSong(Song song) {
-        mSongs.add(song);
-    }
-
-    public void addAlumbArtPair(long albumId, Uri albumArtPath) {
-        if(mAlbumArtCache.get(albumId) != null) {
-            Timber.d("Key exists");
-        } else {
-            Timber.d("Key does not exist in map, adding...");
-            mAlbumArtCache.put(albumId, albumArtPath);
-
-        }
-    }
     public static MusicLibrary get(Context context) {
         if(sMusicLibrary == null) {
             sMusicLibrary = new MusicLibrary(context.getApplicationContext());
@@ -65,16 +53,26 @@ public class MusicLibrary {
         return sMusicLibrary;
     }
 
-    public ArrayList<Song> getSongs() {
-        return mSongs;
+    public void addAlbum (Album album) {
+        if(!mAlbumsList.contains(album)) {
+            Timber.d("ALBUM ADDED");
+            mAlbumsList.add(album);
+        }
     }
 
-    public HashMap<Long, Uri> getAlbumArt() {
-        return mAlbumArtCache;
+    public ArrayList<Album> getAlbums() {
+        return mAlbumsList;
+    }
+    public void addSong(Song song) {
+        mSongsList.add(song);
+    }
+
+    public ArrayList<Song> getSongs() {
+        return mSongsList;
     }
 
     public Song getSong(long id) {
-        for(Song song : mSongs) {
+        for(Song song : mSongsList) {
             if(song.getID() == id) {
                 return song;
             }
@@ -87,7 +85,7 @@ public class MusicLibrary {
      */
     public void sortLibrary() {
         //Sorting
-        Collections.sort(mSongs, new Comparator<Song>() {
+        Collections.sort(mSongsList, new Comparator<Song>() {
             @Override
             public int compare(Song song1, Song song2) {
 
@@ -98,18 +96,18 @@ public class MusicLibrary {
 
     public void updateRating(long songID, float rating) {
 
-        for(Song song : mSongs) {
+        for(Song song : mSongsList) {
             if(song.getID() == songID) {
-                int index = mSongs.indexOf(song);
+                int index = mSongsList.indexOf(song);
                 song.setSongRating(rating);
 
-                mSongs.set(index, song);
+                mSongsList.set(index, song);
             }
         }
     }
 
     public float getRating(long songId) {
-        for(Song song : mSongs) {
+        for(Song song : mSongsList) {
             if(song.getID() == songId) {
                 return song.getSongRating();
             }
@@ -118,7 +116,7 @@ public class MusicLibrary {
     }
 
     public void printLib() {
-        for(Song song : mSongs) {
+        for(Song song : mSongsList) {
             Log.i(TAG, song.getTitle());
             Log.i(TAG, String.valueOf(song.getSongRating()));
         }
@@ -126,7 +124,7 @@ public class MusicLibrary {
 
     public boolean saveLibrary() {
         try {
-            mCleffJSONSerializer.saveLibrary(mSongs);
+            mCleffJSONSerializer.saveLibrary(mSongsList);
             Log.d(TAG, "Library saved.");
             return true;
         } catch (Exception e) {
@@ -136,9 +134,9 @@ public class MusicLibrary {
     }
 
     public void clearLibrary() {
-        mSongs.clear();
+        mSongsList.clear();
     }
     public int getCount() {
-        return  mSongs.size();
+        return  mSongsList.size();
     }
 }

@@ -207,6 +207,8 @@ public class MainActivity extends ActionBarActivity implements
     public void onPostExecute() {
 
         mLinearLayout.setVisibility(View.GONE);
+        MusicLibrary.get(this).saveLibrary();
+
         Log.i("TASK", "Main onPostExecute");
 
         // Library has been created. No need to run this fragment again.

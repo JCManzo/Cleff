@@ -20,6 +20,7 @@ import java.util.ArrayList;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
+import timber.log.Timber;
 
 /**
  * Created by jcmanzo on 12/14/14.
@@ -38,6 +39,7 @@ public class SongsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         mContext = context;
         mSongsListHeaderListener = songsListHeaderListener;
         mSongList = MusicLibrary.get(mContext).getSongs();
+        Timber.d(Integer.toString(mSongList.size()));
     }
 
     /**
@@ -168,11 +170,6 @@ public class SongsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         public void setArtist(CharSequence text) {
             artist.setText(text);
         }
-
-        /*public void setAlbumImage(int image) {
-            albumImage.setImageResource(image);
-        }*/
-
     }
 
     public static final class ViewHolderHeader extends RecyclerView.ViewHolder {

@@ -1,53 +1,28 @@
 package com.freneticlabs.cleff.utils;
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
-import android.net.Uri;
-import android.provider.MediaStore;
 
-import com.freneticlabs.cleff.R;
+import com.freneticlabs.cleff.models.MusicLibrary;
+import com.freneticlabs.cleff.models.Song;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
-
-import timber.log.Timber;
 
 /**
  * Created by jcmanzo on 12/27/14.
  */
 public class MusicUtils {
-    private static final HashMap<Long, Drawable> sAlbumArtCache = new HashMap<Long, Drawable>();
+    public ArrayList<Song> getAllSongsFromAlbum(Context context, long albumId) {
+        ArrayList<Song> albumSongs = new ArrayList<>();
+        ArrayList<Song> songs = MusicLibrary.get(context).getSongs();
 
-    public static Bitmap getArtFromFile(Context context, Uri albumArtUri) {
-        Bitmap bitmap = null;
-
-        try {
-            bitmap = MediaStore.Images.Media.getBitmap(context.getContentResolver(), albumArtUri);
-            bitmap = Bitmap.createScaledBitmap(bitmap, 30, 30, true);
-            Timber.d("FOUND");
-        } catch (FileNotFoundException exception) {
-            exception.printStackTrace();
-            bitmap = BitmapFactory.decodeResource(context.getResources(),
-                    R.drawable.adele);
-        } catch (IOException e) {
-
-        }
-        return  bitmap;
-    }
-
-    public static Drawable getCachedArt(Context context, long albumId) {
-        Drawable albumArt = null;
-
-        synchronized (sAlbumArtCache) {
-            albumArt = sAlbumArtCache.get(albumId);
+        for (Song song : songs) {
+            if(song.getAlbumID() == albumId) {
+                albumSongs.add(song);
+            }
         }
 
-        if(albumArt == null) {
-            // Albumr art does not exist in cache
-        }
-        return albumArt;
+        return songs;
     }
 }
