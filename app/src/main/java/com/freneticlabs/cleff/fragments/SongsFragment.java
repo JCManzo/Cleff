@@ -36,7 +36,7 @@ public class SongsFragment extends Fragment implements
     @InjectView(R.id.action_skip_previous) FloatingActionButton mFloatingPreviousButton;
     @InjectView(R.id.floating_player_actions) FloatingActionsMenu mFloatingActionsMenu;
 
-    SharedPreferences mSettings;
+    private SharedPreferences mSettings;
 
     private CleffApp mCleffApp;
 

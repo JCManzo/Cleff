@@ -1,8 +1,6 @@
 package com.freneticlabs.cleff.views.adapters;
 
-import android.content.ContentUris;
 import android.content.Context;
-import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -49,12 +47,13 @@ public class AlbumsAdapter extends RecyclerView.Adapter<AlbumsAdapter.ViewHolder
        final Album album = getItem(position);
 
        viewHolder.setAlbum(album.getAlbum());
-       Uri coverPath = ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart"), album.getAlbumId());
+       /*Uri coverPath = ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart"), album.getAlbumId());
        mCleffApp.getPicasso()
                .load(coverPath)
                .placeholder(R.drawable.adele)
-               .resize(200,200)
-               .into(viewHolder.mImage);
+               .into(viewHolder.mImage);*/
+        viewHolder.seImage();
+
     }
 
     @Override
@@ -90,9 +89,9 @@ public class AlbumsAdapter extends RecyclerView.Adapter<AlbumsAdapter.ViewHolder
             mName.setText(text);
         }
 
-        //public void seImage() {
-          // albumImage.setImageResource(R.drawable.adele);
-        //}
+        public void seImage() {
+          mImage.setImageResource(R.drawable.adele);
+        }
 
       /*  public ImageView getAlbumImage() {
             return albumImage;
