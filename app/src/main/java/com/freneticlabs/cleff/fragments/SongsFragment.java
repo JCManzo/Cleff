@@ -2,6 +2,7 @@ package com.freneticlabs.cleff.fragments;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -14,7 +15,6 @@ import android.view.ViewGroup;
 import com.freneticlabs.cleff.CleffApp;
 import com.freneticlabs.cleff.MusicService;
 import com.freneticlabs.cleff.R;
-import com.freneticlabs.cleff.SongListDivider;
 import com.freneticlabs.cleff.activities.PlayerActivity;
 import com.freneticlabs.cleff.models.MusicLibrary;
 import com.freneticlabs.cleff.models.Song;
@@ -25,11 +25,16 @@ import com.nispok.snackbar.Snackbar;
 import com.nispok.snackbar.SnackbarManager;
 
 import org.lucasr.twowayview.ItemClickSupport;
+import org.lucasr.twowayview.widget.DividerItemDecoration;
 import org.lucasr.twowayview.widget.TwoWayView;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 import timber.log.Timber;
+
+import static android.support.v7.widget.RecyclerView.SCROLL_STATE_DRAGGING;
+import static android.support.v7.widget.RecyclerView.SCROLL_STATE_IDLE;
+import static android.support.v7.widget.RecyclerView.SCROLL_STATE_SETTLING;
 
 public class SongsFragment extends Fragment implements
     SongsAdapter.SongsListHeaderListener{
@@ -68,9 +73,12 @@ public class SongsFragment extends Fragment implements
         // use this setting to improve performance if you know that changes
         // in content do not change the layout size of the RecyclerView
         mRecyclerView.setHasFixedSize(true);
+        mRecyclerView.setLongClickable(true);
 
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
-        mRecyclerView.addItemDecoration(new SongListDivider(getActivity()));
+
+        final Drawable divider = getResources().getDrawable(R.drawable.divider);
+        mRecyclerView.addItemDecoration(new DividerItemDecoration(divider));
 
         SongsAdapter songAdapter = new SongsAdapter(getActivity(), this);
         mRecyclerView.setAdapter(songAdapter);
@@ -83,6 +91,8 @@ public class SongsFragment extends Fragment implements
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         updatePlayerActionsUi();
+        updateState(SCROLL_STATE_IDLE);
+
     }
 
     private void initListeners() {
@@ -109,6 +119,28 @@ public class SongsFragment extends Fragment implements
                     updatePlayerActionsUi();
                 }
 
+            }
+        });
+
+        itemClick.setOnItemLongClickListener(new ItemClickSupport.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(RecyclerView parent, View child, int position, long id) {
+               // mToast.setText("Item long pressed: " + position);
+                //mToast.show();
+                return true;
+            }
+        });
+
+        mRecyclerView.setOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(RecyclerView recyclerView, int scrollState) {
+                updateState(scrollState);
+            }
+
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int i, int i2) {
+               // mPositionText.setText("First: " + mRecyclerView.getFirstVisiblePosition());
+               // mCountText.setText("Count: " + mRecyclerView.getChildCount());
             }
         });
 
@@ -211,5 +243,23 @@ public class SongsFragment extends Fragment implements
         }
 
         mCleffApp.getService().setShuffle();
+    }
+
+    private void updateState(int scrollState) {
+        String stateName = "Undefined";
+        switch(scrollState) {
+            case SCROLL_STATE_IDLE:
+                stateName = "Idle";
+                break;
+
+            case SCROLL_STATE_DRAGGING:
+                stateName = "Dragging";
+                break;
+
+            case SCROLL_STATE_SETTLING:
+                stateName = "Flinging";
+                break;
+        }
+
     }
 }
