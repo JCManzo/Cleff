@@ -1,5 +1,6 @@
 package com.freneticlabs.cleff.fragments;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -14,6 +15,9 @@ import com.freneticlabs.cleff.CleffApp;
 import com.freneticlabs.cleff.MusicService;
 import com.freneticlabs.cleff.R;
 import com.freneticlabs.cleff.SongListDivider;
+import com.freneticlabs.cleff.activities.PlayerActivity;
+import com.freneticlabs.cleff.models.MusicLibrary;
+import com.freneticlabs.cleff.models.Song;
 import com.freneticlabs.cleff.views.adapters.SongsAdapter;
 import com.getbase.floatingactionbutton.FloatingActionButton;
 import com.getbase.floatingactionbutton.FloatingActionsMenu;
@@ -50,6 +54,7 @@ public class SongsFragment extends Fragment implements
         setHasOptionsMenu(true);
         mCleffApp = (CleffApp)getActivity().getApplication();
         mSettings = mCleffApp.getSharedPreferences();
+
     }
 
     @Override
@@ -87,6 +92,12 @@ public class SongsFragment extends Fragment implements
             @Override
             public void onItemClick(RecyclerView parent, View child, int position, long id) {
                 Timber.d("Item clicked: " + position);
+
+                Song song = MusicLibrary.get(getActivity()).getSongs().get(position - 1);
+                Intent i = new Intent(getActivity(), PlayerActivity.class);
+                i.putExtra(PlayerFragment.EXTRA_SONG_ID, song.getID());
+                startActivity(i);
+
                 if (!mCleffApp.isServiceRunning()) {
                     Timber.e("SERVICE NOT RUNNING YO");
                 }
