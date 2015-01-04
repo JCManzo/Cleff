@@ -15,9 +15,14 @@
         <item name="android:windowContentOverlay">@null</item>
     </style>
 
-    <style name="TwoWayView">
-        <item name="android:orientation">vertical</item>
-        <item name="android:scrollbars">vertical</item>
-    </style>
 
+
+    <declare-styleable name="CheckableImageButton">
+        <attr name="is_checked" format="boolean" />
+
+        <attr name="personality">
+            <enum name="radio" value="0" />
+            <enum name="check" value="1" />
+        </attr>
+    </declare-styleable>
 </resources>

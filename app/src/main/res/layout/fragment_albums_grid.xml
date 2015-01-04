@@ -1,13 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-    <org.lucasr.twowayview.widget.TwoWayView
+
+    <GridView
         xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        android:id="@+id/recycler_view_albums"
-        android:layout_width="match_parent"
+        android:id="@+id/albums_grid_view"
         android:layout_height="match_parent"
-        style="@style/TwoWayView"
-        app:twowayview_layoutManager="GridLayoutManager"
-        app:twowayview_numColumns="2"
-        app:twowayview_numRows="3"
-        />
+        android:layout_width="match_parent"
+    />
 

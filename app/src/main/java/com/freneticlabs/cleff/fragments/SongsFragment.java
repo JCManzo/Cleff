@@ -1,16 +1,17 @@
 package com.freneticlabs.cleff.fragments;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
+import android.widget.AdapterView;
+import android.widget.ListView;
 
 import com.freneticlabs.cleff.CleffApp;
 import com.freneticlabs.cleff.MusicService;
@@ -19,14 +20,11 @@ import com.freneticlabs.cleff.activities.PlayerActivity;
 import com.freneticlabs.cleff.models.MusicLibrary;
 import com.freneticlabs.cleff.models.Song;
 import com.freneticlabs.cleff.views.adapters.SongsAdapter;
+import com.freneticlabs.cleff.views.widgets.CheckableImageButton;
 import com.getbase.floatingactionbutton.FloatingActionButton;
 import com.getbase.floatingactionbutton.FloatingActionsMenu;
-import com.nispok.snackbar.Snackbar;
-import com.nispok.snackbar.SnackbarManager;
 
-import org.lucasr.twowayview.ItemClickSupport;
-import org.lucasr.twowayview.widget.DividerItemDecoration;
-import org.lucasr.twowayview.widget.TwoWayView;
+import java.util.ArrayList;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
@@ -36,19 +34,22 @@ import static android.support.v7.widget.RecyclerView.SCROLL_STATE_DRAGGING;
 import static android.support.v7.widget.RecyclerView.SCROLL_STATE_IDLE;
 import static android.support.v7.widget.RecyclerView.SCROLL_STATE_SETTLING;
 
-public class SongsFragment extends Fragment implements
-    SongsAdapter.SongsListHeaderListener{
+public class SongsFragment extends Fragment{
 
-    @InjectView(R.id.recycler_view_songs) TwoWayView mRecyclerView;
+    @InjectView(R.id.recycler_view_songs) ListView mListView;
     @InjectView(R.id.action_play) FloatingActionButton mFloatingPlayButton;
     @InjectView(R.id.action_skip_next) FloatingActionButton mFloatingNextButton;
     @InjectView(R.id.action_skip_previous) FloatingActionButton mFloatingPreviousButton;
     @InjectView(R.id.floating_player_actions) FloatingActionsMenu mFloatingActionsMenu;
 
     private SharedPreferences mSettings;
-
+    private int mLastClickedItem = -1;
     private CleffApp mCleffApp;
-
+    private Context mContext;
+    private ArrayList<Song> mSongs;
+    private int mLastPosition = 0;
+    private int mPositionOffset = 0;
+    private CheckableImageButton mCurrentButton;
     public SongsFragment() {
         // Required empty public constructor
     }
@@ -57,9 +58,18 @@ public class SongsFragment extends Fragment implements
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
+        mContext = getActivity().getApplicationContext();
         mCleffApp = (CleffApp)getActivity().getApplication();
         mSettings = mCleffApp.getSharedPreferences();
+        mSongs = MusicLibrary.get(mContext).getSongs();
 
+    }
+
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        saveListPosition();
     }
 
     @Override
@@ -70,79 +80,111 @@ public class SongsFragment extends Fragment implements
         View rootView = inflater.inflate(R.layout.fragment_song_list, container, false);
         ButterKnife.inject(this, rootView);
 
-        // use this setting to improve performance if you know that changes
-        // in content do not change the layout size of the RecyclerView
-        mRecyclerView.setHasFixedSize(true);
-        mRecyclerView.setLongClickable(true);
+        final SongsAdapter songAdapter = new SongsAdapter(getActivity(), R.layout.song_list_row_item, mSongs);
+        songAdapter.setSongsListListener(new SongsAdapter.SongsListListener() {
+            @Override
+            public void playBackClicked(int clickedPosition) {
+                Timber.d(Integer.toString(clickedPosition));
 
-        mRecyclerView.setItemAnimator(new DefaultItemAnimator());
+                int wantedChild = getWantedChild(clickedPosition);
+                View view = mListView.getChildAt(wantedChild);
+                //view.setBackgroundColor(getResources().getColor(R.color.red));
+                    if (view.isSelected()) {
+                        Timber.d("IS SELECTED");
+                        //view.setSelected(false);
 
-        final Drawable divider = getResources().getDrawable(R.drawable.divider);
-        mRecyclerView.addItemDecoration(new DividerItemDecoration(divider));
+                    } else {
+                        Timber.d("NOT SELECTED");
+                        view.setSelected(true);
 
-        SongsAdapter songAdapter = new SongsAdapter(getActivity(), this);
-        mRecyclerView.setAdapter(songAdapter);
+                    }
+                 updatePlayer(clickedPosition);
+                    if(mLastClickedItem != -1 && mLastClickedItem != clickedPosition) {
+                        int t = getWantedChild(mLastClickedItem);
+                        View view2 = mListView.getChildAt(t);
+                        if(view2 != null)
+                        view2.setSelected(false);
+                    }
+                    mLastClickedItem = clickedPosition;
 
+            }
+
+            @Override
+            public void itemClicked(int song) {
+                 /*
+
+        */
+            }
+        });
+        mListView.setAdapter(songAdapter);
+        mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+               view.setSelected(true);
+                Song song = MusicLibrary.get(getActivity()).getSongs().get(position);
+                Intent i = new Intent(getActivity(), PlayerActivity.class);
+               // i.putExtra(PlayerFragment.EXTRA_SONG_ID, song.getID());
+                //startActivity(i);
+
+                    updatePlayer((position));
+                   // saveLastPlayedSong((position));
+                //Timber.d("CLICKED");
+            }
+        });
         initListeners();
         return rootView;
+    }
+
+    private int getWantedChild(int position) {
+        int firstPosition = mListView.getFirstVisiblePosition() - mListView.getHeaderViewsCount(); // This is the same as child #0
+        int wantedChild = position - firstPosition;
+
+        if (wantedChild < 0 || wantedChild >= mListView.getChildCount()) {
+            Timber.d("Unable to get view for desired position, because it's not being displayed on screen.");
+            return -1;
+        }
+
+        return wantedChild;
     }
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        updatePlayerActionsUi();
+        //updateUi();
         updateState(SCROLL_STATE_IDLE);
+        restoreListPosition();
 
     }
 
+
     private void initListeners() {
-        final ItemClickSupport itemClick = ItemClickSupport.addTo(mRecyclerView);
 
-        itemClick.setOnItemClickListener(new ItemClickSupport.OnItemClickListener() {
+        mListView.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
-            public void onItemClick(RecyclerView parent, View child, int position, long id) {
-                Timber.d("Item clicked: " + position);
-
-                Song song = MusicLibrary.get(getActivity()).getSongs().get(position - 1);
-                Intent i = new Intent(getActivity(), PlayerActivity.class);
-                i.putExtra(PlayerFragment.EXTRA_SONG_ID, song.getID());
-                startActivity(i);
-
-                if (!mCleffApp.isServiceRunning()) {
-                    Timber.e("SERVICE NOT RUNNING YO");
-                }
-
-                if (position > 0) {
-                    mCleffApp.getPlaybackManager().initPlayback();
-                    mCleffApp.getService().setSong((position - 1));
-                    mCleffApp.getService().playSong();
-                    updatePlayerActionsUi();
-                }
-
+            public boolean onLongClick(View v) {
+                return false;
             }
         });
 
-        itemClick.setOnItemLongClickListener(new ItemClickSupport.OnItemLongClickListener() {
+        mListView.setOnScrollListener(new AbsListView.OnScrollListener() {
             @Override
-            public boolean onItemLongClick(RecyclerView parent, View child, int position, long id) {
-               // mToast.setText("Item long pressed: " + position);
-                //mToast.show();
-                return true;
-            }
-        });
-
-        mRecyclerView.setOnScrollListener(new RecyclerView.OnScrollListener() {
-            @Override
-            public void onScrollStateChanged(RecyclerView recyclerView, int scrollState) {
+            public void onScrollStateChanged(AbsListView view, int scrollState) {
                 updateState(scrollState);
+
             }
 
             @Override
-            public void onScrolled(RecyclerView recyclerView, int i, int i2) {
-               // mPositionText.setText("First: " + mRecyclerView.getFirstVisiblePosition());
-               // mCountText.setText("Count: " + mRecyclerView.getChildCount());
+            public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+
+                mLastPosition = mListView.getFirstVisiblePosition();
+                View childView = mListView.getChildAt(0);
+                mPositionOffset = (childView == null) ? 0 : childView.getTop();
+
+               // Timber.d("First visible position: " + first + " with offset: " + topOffset);
+
             }
         });
+
 
         // Set up the floating player action listeners
         mFloatingActionsMenu.setOnFloatingActionsMenuUpdateListener(new FloatingActionsMenu.OnFloatingActionsMenuUpdateListener() {
@@ -161,7 +203,7 @@ public class SongsFragment extends Fragment implements
         mFloatingPlayButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-            updatePlayer();
+            updatePlayer(mCleffApp.getService().getCurrentSongPosition());
 
             }
         });
@@ -183,67 +225,92 @@ public class SongsFragment extends Fragment implements
         });
     }
 
-    public void updatePlayerActionsUi() {
-        if(mCleffApp.getService().isPlaying().equals(MusicService.PlayerState.PLAYING)) {
+    private void saveListPosition() {
+        Timber.d(Integer.toString(mLastPosition));
+
+        SharedPreferences.Editor editor = mSettings.edit();
+
+        editor.putInt(CleffApp.LAST_VIEWED_ITEM, mLastPosition);
+
+        editor.putInt(CleffApp.LAST_VIEWED_OFFSET, mPositionOffset);
+
+        editor.apply();
+    }
+
+    private void restoreListPosition() {
+        int position = mSettings.getInt(CleffApp.LAST_VIEWED_ITEM, 0);
+        int offset = mSettings.getInt(CleffApp.LAST_VIEWED_OFFSET, 0);
+
+        Timber.d("I: " + position + " " + "I2: " + " " + offset);
+
+        mListView.setSelectionFromTop(position, offset);
+    }
+
+    public void updateUi() {
+        if(mCleffApp.getService().getPlayerSate().equals(MusicService.PlayerState.PLAYING)) {
             Timber.d("PLAYER UI CHANGED TO PLAY");
             mFloatingPlayButton.setIcon(R.drawable.ic_orange_pause);
+
         } else {
             Timber.d("PLAYER UI CHANGED TO PAUSED");
             mFloatingPlayButton.setIcon(R.drawable.ic_orange_play_arrow);
         }
     }
 
-    public void updatePlayer (){
-        if(mCleffApp.getService().isPlaying().equals(MusicService.PlayerState.PLAYING)) {
-            mCleffApp.getService().pausePlayer();
-            Timber.d("PLAYER IS NOW PAUSED");
-        } else {
-            if(mCleffApp.getService().isPaused().equals(MusicService.PlayerState.PAUSED)) {
+    public void play(int songIndex) {
+        mCleffApp.getPlaybackManager().initPlayback();
+        mCleffApp.getService().setSong(songIndex);
+        mCleffApp.getService().playSong();
+    }
+
+    public void updatePlayer (int position){
+        Timber.d("Updating player..");
+        int selectedSong = position;
+
+        if(mCleffApp.getService().getPlayerSate().equals(MusicService.PlayerState.IDLE)) {
+            Timber.d("PLAYER IS NOW PLAYING");
+
+            play(selectedSong);
+
+        } else if(mCleffApp.getService().getPlayerSate().equals(MusicService.PlayerState.PLAYING)) {
+            int lastPlayedSong = mSettings.getInt(CleffApp.LAST_PLAYED_SONG, selectedSong);
+            if(lastPlayedSong == selectedSong) {
+                mCleffApp.getService().pausePlayer();
+                Timber.d("PLAYER IS NOW PAUSED");
+            } else {
+                Timber.d("PLAYING NEW SONG");
+               play(selectedSong);
+            }
+        } else if(mCleffApp.getService().getPlayerSate().equals(MusicService.PlayerState.PAUSED)) {
+            int lastPlayedSong = mSettings.getInt(CleffApp.LAST_PLAYED_SONG, selectedSong);
+            Timber.d("Last played song: " + Integer.toString(lastPlayedSong));
+            Timber.d("Current song: " + Integer.toString(selectedSong));
+
+            if(lastPlayedSong == selectedSong) {
                 mCleffApp.getService().resumePlayer();
                 Timber.d("RESUMING PLAYER");
+
             } else {
-                mCleffApp.getPlaybackManager().initPlayback();
-                Timber.d("PLAYER IS NOW PLAYING");
-                mCleffApp.getService().playSong();
+                Timber.d("PLAYING NEW SONG");
+                play(selectedSong);
             }
-        }
-
-        updatePlayerActionsUi();
-    }
-
-    @Override
-    public void repeatClicked() {
-        if(mCleffApp.getService().isRepeat()) {
-            SnackbarManager.show(
-                    Snackbar.with(getActivity())
-                            .text("Repeat off")
-                            .attachToRecyclerView(mRecyclerView));
         } else {
-            SnackbarManager.show(
-                    Snackbar.with(getActivity())
-                            .text("Repeat on")
-                            .attachToRecyclerView(mRecyclerView));
+            Timber.d("NONE");
+            throw new RuntimeException("Not a valid state");
         }
 
-        mCleffApp.getService().setRepeat();
+        updateUi();
     }
 
-    @Override
-    public void shuffleClicked() {
-        if(mCleffApp.getService().isShuffle()) {
-            SnackbarManager.show(
-                    Snackbar.with(getActivity())
-                            .text("Shuffle off")
-                            .attachToRecyclerView(mRecyclerView));
-        } else {
-            SnackbarManager.show(
-                    Snackbar.with(getActivity())
-                            .text("Shuffle on")
-                            .attachToRecyclerView(mRecyclerView));
-        }
+    public void saveLastPlayedSong(int position) {
+        SharedPreferences.Editor editor = mSettings.edit();
+        editor.putInt(CleffApp.LAST_SELECTED_ITEM, position);
 
-        mCleffApp.getService().setShuffle();
+        editor.apply();
     }
+
+
+
 
     private void updateState(int scrollState) {
         String stateName = "Undefined";

@@ -6,6 +6,7 @@ import android.app.Service;
 import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
@@ -38,21 +39,19 @@ public class MusicService extends Service implements
 
     private Context mContext;
     private Service mService;
-    public static String RESULT = "result";
-    public static final String SERVICEMD = "com.freneticlabs.cleff.service.receiver";
+    private SharedPreferences mSettings;
+
     public static final String STOP_SERVICE = "com.freneticlabs.cleff.STOP_SERVICE";
 
-    public static final int UPDATE_PLAYING = -1;
     private static int NOTIFICATION_ID = 579; // just a number
 
     private NotificationCompat.Builder mNotificationBuilder;
-    public static final int mNotificationId = 1080;
 
 
     private ArrayList<Song> mSongs;
     private CleffApp mCleffApp;
 
-    public   enum PlayerState {
+    public enum PlayerState {
         IDLE, PAUSED, PLAYING
     }
 
@@ -142,8 +141,11 @@ public class MusicService extends Service implements
         Timber.d("onStartCommand()");
 
         mContext = getApplicationContext();
+        mCleffApp = (CleffApp) getApplicationContext();
+
         mCurrentSongPosition = 0;
         mService = this;
+        mSettings = mCleffApp.getSharedPreferences();
         mSongs = MusicLibrary.get(getApplicationContext()).getSongs();
 
 
@@ -169,7 +171,6 @@ public class MusicService extends Service implements
      *  Initialize the service listeners.
      */
     void initService() {
-        mCleffApp = (CleffApp) getApplicationContext();
         mCleffApp.setService(this);
 
         //The service has been successfully started.
@@ -203,6 +204,9 @@ public class MusicService extends Service implements
         mCurrentSongPosition = songPosition;
     }
 
+    public int getCurrentSongPosition(){
+        return mCurrentSongPosition;
+    }
     public void setShuffle() {
         if(mShuffle) mShuffle=false;
         else mShuffle=true;
@@ -220,7 +224,7 @@ public class MusicService extends Service implements
         return mRepeat;
     }
 
-    public PlayerState isPlaying() {
+    public PlayerState getPlayerSate() {
         return mPlayerSate;
     }
 
@@ -247,6 +251,12 @@ public class MusicService extends Service implements
             mMediaPlayer.setOnCompletionListener(this);
             mMediaPlayer.prepareAsync();
             mPlayerSate = PlayerState.PLAYING;
+
+            SharedPreferences.Editor editor = mSettings.edit();
+            editor.putInt(CleffApp.LAST_PLAYED_SONG, mCurrentSongPosition);
+
+            // Commit the edits!
+            editor.apply();
 
         } catch (Exception e) {
             Timber.d("Error setting the data source", e);

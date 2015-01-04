@@ -34,6 +34,7 @@ public class MainActivity extends ActionBarActivity implements
     private static final String TAG_TASK_FRAGMENT = "build_library_task_fragment";
     private MusicService mService;
     private CleffApp mCleffApp;
+    private SharedPreferences mSettings;
     /**
      * Fragment managing the behaviors, interactions and presentation of the navigation drawer.
      */
@@ -66,7 +67,7 @@ public class MainActivity extends ActionBarActivity implements
                 getSupportFragmentManager().findFragmentById(R.id.navigation_drawer);
         mTitle = getTitle();
         mCleffApp = (CleffApp)getApplication();
-
+        mSettings = mCleffApp.getSharedPreferences();
         // Set up the drawer.
         mNavigationDrawerFragment.setUp(
                 R.id.navigation_drawer,
@@ -89,6 +90,12 @@ public class MainActivity extends ActionBarActivity implements
                     .commit();
            Timber.d("Building library.");
            mLinearLayout.setVisibility(View.VISIBLE);
+
+           SharedPreferences.Editor editor = mSettings.edit();
+           editor.putInt(CleffApp.LAST_SELECTED_ITEM, -1);
+
+           // Commit the edits!
+           editor.apply();
 
         } else if (!firstRun) {
             // Library has been built. Show main fragment.

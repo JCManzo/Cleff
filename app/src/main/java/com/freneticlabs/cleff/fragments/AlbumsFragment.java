@@ -7,12 +7,11 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.GridView;
 
 import com.freneticlabs.cleff.CleffApp;
 import com.freneticlabs.cleff.R;
 import com.freneticlabs.cleff.views.adapters.AlbumsAdapter;
-
-import org.lucasr.twowayview.widget.TwoWayView;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
@@ -21,7 +20,8 @@ import butterknife.InjectView;
  * A simple {@link Fragment} subclass.
  */
 public class AlbumsFragment extends Fragment {
-    @InjectView(R.id.recycler_view_albums) TwoWayView mRecyclerView;
+    @InjectView(R.id.albums_grid_view)
+    GridView mRecyclerView;
     private SharedPreferences mSettings;
 
     private CleffApp mCleffApp;
@@ -53,7 +53,7 @@ public class AlbumsFragment extends Fragment {
         //mRecyclerView.setItemAnimator(new DefaultItemAnimator());
 
         AlbumsAdapter albumsAdapter = new AlbumsAdapter(getActivity());
-        mRecyclerView.setAdapter(albumsAdapter);
+       // mRecyclerView.setAdapter(albumsAdapter);
         return rootView;
     }
 

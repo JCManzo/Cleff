@@ -36,8 +36,6 @@ dependencies {
     compile 'de.greenrobot:eventbus:2.4.0'
     compile 'com.jakewharton:butterknife:6.0.0'
     compile 'com.jakewharton.timber:timber:2.5.0'
-    compile 'org.lucasr.twowayview:core:1.0.0-SNAPSHOT@aar'
-    compile 'org.lucasr.twowayview:layouts:1.0.0-SNAPSHOT@aar'
     compile 'com.nispok:snackbar:2.7.2'
     compile 'com.squareup.picasso:picasso:2.4.0'
     compile 'de.hdodenhof:circleimageview:1.2.1'

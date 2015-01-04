@@ -32,9 +32,14 @@ public class CleffApp extends Application {
     public static final String REPEAT_MODE = "RepeatMode";
     public static final String SERVICE_RUNNING = "ServiceRunning";
     public static final String SHUFFLE_ON = "ShuffleOn";
-    public static final String PLAYER_ACTIONS_EXPANDED = "PlayerActionsExpanded";
     public static final String FIRST_RUN = "FirstRun";
+    public static final String LAST_PLAYED_SONG = "LastPlayedSong";
 
+    // Keys used in SongsFragment
+    public static final String PLAYER_ACTIONS_EXPANDED = "PlayerActionsExpanded";
+    public static final String LAST_SELECTED_ITEM = "SongListSelectedItem";
+    public static final String LAST_VIEWED_ITEM = "LastViewedItem";
+    public static final String LAST_VIEWED_OFFSET = "LastViewedOffset";
 
     public CleffApp() {
         sCleffApp = this;
