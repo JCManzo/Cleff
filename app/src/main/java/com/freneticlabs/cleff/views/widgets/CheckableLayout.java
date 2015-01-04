@@ -5,11 +5,12 @@ import android.util.AttributeSet;
 import android.view.View;
 import android.widget.Checkable;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 
 /**
  * Created by jcmanzo on 1/3/15.
  */
-public class CheckableLayout extends LinearLayout implements
+public class CheckableLayout extends RelativeLayout implements
     Checkable {
 
     private boolean mIsChecked;

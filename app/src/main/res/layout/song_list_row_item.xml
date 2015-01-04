@@ -3,9 +3,8 @@
 <com.freneticlabs.cleff.views.widgets.CheckableLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/song_list_row_container"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="horizontal"
+    android:layout_width="wrap_content"
+    android:layout_height="?android:listPreferredItemHeight"
     android:background="@drawable/song_list_selected_item"
     android:padding="5dp"
     android:descendantFocusability="blocksDescendants"
@@ -15,28 +14,33 @@
    <com.freneticlabs.cleff.views.widgets.CheckableImageButton
        android:id="@+id/song_list_play_button"
        android:layout_width="wrap_content"
-       android:layout_height="wrap_content"
+       android:layout_height="match_parent"
+       android:layout_alignParentTop="true"
+       android:layout_alignParentBottom="true"
        android:background="@drawable/toggle_play_button"/>
 
-    <LinearLayout
+    <TextView
+        android:id="@+id/list_song_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:paddingLeft="10dp">
-        <TextView
-            android:id="@+id/list_song_title"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textColor="@color/text_primary"
-            android:singleLine="true"
-            android:textSize="20sp"
-            android:textStyle="bold" />
+        android:textColor="@color/text_primary"
+        android:singleLine="true"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true"
+        android:layout_toRightOf="@id/song_list_play_button"
+        android:ellipsize="marquee"
+        android:textSize="20sp"
+        android:textStyle="bold" />
 
-        <TextView
-            android:id="@+id/list_song_artist"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textColor="@color/text_secondary"
+    <TextView
+        android:id="@+id/list_song_artist"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:singleLine="true"
+        android:layout_below="@id/list_song_title"
+        android:layout_toRightOf="@id/song_list_play_button"
+        android:textColor="@color/text_secondary"
             android:textSize="18sp" />
-    </LinearLayout>
-    </com.freneticlabs.cleff.views.widgets.CheckableLayout>
+</com.freneticlabs.cleff.views.widgets.CheckableLayout>

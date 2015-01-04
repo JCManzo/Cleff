@@ -85,11 +85,17 @@ public class SongsAdapter extends ArrayAdapter<Song> {
         holder.title.setText(song.getTitle());
         holder.artist.setText(song.getArtist());
         holder.button.setOnCheckedChangeListener(new CheckableImageButton.OnCheckedChangeListener() {
+            /** Keeps track of the currently toggle button in order to
+             * turn off any previous buttons that were turned on.
+             *
+             * @param button the button was just pressed
+             *            The button view whose state has changed.
+             * @param checkState the state of this button
+             */
             @Override
             public void onCheckedChanged(CheckableImageButton button, boolean checkState) {
                 if (checkState && mCurrentButton != button) {
                     if(mCurrentButton != null) {
-                        counter++;
                         mCurrentButton.setChecked(false);
                     }
                     mCurrentButton = button;
