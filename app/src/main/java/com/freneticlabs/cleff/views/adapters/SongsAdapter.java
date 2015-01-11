@@ -1,82 +1,72 @@
 package com.freneticlabs.cleff.views.adapters;
 
 import android.content.Context;
+import android.database.Cursor;
+import android.support.v4.widget.CursorAdapter;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
-import com.freneticlabs.cleff.CleffApp;
 import com.freneticlabs.cleff.R;
-import com.freneticlabs.cleff.models.Song;
-import com.freneticlabs.cleff.views.widgets.CheckableImageButton;
-
-import java.util.ArrayList;
+import com.freneticlabs.cleff.models.MusicDatabase;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
+import timber.log.Timber;
 
 /**
  * Created by jcmanzo on 12/14/14.
  */
-public class SongsAdapter extends ArrayAdapter<Song> {
-    private ArrayList<Song> mSongList;
+public class SongsAdapter extends CursorAdapter {
     private final Context mContext;
 
-    private CleffApp mCleffApp;
-    private CheckableImageButton mCurrentButton = null;
     // Remember the last item shown on screen
     private int lastPosition = -1;
 
 
-    public SongsAdapter(Context context, int resource, ArrayList<Song> songs) {
-        super(context, resource, songs);
+    public SongsAdapter(Context context, Cursor cursor, int flags) {
+        super(context, cursor, flags);
         mContext = context;
-        mSongList = songs;
-        mCleffApp = (CleffApp) mContext.getApplicationContext();
     }
 
 
+    @Override
+    public void bindView(View view, Context context, Cursor cursor) {
+        Log.d("TAG", "HEREEE");
+        ViewHolder viewHolder = (ViewHolder) view.getTag();
+        ViewHolder holder = new ViewHolder(view);
+        view.setTag(holder);
+        Timber.d(cursor.getString(cursor.getColumnIndex(MusicDatabase.SONG_TITLE)));
+        holder.title.setText(cursor.getString(cursor.getColumnIndex(MusicDatabase.SONG_TITLE)));
+        holder.artist.setText(cursor.getString(cursor.getColumnIndex(MusicDatabase.SONG_ARTIST)));
 
+        setAnimation(view, cursor.getPosition());
 
-    static class ViewHolderItem {
+    }
+
+    @Override
+    public View newView(Context context, Cursor cursor, ViewGroup parent) {
+        LayoutInflater inflater = LayoutInflater.from(mContext);
+        View view = inflater.inflate(R.layout.song_list_row_item, parent, false);
+
+        return view;
+    }
+
+    static class ViewHolder {
         @InjectView(R.id.list_song_title)
         TextView title;
         @InjectView(R.id.list_song_artist)
         TextView artist;
 
 
-        public ViewHolderItem(View view) {
+        public ViewHolder(View view) {
             ButterKnife.inject(this, view);
         }
     }
-
-    @Override
-    public View getView(final int position, View view, ViewGroup parent) {
-        ViewHolderItem holder;
-        final Song song = getItem(position);
-
-        // reuse views
-        if (view != null) {
-            holder = (ViewHolderItem) view.getTag();
-
-        } else {
-            LayoutInflater inflater = (LayoutInflater)mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            view = inflater.inflate(R.layout.song_list_row_item, null);
-            holder = new ViewHolderItem(view);
-            view.setTag(holder);
-        }
-
-        holder.title.setText(song.getTitle());
-        holder.artist.setText(song.getArtist());
-
-        setAnimation(view, position);
-        return view;
-    }
-
 
     /**
      * Only ViewHolderItems that have not previously appeared

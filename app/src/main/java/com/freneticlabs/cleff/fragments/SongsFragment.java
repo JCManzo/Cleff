@@ -3,9 +3,14 @@ package com.freneticlabs.cleff.fragments;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,10 +19,11 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 
 import com.freneticlabs.cleff.CleffApp;
+import com.freneticlabs.cleff.MusicLibrary;
 import com.freneticlabs.cleff.MusicService;
 import com.freneticlabs.cleff.R;
 import com.freneticlabs.cleff.activities.PlayerActivity;
-import com.freneticlabs.cleff.models.MusicLibrary;
+import com.freneticlabs.cleff.models.MusicDatabase;
 import com.freneticlabs.cleff.models.Song;
 import com.freneticlabs.cleff.views.adapters.SongsAdapter;
 import com.getbase.floatingactionbutton.FloatingActionButton;
@@ -33,7 +39,7 @@ import static android.support.v7.widget.RecyclerView.SCROLL_STATE_DRAGGING;
 import static android.support.v7.widget.RecyclerView.SCROLL_STATE_IDLE;
 import static android.support.v7.widget.RecyclerView.SCROLL_STATE_SETTLING;
 
-public class SongsFragment extends Fragment {
+public class SongsFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
     @InjectView(R.id.recycler_view_songs)
     ListView mListView;
@@ -45,6 +51,7 @@ public class SongsFragment extends Fragment {
     FloatingActionButton mFloatingPreviousButton;
     @InjectView(R.id.floating_player_actions)
     FloatingActionsMenu mFloatingActionsMenu;
+    private static final int URL_LOADER = 0;
 
     private SharedPreferences mSettings;
     private int mLastClickedItem = -1;
@@ -66,7 +73,6 @@ public class SongsFragment extends Fragment {
         mContext = getActivity().getApplicationContext();
         mCleffApp = (CleffApp) getActivity().getApplication();
         mSettings = mCleffApp.getSharedPreferences();
-        mSongs = MusicLibrary.get(mContext).getSongs();
 
     }
 
@@ -88,12 +94,14 @@ public class SongsFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_song_list, container, false);
         ButterKnife.inject(this, rootView);
 
-        mSongsAdapter = new SongsAdapter(getActivity(), R.layout.song_list_row_item, mSongs);
+        mSongsAdapter = new SongsAdapter(getActivity(), null, 0);
         mListView.setAdapter(mSongsAdapter);
+        getLoaderManager().initLoader(URL_LOADER, null, this);
 
         initListeners();
         return rootView;
     }
+
 
     private int getWantedChild(int position) {
         int firstPosition = mListView.getFirstVisiblePosition() - mListView.getHeaderViewsCount(); // This is the same as child #0
@@ -123,7 +131,6 @@ public class SongsFragment extends Fragment {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
 
-                Song song = MusicLibrary.get(getActivity()).getSongs().get(position);
                 Intent i = new Intent(getActivity(), PlayerActivity.class);
                 // i.putExtra(PlayerFragment.EXTRA_SONG_ID, song.getID());
                 //startActivity(i);
@@ -293,6 +300,47 @@ public class SongsFragment extends Fragment {
                 stateName = "Flinging";
                 break;
         }
+
+    }
+
+    @Override
+    public Loader<Cursor> onCreateLoader(int loaderId, Bundle args) {
+        String [] sqlSelect = {"0 _id", "song_name", "song_artist"};
+        final String[] projection = {
+                MusicDatabase.SONG_ID,
+                MusicDatabase.SONG_ARTIST,
+                MusicDatabase.SONG_TITLE
+        };
+
+
+        Uri uri = MusicLibrary.CONTENT_URI;
+        Timber.d(uri.toString());
+
+
+        /*
+         * Takes action based on the ID of the Loader that's being created
+         */
+        // Returns a new CursorLoader
+        return new CursorLoader(
+                getActivity(),   // Parent activity context
+                uri,        // Table to query
+                null,     // Projection to return
+                null,            // No selection clause
+                null,            // No selection arguments
+                null           // Default sort order
+        );
+    }
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+        mSongsAdapter.swapCursor(null);
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        // Swap the new cursor in.  (The framework will take care of closing the
+        // old cursor once we return.)
+
+        mSongsAdapter.swapCursor(data);
 
     }
 }
