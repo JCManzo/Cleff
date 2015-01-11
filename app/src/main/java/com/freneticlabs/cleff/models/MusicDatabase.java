@@ -59,6 +59,7 @@ public class MusicDatabase extends SQLiteAssetHelper {
         super(context, name, null, factory, version);
     }
 
+
     public Cursor getSongs() {
         SQLiteDatabase db = getReadableDatabase();
         SQLiteQueryBuilder qb = new SQLiteQueryBuilder();

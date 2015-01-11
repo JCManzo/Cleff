@@ -24,6 +24,7 @@ public class MusicLibrary extends ContentProvider {
     private static final int SONGS = 10;
     private static final int SONG_ID = 20;
 
+
     private static final UriMatcher sURIMatcher = new UriMatcher(UriMatcher.NO_MATCH);
     static {
         sURIMatcher.addURI(AUTHORITY,  BASE_PATH, SONGS);
