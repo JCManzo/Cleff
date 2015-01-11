@@ -11,7 +11,11 @@ import android.widget.GridView;
 
 import com.freneticlabs.cleff.CleffApp;
 import com.freneticlabs.cleff.R;
+import com.freneticlabs.cleff.models.Album;
+import com.freneticlabs.cleff.models.MusicLibrary;
 import com.freneticlabs.cleff.views.adapters.AlbumsAdapter;
+
+import java.util.ArrayList;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
@@ -21,7 +25,9 @@ import butterknife.InjectView;
  */
 public class AlbumsFragment extends Fragment {
     @InjectView(R.id.albums_grid_view)
-    GridView mRecyclerView;
+    GridView mGridView;
+    private AlbumsAdapter mAlbumsAdapter;
+    private ArrayList<Album> mAlbums;
     private SharedPreferences mSettings;
 
     private CleffApp mCleffApp;
@@ -36,6 +42,7 @@ public class AlbumsFragment extends Fragment {
         setHasOptionsMenu(true);
         mCleffApp = (CleffApp)getActivity().getApplication();
         mSettings = mCleffApp.getSharedPreferences();
+        mAlbums = MusicLibrary.get(getActivity()).getAlbums();
     }
 
     @Override
@@ -46,14 +53,10 @@ public class AlbumsFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_albums_grid, container, false);
         ButterKnife.inject(this, rootView);
 
-        // use this setting to improve performance if you know that changes
-        // in content do not change the layout size of the RecyclerView
-        //mRecyclerView.setHasFixedSize(true);
 
-        //mRecyclerView.setItemAnimator(new DefaultItemAnimator());
+        mAlbumsAdapter = new AlbumsAdapter(getActivity(), R.layout.albums_grid_item, mAlbums);
+        mGridView.setAdapter(mAlbumsAdapter);
 
-        AlbumsAdapter albumsAdapter = new AlbumsAdapter(getActivity());
-       // mRecyclerView.setAdapter(albumsAdapter);
         return rootView;
     }
 

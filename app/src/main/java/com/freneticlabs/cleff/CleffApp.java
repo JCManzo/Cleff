@@ -4,6 +4,7 @@ import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import com.freneticlabs.cleff.models.MusicDatabase;
 import com.freneticlabs.cleff.utils.PlaybackManager;
 import com.squareup.picasso.Picasso;
 
@@ -23,6 +24,7 @@ public class CleffApp extends Application {
     //Service reference and flags.
     private MusicService mService;
     private PlaybackManager mPlaybackManager;
+    private MusicDatabase mMusicDatabase;
     private Picasso mPicasso;
     private boolean mIsServiceRunning = false;
     private static boolean mIsActivityVisible = false;
@@ -85,6 +87,10 @@ public class CleffApp extends Application {
         return mSharedPreferences;
     }
 
+    public MusicDatabase getMusicDatabase() {
+        return mMusicDatabase;
+    }
+
     public Picasso getPicasso() {
         return mPicasso;
     }
@@ -100,10 +106,9 @@ public class CleffApp extends Application {
             Timber.plant(new CrashReportingTree());
         }
 
-
-
         mContext = getApplicationContext();
         mPicasso = new Picasso.Builder(mContext).build();
+        mMusicDatabase = new MusicDatabase(mContext);
         mPlaybackManager = new PlaybackManager(this.getApplicationContext());
     }
 

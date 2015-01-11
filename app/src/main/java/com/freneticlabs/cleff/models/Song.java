@@ -27,10 +27,15 @@ public class Song implements Parcelable{
     private String mArtist;
     private String mAlbum;
     private String mGenre;
-
+    private String mPath;
 
     private float mSongRating;
 
+
+
+    public Song() {
+
+    }
     public Song(long songID, String songTitle, String songArtist,
                 String album, long albumID, String genre) {
         mID = songID;
@@ -74,6 +79,14 @@ public class Song implements Parcelable{
         return mSongRating;
     }
 
+    public String getGenre() {
+        return mGenre;
+    }
+
+    public void setGenre(String genre) {
+        mGenre = genre;
+    }
+
     public void setSongRating(float songRating) {
         mSongRating = songRating;
     }
@@ -86,6 +99,9 @@ public class Song implements Parcelable{
         return mAlbum;
     }
 
+    public void setAlbum(String album) {
+        mAlbum = album;
+    }
     public long getAlbumID() {
         return mAlbumID;
     }
@@ -108,6 +124,14 @@ public class Song implements Parcelable{
 
     public void setArtist(String artist) {
         mArtist = artist;
+    }
+
+    public void setPath(String path) {
+        mPath = path;
+    }
+
+    public String getPath() {
+        return mPath;
     }
 
     @Override

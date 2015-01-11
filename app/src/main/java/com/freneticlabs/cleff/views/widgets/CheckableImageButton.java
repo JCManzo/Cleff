@@ -1,16 +1,11 @@
 package com.freneticlabs.cleff.views.widgets;
 
 import android.content.Context;
-import android.content.res.TypedArray;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.AttributeSet;
 import android.widget.Checkable;
 import android.widget.ImageButton;
-
-import com.freneticlabs.cleff.R;
-
-import timber.log.Timber;
 
 /**
  * Created by jcmanzo on 1/3/15.
@@ -19,10 +14,9 @@ public class CheckableImageButton extends ImageButton implements
         Checkable {
     private boolean mChecked;
     private boolean mBroadcasting;
-    private int mPersonality;
     private OnCheckedChangeListener mOnCheckedChangeListener;
 
-    private static final int[] CHECKED_STATE_SET = { R.attr.is_checked };
+    private static final int[] CHECKED_STATE_SET = { android.R.attr.state_checked };
 
     private static final int PERSONALITY_RADIO_BUTTON = 0;
     private static final int PERSONALITY_CHECK_BOX = 1;
@@ -34,26 +28,13 @@ public class CheckableImageButton extends ImageButton implements
     public CheckableImageButton(Context context, AttributeSet attrs) {
         super(context, attrs);
 
-        TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.CheckableImageButton);
-
-        mPersonality = a.getInt(R.styleable.CheckableImageButton_personality, PERSONALITY_RADIO_BUTTON);
-        boolean checked = a.getBoolean(R.styleable.CheckableImageButton_is_checked, false);
-        setChecked(checked);
-
-        a.recycle();
     }
 
     public void toggle() {
         setChecked(!mChecked);
     }
 
-    @Override
-    public boolean performClick() {
 
-        toggle();
-
-        return super.performClick();
-    }
 
     public boolean isChecked() {
         return mChecked;
@@ -86,15 +67,15 @@ public class CheckableImageButton extends ImageButton implements
         }
     }
 
-    /**
-     * Register a callback to be invoked when the checked state of this button changes.
-     *
-     * @param listener
-     *            the callback to call on checked state change
-     */
-    public void setOnCheckedChangeListener(OnCheckedChangeListener listener) {
-        mOnCheckedChangeListener = listener;
-    }
+/**
+ * Register a callback to be invoked when the checked state of this button changes.
+ *
+ * @param listener
+ *            the callback to call on checked state change
+ */
+public void setOnCheckedChangeListener(OnCheckedChangeListener listener) {
+    mOnCheckedChangeListener = listener;
+}
 
     /**
      * Interface definition for a callback.
@@ -137,7 +118,6 @@ public class CheckableImageButton extends ImageButton implements
             super(in);
             checked = (Boolean) in.readValue(null);
         }
-
         @Override
         public void writeToParcel(Parcel out, int flags) {
             super.writeToParcel(out, flags);
@@ -146,8 +126,6 @@ public class CheckableImageButton extends ImageButton implements
 
         public static final Parcelable.Creator<SavedState> CREATOR = new Parcelable.Creator<SavedState>() {
             public SavedState createFromParcel(Parcel in) {
-                Timber.d("SAVED");
-
                 return new SavedState(in);
             }
 
@@ -155,7 +133,6 @@ public class CheckableImageButton extends ImageButton implements
                 return new SavedState[size];
             }
         };
-
     }
 
     @Override
@@ -169,10 +146,9 @@ public class CheckableImageButton extends ImageButton implements
     @Override
     public void onRestoreInstanceState(Parcelable state) {
         SavedState ss = (SavedState) state;
+
         super.onRestoreInstanceState(ss.getSuperState());
         setChecked(ss.checked);
         requestLayout();
     }
-
-
 }

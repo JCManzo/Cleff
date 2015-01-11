@@ -2,9 +2,7 @@ package com.freneticlabs.cleff.views.widgets;
 
 import android.content.Context;
 import android.util.AttributeSet;
-import android.view.View;
 import android.widget.Checkable;
-import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
 /**
@@ -13,9 +11,9 @@ import android.widget.RelativeLayout;
 public class CheckableLayout extends RelativeLayout implements
     Checkable {
 
-    private boolean mIsChecked;
-    private CheckableImageButton mCheckableImageButton;
-    private LinearLayout mLinearLayout;
+    private boolean mChecked = false;
+    private static final int[] CHECKED_STATE_SET = {android.R.attr.state_checked};
+
     public CheckableLayout(Context context) {
         super(context);
         // TODO Auto-generated constructor stub
@@ -31,34 +29,37 @@ public class CheckableLayout extends RelativeLayout implements
 
     @Override
     public boolean isChecked() {
-        return mCheckableImageButton != null && mCheckableImageButton.isChecked();
+        return mChecked;
+    }
+
+    @Override
+    public boolean performClick() {
+        toggle();
+        return super.performClick();
     }
 
     @Override
     public void toggle() {
-        if(mCheckableImageButton != null) {
-            mCheckableImageButton.toggle();
-        }
+        setChecked(!mChecked);
     }
 
     @Override
     public void setChecked(boolean checked) {
-        if(mCheckableImageButton != null) {
-            mCheckableImageButton.setChecked(checked);
+        if(mChecked != checked) {
+            mChecked = checked;
+            refreshDrawableState();
+
         }
     }
 
     @Override
-    protected void onFinishInflate() {
-        super.onFinishInflate();
-
-        final int childCount = getChildCount();
-
-        for (int i = 0; i < childCount; ++i) {
-            View v = getChildAt(i);
-            if(v instanceof CheckableImageButton) {
-                mCheckableImageButton = (CheckableImageButton)v;
-            }
+    protected int[] onCreateDrawableState(int extraSpace) {
+        int[] drawableState = super.onCreateDrawableState(extraSpace + 1);
+        if (isChecked()) {
+            mergeDrawableStates(drawableState, CHECKED_STATE_SET);
         }
+        return drawableState;
     }
+
+
 }

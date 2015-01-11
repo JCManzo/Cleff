@@ -27,12 +27,9 @@ public class SongsAdapter extends ArrayAdapter<Song> {
     private final Context mContext;
 
     private CleffApp mCleffApp;
-    private SongsListListener mSongsListListener;
     private CheckableImageButton mCurrentButton = null;
-    private int counter = 0;
     // Remember the last item shown on screen
     private int lastPosition = -1;
-    private int mLastClickedPosition = -1;
 
 
     public SongsAdapter(Context context, int resource, ArrayList<Song> songs) {
@@ -43,22 +40,14 @@ public class SongsAdapter extends ArrayAdapter<Song> {
     }
 
 
-    public void setSongsListListener(SongsListListener songsListListener) {
-        mSongsListListener = songsListListener;
-    }
 
-    public interface SongsListListener {
-        public void playBackClicked(int position);
-        public void itemClicked(int song);
-    }
 
     static class ViewHolderItem {
         @InjectView(R.id.list_song_title)
         TextView title;
         @InjectView(R.id.list_song_artist)
         TextView artist;
-        @InjectView(R.id.song_list_play_button)
-        CheckableImageButton button;
+
 
         public ViewHolderItem(View view) {
             ButterKnife.inject(this, view);
@@ -81,36 +70,9 @@ public class SongsAdapter extends ArrayAdapter<Song> {
             view.setTag(holder);
         }
 
-
         holder.title.setText(song.getTitle());
         holder.artist.setText(song.getArtist());
-        holder.button.setOnCheckedChangeListener(new CheckableImageButton.OnCheckedChangeListener() {
-            /** Keeps track of the currently toggle button in order to
-             * turn off any previous buttons that were turned on.
-             *
-             * @param button the button was just pressed
-             *            The button view whose state has changed.
-             * @param checkState the state of this button
-             */
-            @Override
-            public void onCheckedChanged(CheckableImageButton button, boolean checkState) {
-                if (checkState && mCurrentButton != button) {
-                    if(mCurrentButton != null) {
-                        mCurrentButton.setChecked(false);
-                    }
-                    mCurrentButton = button;
-                }
-            }
-        });
 
-        holder.button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-               mSongsListListener.playBackClicked(position);
-
-                mLastClickedPosition = position;
-            }
-        });
         setAnimation(view, position);
         return view;
     }

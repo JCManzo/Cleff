@@ -1,1 +1,3 @@
-include ":libraries:floatingactionbutton", ":app"
+include ":libraries:floatingactionbutton"
+include ":libraries:filepicker"
+include ":app"

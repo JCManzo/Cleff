@@ -18,8 +18,6 @@
 
 
     <declare-styleable name="CheckableImageButton">
-        <attr name="is_checked" format="boolean" />
-
         <attr name="personality">
             <enum name="radio" value="0" />
             <enum name="check" value="1" />

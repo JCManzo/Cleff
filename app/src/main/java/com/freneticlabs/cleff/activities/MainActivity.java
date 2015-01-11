@@ -1,6 +1,7 @@
 package com.freneticlabs.cleff.activities;
 
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.DrawerLayout;
@@ -21,6 +22,11 @@ import com.freneticlabs.cleff.fragments.BuildLibraryTaskFragment;
 import com.freneticlabs.cleff.fragments.NavigationDrawerFragment;
 import com.freneticlabs.cleff.fragments.PageSlidingTabStripFragment;
 import com.freneticlabs.cleff.models.MusicLibrary;
+import com.nispok.snackbar.Snackbar;
+import com.nispok.snackbar.SnackbarManager;
+import com.nononsenseapps.filepicker.FilePickerFragment;
+
+import java.util.List;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
@@ -29,12 +35,13 @@ import timber.log.Timber;
 
 public class MainActivity extends ActionBarActivity implements
         NavigationDrawerFragment.NavigationDrawerCallbacks,
-        BuildLibraryTaskFragment.BuildLibraryTaskCallbacks {
-
+        BuildLibraryTaskFragment.BuildLibraryTaskCallbacks,
+        FilePickerFragment.OnFilePickedListener{
     private static final String TAG_TASK_FRAGMENT = "build_library_task_fragment";
     private MusicService mService;
     private CleffApp mCleffApp;
     private SharedPreferences mSettings;
+    private FilePickerFragment mDialog;
     /**
      * Fragment managing the behaviors, interactions and presentation of the navigation drawer.
      */
@@ -62,6 +69,8 @@ public class MainActivity extends ActionBarActivity implements
         if(mToolbar != null) {
             setSupportActionBar(mToolbar);
         }
+
+        mDialog = new FilePickerFragment();
 
         mNavigationDrawerFragment = (NavigationDrawerFragment)
                 getSupportFragmentManager().findFragmentById(R.id.navigation_drawer);
@@ -193,6 +202,9 @@ public class MainActivity extends ActionBarActivity implements
         if (id == R.id.action_settings) {
             return true;
         } else if (id == R.id.action_sort) {
+
+        } else if(id == R.id.action_scan) {
+            mDialog.show(getSupportFragmentManager(), null);
         }
 
         return super.onOptionsItemSelected(item);
@@ -232,5 +244,17 @@ public class MainActivity extends ActionBarActivity implements
         fragmentManager.beginTransaction()
                 .replace(R.id.container, new PageSlidingTabStripFragment())
                 .commit();
+    }
+
+    @Override
+    public void onFilePicked(Uri file) {
+        SnackbarManager.show(Snackbar.with(this).text("SUCESS3"));
+
+    }
+
+    @Override
+    public void onFilesPicked(List<Uri> files) {
+        SnackbarManager.show(Snackbar.with(this).text("SUCESS"));
+
     }
 }
