@@ -39,7 +39,8 @@ import static android.support.v7.widget.RecyclerView.SCROLL_STATE_DRAGGING;
 import static android.support.v7.widget.RecyclerView.SCROLL_STATE_IDLE;
 import static android.support.v7.widget.RecyclerView.SCROLL_STATE_SETTLING;
 
-public class SongsFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
+public class SongsFragment extends Fragment
+        implements LoaderManager.LoaderCallbacks<Cursor> {
 
     @InjectView(R.id.recycler_view_songs)
     ListView mListView;

@@ -17,19 +17,20 @@ public class MusicDatabase extends SQLiteAssetHelper {
 
     //Music library table.
     public static final String GENRE_TABLE = "genre";
-    public static final String SONG_TABLE = "song";
+    public static final String MUSIC_TABLE = "musiclibrary";
     public static final String SONG_ID = "_id";
     public static final String SONG_TITLE = "song_name";
-    public static final String SONG_ARTIST = "song_artist_id";
-    public static final String SONG_ALBUM = "song_album_id";
+    public static final String SONG_ARTIST = "song_artist";
+    public static final String SONG_ALBUM = "song_album";
+    public static final String SONG_ALBUM_ID = "song_album_id";
     public static final String SONG_ALBUM_ARTIST = "album_artist";
     public static final String SONG_DURATION = "song_duration";
     public static final String SONG_FILE_PATH = "song_file_path";
     public static final String SONG_TRACK_NUMBER = "song_track_number";
-    public static final String SONG_GENRE = "song_genre_id";
+    public static final String SONG_GENRE = "song_genre";
     public static final String SONG_PLAY_COUNT = "song_play_count";
     public static final String SONG_YEAR = "song_year";
-    public static final String SONG_LAST_MODIFIED = "last_modified";
+    public static final String LAST_MODIFIED = "last_modified";
     public static final String SONG_SCANNED = "scanned";
     public static final String SONG_RATING = "rating";
     public static final String DATE_ADDED = "date_added";
@@ -64,14 +65,20 @@ public class MusicDatabase extends SQLiteAssetHelper {
         SQLiteDatabase db = getReadableDatabase();
         SQLiteQueryBuilder qb = new SQLiteQueryBuilder();
 
-        String [] sqlSelect = {"0 _id", "FirstName", "LastName"};
+        String [] sqlSelect = {"0 _id", "song_name", "song_artist"};
+        String [] projection = {
+                SONG_ID,
+                SONG_TITLE,
+                SONG_ARTIST
+        };
         String sqlTables = "musiclibrary";
 
         qb.setTables(sqlTables);
-        Cursor cursor = qb.query(db, sqlSelect, null, null,
+        Cursor songCursor = qb.query(db, projection, null, null,
                 null, null, null);
 
-        cursor.moveToFirst();
-        return cursor;
+        songCursor.moveToFirst();
+
+        return songCursor;
     }
 }

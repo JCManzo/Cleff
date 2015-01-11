@@ -13,9 +13,9 @@ import android.support.v4.app.Fragment;
 import android.util.Log;
 
 import com.freneticlabs.cleff.CleffApp;
+import com.freneticlabs.cleff.MusicLibrary;
 import com.freneticlabs.cleff.R;
 import com.freneticlabs.cleff.models.MusicDatabase;
-import com.freneticlabs.cleff.models.MusicLibrary;
 
 import java.util.HashMap;
 
@@ -136,7 +136,6 @@ public class BuildLibraryTaskFragment extends Fragment {
 
         public void saveMediaStoreDataToDB(Cursor mediaStoreCursor) {
             // Populates the ArrayList in MusicLibrary with Song objects.
-            MusicLibrary.get(getActivity()).clearLibrary();
 
             buildGenresTable();
 
@@ -159,7 +158,7 @@ public class BuildLibraryTaskFragment extends Fragment {
                 int titleColumn = mediaStoreCursor.getColumnIndexOrThrow(MediaStore.Audio.Media.TITLE);
                 int yearColumn = mediaStoreCursor.getColumnIndexOrThrow(MediaStore.Audio.Media.YEAR);
                 int filePathColumn = mediaStoreCursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DATA);
-
+                int songTrackColumn = mediaStoreCursor.getColumnIndexOrThrow(MediaStore.Audio.Media.TRACK);
                 do {
                     // long thisSongId = musicCursor.getLong(idColumn);
                     int thisSongId = Integer.parseInt(mediaStoreCursor.getString(idColumn));
@@ -175,6 +174,7 @@ public class BuildLibraryTaskFragment extends Fragment {
                     String songDateAdded = mediaStoreCursor.getString(dateAddedColumn);
                     String songDateModified = mediaStoreCursor.getString(dateModifiedColumn);
                     String songAlbumArtist = mediaStoreCursor.getString(albumArtistColumn);
+                    String songTrackNumber = mediaStoreCursor.getString(songTrackColumn);
 
                     boolean unknownArtist = songArtist == null || songArtist.equals(MediaStore.UNKNOWN_STRING);
                     boolean unknownAlbum = songAlbum == null || songAlbum.equals(MediaStore.UNKNOWN_STRING);
@@ -189,10 +189,15 @@ public class BuildLibraryTaskFragment extends Fragment {
                     values.put(MusicDatabase.SONG_FILE_PATH, songFilePath);
                     values.put(MusicDatabase.SONG_ARTIST, songArtist);
                     values.put(MusicDatabase.SONG_GENRE, getSongGenre(songFilePath));
-                    mCleffApp.getMusicDatabase()
-                            .getWritableDatabase()
-                            .insert(MusicDatabase.SONG_TABLE, null, values);
+                    values.put(MusicDatabase.SONG_ALBUM, songAlbum);
+                    values.put(MusicDatabase.SONG_ALBUM_ID, songAlbumId);
+                    values.put(MusicDatabase.SONG_YEAR, songYear);
+                    values.put(MusicDatabase.SONG_DURATION, songDuration);
+                    values.put(MusicDatabase.SONG_TRACK_NUMBER, songTrackNumber);
+                    values.put(MusicDatabase.DATE_ADDED, songDateAdded);
+                    values.put(MusicDatabase.LAST_MODIFIED, songDateModified);
 
+                    mContext.getContentResolver().insert(MusicLibrary.CONTENT_URI, values);
                 }
                 while (mediaStoreCursor.moveToNext());
             }
@@ -217,7 +222,7 @@ public class BuildLibraryTaskFragment extends Fragment {
          */
         private Cursor getSongsFromMediaStore() {
             //Get a cursor of all active music folders.
-           // Cursor musicFoldersCursor = mContext.getDBAccessHelper().getAllMusicFolderPaths();
+            // Cursor musicFoldersCursor = mContext.getDBAccessHelper().getAllMusicFolderPaths();
 
             Cursor mediaStoreCursor = null;
             String sortOrder = null;
@@ -236,12 +241,12 @@ public class BuildLibraryTaskFragment extends Fragment {
             };
 
             //Grab the cursor of MediaStore entries.
-          //  if (musicFoldersCursor==null || musicFoldersCursor.getCount() < 1) {
-                //No folders were selected by the user. Grab all songs in MediaStore.
-               // mediaStoreCursor = MediaStoreAccessHelper.getAllSongs(mContext, projection, sortOrder);
-          //  } else {
-                //Build a selection statement for querying MediaStore.
-               // mMediaStoreSelection = buildMusicFoldersSelection(musicFoldersCursor);
+            //  if (musicFoldersCursor==null || musicFoldersCursor.getCount() < 1) {
+            //No folders were selected by the user. Grab all songs in MediaStore.
+            // mediaStoreCursor = MediaStoreAccessHelper.getAllSongs(mContext, projection, sortOrder);
+            //  } else {
+            //Build a selection statement for querying MediaStore.
+            // mMediaStoreSelection = buildMusicFoldersSelection(musicFoldersCursor);
                 /*mediaStoreCursor = MediaStoreAccessHelper.getAllSongsWithSelection(mContext,
                         mMediaStoreSelection,
                         projection,
@@ -249,7 +254,7 @@ public class BuildLibraryTaskFragment extends Fragment {
 
                 //Close the music folders cursor.
                 musicFoldersCursor.close();*/
-           // }
+            // }
             ContentResolver contentResolver = mContext.getContentResolver();
             Uri uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
             String selection = MediaStore.Audio.Media.IS_MUSIC + "=1";
@@ -260,7 +265,8 @@ public class BuildLibraryTaskFragment extends Fragment {
         }
 
         /**
-         * Builds a HashMap of all songs and their genres.
+         * Builds a HashMap of all songs, their genres and the amount of songs
+         * of each genre.
          */
         private void buildGenresTable() {
             // Queries for this Genre columns.
@@ -291,9 +297,9 @@ public class BuildLibraryTaskFragment extends Fragment {
                 }
 
 
-            /* Grab a cursor of songs in the each genre id. Limit the songs to
-             * the user defined folders using mMediaStoreSelection.
-            */
+                /* Grab a cursor of songs in the each genre id. Limit the songs to
+                 * the user defined folders using mMediaStoreSelection.
+                */
                 Cursor cursor = mContext.getContentResolver().query(makeGenreUri(genreId),
                         new String[] { MediaStore.Audio.Media.DATA },
                         null,
@@ -308,7 +314,6 @@ public class BuildLibraryTaskFragment extends Fragment {
                         mGenresSongCountHashMap.put(genreName, cursor.getCount());
                     }
                     ContentValues values = new ContentValues();
-                    values.put(MusicDatabase.GENRE_ID, genreId);
                     values.put(MusicDatabase.GENRE_NAME, genreName);
                     values.put(MusicDatabase.GENRES_SONG_COUNT, getSongGenreCount(genreName));
                     mCleffApp.getMusicDatabase()

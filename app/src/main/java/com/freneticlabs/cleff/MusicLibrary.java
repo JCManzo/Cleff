@@ -48,7 +48,6 @@ public class MusicLibrary extends ContentProvider {
         int uriType = sURIMatcher.match(uri);
         switch (uriType) {
             case SONGS:
-                Timber.d("URITYPE SONGS");
                 return mMusicLibrary.getSongs();
             default:
                 throw new IllegalArgumentException("Unknown URI: " + uri);
@@ -63,7 +62,7 @@ public class MusicLibrary extends ContentProvider {
 
     @Override
     public Uri insert(Uri uri, ContentValues values) {
-        // TODO Auto-generated method stub
+        mMusicLibrary.getWritableDatabase().insert(MusicDatabase.MUSIC_TABLE, null, values);
         return null;
     }
 
