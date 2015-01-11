@@ -16,12 +16,12 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 
 import com.freneticlabs.cleff.CleffApp;
+import com.freneticlabs.cleff.MusicLibrary;
 import com.freneticlabs.cleff.MusicService;
 import com.freneticlabs.cleff.R;
 import com.freneticlabs.cleff.fragments.BuildLibraryTaskFragment;
 import com.freneticlabs.cleff.fragments.NavigationDrawerFragment;
 import com.freneticlabs.cleff.fragments.PageSlidingTabStripFragment;
-import com.freneticlabs.cleff.models.MusicLibrary;
 import com.nispok.snackbar.Snackbar;
 import com.nispok.snackbar.SnackbarManager;
 import com.nononsenseapps.filepicker.FilePickerFragment;
@@ -127,7 +127,6 @@ public class MainActivity extends ActionBarActivity implements
     @Override
     public void onPause() {
         super.onPause();
-        MusicLibrary.get(this).saveLibrary();
         CleffApp.activityPaused();
 
     }
@@ -226,7 +225,6 @@ public class MainActivity extends ActionBarActivity implements
     public void onPostExecute() {
 
         mLinearLayout.setVisibility(View.GONE);
-        MusicLibrary.get(this).saveLibrary();
 
         Log.i("TASK", "Main onPostExecute");
 

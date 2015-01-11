@@ -17,7 +17,6 @@ import android.support.v4.app.NotificationCompat;
 import android.widget.RemoteViews;
 
 import com.freneticlabs.cleff.activities.MainActivity;
-import com.freneticlabs.cleff.models.MusicLibrary;
 import com.freneticlabs.cleff.models.Song;
 
 import java.util.ArrayList;
@@ -146,7 +145,6 @@ public class MusicService extends Service implements
         mCurrentSongPosition = 0;
         mService = this;
         mSettings = mCleffApp.getSharedPreferences();
-        mSongs = MusicLibrary.get(getApplicationContext()).getSongs();
 
 
         initMediaPlayer();

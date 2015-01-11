@@ -12,7 +12,6 @@ import android.widget.GridView;
 import com.freneticlabs.cleff.CleffApp;
 import com.freneticlabs.cleff.R;
 import com.freneticlabs.cleff.models.Album;
-import com.freneticlabs.cleff.models.MusicLibrary;
 import com.freneticlabs.cleff.views.adapters.AlbumsAdapter;
 
 import java.util.ArrayList;
@@ -42,7 +41,6 @@ public class AlbumsFragment extends Fragment {
         setHasOptionsMenu(true);
         mCleffApp = (CleffApp)getActivity().getApplication();
         mSettings = mCleffApp.getSharedPreferences();
-        mAlbums = MusicLibrary.get(getActivity()).getAlbums();
     }
 
     @Override
@@ -54,8 +52,8 @@ public class AlbumsFragment extends Fragment {
         ButterKnife.inject(this, rootView);
 
 
-        mAlbumsAdapter = new AlbumsAdapter(getActivity(), R.layout.albums_grid_item, mAlbums);
-        mGridView.setAdapter(mAlbumsAdapter);
+       // mAlbumsAdapter = new AlbumsAdapter(getActivity(), R.layout.albums_grid_item, mAlbums);
+//        mGridView.setAdapter(mAlbumsAdapter);
 
         return rootView;
     }

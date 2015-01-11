@@ -8,8 +8,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.freneticlabs.cleff.MusicLibrary;
 import com.freneticlabs.cleff.R;
-import com.freneticlabs.cleff.models.MusicLibrary;
 import com.freneticlabs.cleff.models.Song;
 
 import butterknife.ButterKnife;
@@ -42,7 +42,6 @@ public class PlayerFragment extends Fragment {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
         long songId = (long)getArguments().getSerializable(EXTRA_SONG_ID);
-        mSong = MusicLibrary.get(getActivity()).getSong(songId);
 
     }
 
