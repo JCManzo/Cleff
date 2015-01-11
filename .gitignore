@@ -28,3 +28,6 @@ proguard/
 *.log
 
 
+
+libraries/filepicker
+libraries/floatingactionbutton
