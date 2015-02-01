@@ -5,8 +5,6 @@
       <module fileurl="file://$PROJECT_DIR$/Cleff.iml" filepath="$PROJECT_DIR$/Cleff.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/libraries/filepicker/filepicker.iml" filepath="$PROJECT_DIR$/libraries/filepicker/filepicker.iml" />
-      <module fileurl="file://$PROJECT_DIR$/libraries/filepicker/filepicker.iml" filepath="$PROJECT_DIR$/libraries/filepicker/filepicker.iml" />
-      <module fileurl="file://$PROJECT_DIR$/libraries/floatingactionbutton/floatingactionbutton.iml" filepath="$PROJECT_DIR$/libraries/floatingactionbutton/floatingactionbutton.iml" />
       <module fileurl="file://$PROJECT_DIR$/libraries/floatingactionbutton/floatingactionbutton.iml" filepath="$PROJECT_DIR$/libraries/floatingactionbutton/floatingactionbutton.iml" />
     </modules>
   </component>

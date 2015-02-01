@@ -8,7 +8,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.freneticlabs.cleff.MusicLibrary;
 import com.freneticlabs.cleff.R;
 import com.freneticlabs.cleff.models.Song;
 

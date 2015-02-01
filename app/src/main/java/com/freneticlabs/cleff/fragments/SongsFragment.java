@@ -19,17 +19,15 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 
 import com.freneticlabs.cleff.CleffApp;
-import com.freneticlabs.cleff.MusicLibrary;
 import com.freneticlabs.cleff.MusicService;
 import com.freneticlabs.cleff.R;
 import com.freneticlabs.cleff.activities.PlayerActivity;
 import com.freneticlabs.cleff.models.MusicDatabase;
-import com.freneticlabs.cleff.models.Song;
+import com.freneticlabs.cleff.models.MusicLibrary;
+import com.freneticlabs.cleff.models.events.QueryAllSongsEvent;
 import com.freneticlabs.cleff.views.adapters.SongsAdapter;
 import com.getbase.floatingactionbutton.FloatingActionButton;
 import com.getbase.floatingactionbutton.FloatingActionsMenu;
-
-import java.util.ArrayList;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
@@ -58,7 +56,6 @@ public class SongsFragment extends Fragment
     private int mLastClickedItem = -1;
     private CleffApp mCleffApp;
     private Context mContext;
-    private ArrayList<Song> mSongs;
     private SongsAdapter mSongsAdapter;
     private int mLastPosition = 0;
     private int mPositionOffset = 0;
@@ -74,7 +71,6 @@ public class SongsFragment extends Fragment
         mContext = getActivity().getApplicationContext();
         mCleffApp = (CleffApp) getActivity().getApplication();
         mSettings = mCleffApp.getSharedPreferences();
-
     }
 
     @Override
@@ -97,21 +93,11 @@ public class SongsFragment extends Fragment
 
         mSongsAdapter = new SongsAdapter(getActivity(), null, 0);
         mListView.setAdapter(mSongsAdapter);
+
         getLoaderManager().initLoader(URL_LOADER, null, this);
 
         initListeners();
         return rootView;
-    }
-
-
-    private int getWantedChild(int position) {
-        int firstPosition = mListView.getFirstVisiblePosition() - mListView.getHeaderViewsCount(); // This is the same as child #0
-        int wantedChild = position - firstPosition;
-        if (wantedChild < 0 || wantedChild >= mListView.getChildCount()) {
-            Timber.d("Unable to get view for desired position, because it's not being displayed on screen.");
-            return -1;
-        }
-        return wantedChild;
     }
 
     @Override
@@ -123,26 +109,19 @@ public class SongsFragment extends Fragment
     }
 
     private void initListeners() {
-
-
-
         // Listener for when a list item is clicked
-        mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+       mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
-
                 Intent i = new Intent(getActivity(), PlayerActivity.class);
-                // i.putExtra(PlayerFragment.EXTRA_SONG_ID, song.getID());
-                //startActivity(i);
-                play((position));
-            }
-        });
+                Cursor cursor = (Cursor) parent.getItemAtPosition(position);
+                String path = cursor.getString(cursor.getColumnIndexOrThrow(MusicDatabase.SONG_FILE_PATH));
+                Timber.d(path);
 
-        mListView.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                return false;
+                // i.putExtra(PlayerFragment.EXTRA_SONG_ID, 3);
+               // startActivity(i);
+               //play((position));
             }
         });
 
@@ -234,15 +213,14 @@ public class SongsFragment extends Fragment
         }
     }
 
-    public void play(int songIndex) {
+    public void play(int file) {
         mCleffApp.getPlaybackManager().initPlayback();
-        mCleffApp.getService().setSong(songIndex);
+        mCleffApp.getService().setSong(file);
         mCleffApp.getService().playSong();
     }
 
-    public void updatePlayer(int position) {
+    public void updatePlayer(int selectedSong) {
         Timber.d("Updating player..");
-        int selectedSong = position;
 
         if (mCleffApp.getService().getPlayerSate().equals(MusicService.PlayerState.IDLE)) {
             Timber.d("PLAYER IS NOW PLAYING");
@@ -304,28 +282,29 @@ public class SongsFragment extends Fragment
 
     }
 
+
+    /**
+     * Queries the Cleff database for all songs
+     * @param loaderId
+     * @param args
+     * @return a cursor containing all the songs in the library
+     */
     @Override
     public Loader<Cursor> onCreateLoader(int loaderId, Bundle args) {
-        String [] sqlSelect = {"0 _id", "song_name", "song_artist"};
         final String[] projection = {
-                MusicDatabase.SONG_ID,
+                MusicDatabase._ID,
                 MusicDatabase.SONG_ARTIST,
-                MusicDatabase.SONG_TITLE
+                MusicDatabase.SONG_TITLE,
+                MusicDatabase.SONG_FILE_PATH
         };
 
-
         Uri uri = MusicLibrary.CONTENT_URI;
-        Timber.d(uri.toString());
 
-
-        /*
-         * Takes action based on the ID of the Loader that's being created
-         */
         // Returns a new CursorLoader
         return new CursorLoader(
                 getActivity(),   // Parent activity context
                 uri,        // Table to query
-                null,     // Projection to return
+                projection,     // Projection to return
                 null,            // No selection clause
                 null,            // No selection arguments
                 null           // Default sort order
@@ -337,11 +316,13 @@ public class SongsFragment extends Fragment
     }
 
     @Override
-    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+    public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
         // Swap the new cursor in.  (The framework will take care of closing the
         // old cursor once we return.)
 
-        mSongsAdapter.swapCursor(data);
+        // Post the event to any subscribers
+        CleffApp.getEventBus().post(new QueryAllSongsEvent((cursor)));
+        mSongsAdapter.swapCursor(cursor);
 
     }
 }

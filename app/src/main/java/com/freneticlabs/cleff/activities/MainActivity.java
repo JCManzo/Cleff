@@ -16,7 +16,6 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 
 import com.freneticlabs.cleff.CleffApp;
-import com.freneticlabs.cleff.MusicLibrary;
 import com.freneticlabs.cleff.MusicService;
 import com.freneticlabs.cleff.R;
 import com.freneticlabs.cleff.fragments.BuildLibraryTaskFragment;
@@ -116,14 +115,17 @@ public class MainActivity extends ActionBarActivity implements
 
        }
 
-       mCleffApp.getPlaybackManager().initPlayback();
     }
 
     @Override
-    protected void onStart() {
+    public void onStart() {
         super.onStart();
     }
 
+    @Override
+    public void onStop() {
+        super.onStop();
+    }
     @Override
     public void onPause() {
         super.onPause();

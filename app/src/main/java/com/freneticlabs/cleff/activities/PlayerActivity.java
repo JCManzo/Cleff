@@ -8,7 +8,6 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.Toolbar;
 
-import com.freneticlabs.cleff.MusicLibrary;
 import com.freneticlabs.cleff.R;
 import com.freneticlabs.cleff.fragments.PlayerFragment;
 import com.freneticlabs.cleff.models.Song;

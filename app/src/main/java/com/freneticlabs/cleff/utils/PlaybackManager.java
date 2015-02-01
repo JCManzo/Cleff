@@ -5,14 +5,15 @@ import android.content.Intent;
 
 import com.freneticlabs.cleff.CleffApp;
 import com.freneticlabs.cleff.MusicService;
+import com.freneticlabs.cleff.models.events.MusicServiceStartedEvent;
+import com.squareup.otto.Subscribe;
 
 import timber.log.Timber;
 
 /**
  * Created by jcmanzo on 12/18/14.
  */
-public class PlaybackManager implements MusicService.PrepareServiceListener {
-    private static final String TAG = PlaybackManager.class.getSimpleName();
+public class PlaybackManager {
     private Context mContext;
     private CleffApp mCleffApp;
 
@@ -22,40 +23,37 @@ public class PlaybackManager implements MusicService.PrepareServiceListener {
 
     public void initPlayback() {
         mCleffApp = (CleffApp) mContext.getApplicationContext();
-
         // Start the service if it isn't already running
-        if(!mCleffApp.isServiceRunning()) {
-            Timber.d("Service is not running.");
-           startService();
+
+        if(!MusicService.isRunning()) {
+            Timber.d("Service is not running. Starting service...");
+            CleffApp.getEventBus().register(this);
+            MusicService.setRunning(true);
+            startService();
+
         } else {
             Timber.d("Service already running.");
-            mCleffApp.getService()
-                    .getPrepareServiceListener()
-                    .onServiceRunning(mCleffApp.getService());
+
         }
     }
 
-    public void stopPlayback() {
-        mCleffApp.getService().stopPlayer();
-    }
+
     private void startService() {
         Timber.d("Starting service.");
         Intent intent = new Intent(mContext, MusicService.class);
         mContext.startService(intent);
+        CleffApp.getEventBus().post(new MusicServiceStartedEvent(mCleffApp.getService()));
 
     }
 
-    @Override
-    public void onServiceRunning(MusicService service) {
+    @Subscribe
+    public void onServiceRunningEvent(MusicServiceStartedEvent event) {
+        Timber.d("Event Called");
         mCleffApp = (CleffApp) mContext.getApplicationContext();
         mCleffApp.setIsServiceRunning(true);
-        mCleffApp.setService(service);
-        mCleffApp.getService().setPrepareServiceListener(this);
+        mCleffApp.setService(event.mMusicService);
 
     }
 
-    @Override
-    public void onServiceFailed(Exception exception) {
 
-    }
 }

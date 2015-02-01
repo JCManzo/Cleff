@@ -13,11 +13,13 @@ import android.support.v4.app.Fragment;
 import android.util.Log;
 
 import com.freneticlabs.cleff.CleffApp;
-import com.freneticlabs.cleff.MusicLibrary;
+import com.freneticlabs.cleff.models.MusicLibrary;
 import com.freneticlabs.cleff.R;
 import com.freneticlabs.cleff.models.MusicDatabase;
 
 import java.util.HashMap;
+
+import timber.log.Timber;
 
 
 /**
@@ -28,8 +30,6 @@ import java.util.HashMap;
  * to handle interaction events.
  */
 public class BuildLibraryTaskFragment extends Fragment {
-    private static final String TAG = BuildLibraryTaskFragment.class.getSimpleName();
-    private static final String ALBUM_ART_PATH = "content://media/external/audio/albumart";
     private static final Uri EXTERNAL_CONTENT = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
 
     private Context mContext;
@@ -52,7 +52,14 @@ public class BuildLibraryTaskFragment extends Fragment {
         void onPostExecute();
     }
 
+    public interface BuildCursorListener {
+
+        public void onCursorReady(Cursor cursor, int currentSongIndex, boolean playAll);
+    }
+
     private BuildLibraryTaskCallbacks mBuildLibraryTaskCallbacks;
+    private BuildCursorListener mBuildCursorListener;
+
     private BuildLibraryTask mTask;
 
     /**
@@ -92,7 +99,7 @@ public class BuildLibraryTaskFragment extends Fragment {
         mBuildLibraryTaskCallbacks = null;
     }
 
-    private class BuildLibraryTask extends AsyncTask <Void, Void, Void>{
+    private class BuildLibraryTask extends AsyncTask <Void, Void, Cursor>{
 
         public BuildLibraryTask(Context context) {
             super();
@@ -110,7 +117,7 @@ public class BuildLibraryTaskFragment extends Fragment {
         }
 
         @Override
-        protected Void doInBackground(Void... voids) {
+        protected Cursor doInBackground(Void... voids) {
             Cursor mediaStoreCursor = getSongsFromMediaStore();
             if (mediaStoreCursor!=null) {
                 saveMediaStoreDataToDB(mediaStoreCursor);
@@ -124,13 +131,20 @@ public class BuildLibraryTaskFragment extends Fragment {
             if (mBuildLibraryTaskCallbacks != null) {
                 mBuildLibraryTaskCallbacks.onCancelled();
             }
+
         }
 
         @Override
-        protected void onPostExecute(Void aVoid) {
-            super.onPostExecute(aVoid);
+        protected void onPostExecute(Cursor cursor) {
+            super.onPostExecute(cursor);
             if(mBuildLibraryTaskCallbacks != null) {
                 mBuildLibraryTaskCallbacks.onPostExecute();
+            }
+
+            if (cursor != null) {
+                getBuildCursorListener().onCursorReady(cursor, 0, true);
+            } else {
+                Timber.d("NULL CURSOR");
             }
         }
 
@@ -143,9 +157,7 @@ public class BuildLibraryTaskFragment extends Fragment {
             String mUnknownArtist = getActivity().getApplicationContext().getString(R.string.unknown_artist_name);
             String mUnknownTitle = getActivity().getApplicationContext().getString(R.string.unknown_title_name);
 
-
             if(mediaStoreCursor!=null && mediaStoreCursor.moveToFirst()){
-
                 /** These are the columns in the music cursor that we are interested in. */
                 int idColumn = mediaStoreCursor.getColumnIndex(MediaStore.Audio.Media._ID);
                 int artistColumn = mediaStoreCursor.getColumnIndexOrThrow(MediaStore.Audio.Media.ARTIST);
@@ -159,6 +171,7 @@ public class BuildLibraryTaskFragment extends Fragment {
                 int yearColumn = mediaStoreCursor.getColumnIndexOrThrow(MediaStore.Audio.Media.YEAR);
                 int filePathColumn = mediaStoreCursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DATA);
                 int songTrackColumn = mediaStoreCursor.getColumnIndexOrThrow(MediaStore.Audio.Media.TRACK);
+
                 do {
                     // long thisSongId = musicCursor.getLong(idColumn);
                     int thisSongId = Integer.parseInt(mediaStoreCursor.getString(idColumn));
@@ -217,6 +230,7 @@ public class BuildLibraryTaskFragment extends Fragment {
             else
                 return mContext.getResources().getString(R.string.unknown_genre_name);
         }
+
         /**
          * Retrives all songs from the MediaStore with no folder contraint
          */
@@ -343,8 +357,14 @@ public class BuildLibraryTaskFragment extends Fragment {
                     .append(CONTENTDIR)
                     .toString());
         }
+    }
 
+    public BuildCursorListener getBuildCursorListener() {
+        return mBuildCursorListener;
+    }
 
+    public void setBuildCursorListener(BuildCursorListener listener) {
+        mBuildCursorListener = listener;
     }
 
 }

@@ -19,6 +19,7 @@ public class MusicDatabase extends SQLiteAssetHelper {
     public static final String GENRE_TABLE = "genre";
     public static final String MUSIC_TABLE = "musiclibrary";
     public static final String SONG_ID = "_id";
+    public static final String _ID = "_id";
     public static final String SONG_TITLE = "song_name";
     public static final String SONG_ARTIST = "song_artist";
     public static final String SONG_ALBUM = "song_album";
@@ -61,15 +62,15 @@ public class MusicDatabase extends SQLiteAssetHelper {
     }
 
 
-    public Cursor getSongs() {
+    public Cursor getAllSongs() {
         SQLiteDatabase db = getReadableDatabase();
         SQLiteQueryBuilder qb = new SQLiteQueryBuilder();
 
-        String [] sqlSelect = {"0 _id", "song_name", "song_artist"};
         String [] projection = {
-                SONG_ID,
+                _ID,
                 SONG_TITLE,
-                SONG_ARTIST
+                SONG_ARTIST,
+                SONG_FILE_PATH
         };
         String sqlTables = "musiclibrary";
 

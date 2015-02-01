@@ -3,7 +3,6 @@ package com.freneticlabs.cleff.views.adapters;
 import android.content.Context;
 import android.database.Cursor;
 import android.support.v4.widget.CursorAdapter;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,10 +12,6 @@ import android.widget.TextView;
 
 import com.freneticlabs.cleff.R;
 import com.freneticlabs.cleff.models.MusicDatabase;
-
-import butterknife.ButterKnife;
-import butterknife.InjectView;
-import timber.log.Timber;
 
 /**
  * Created by jcmanzo on 12/14/14.
@@ -36,11 +31,7 @@ public class SongsAdapter extends CursorAdapter {
 
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
-        Log.d("TAG", "HEREEE");
-        ViewHolder viewHolder = (ViewHolder) view.getTag();
-        ViewHolder holder = new ViewHolder(view);
-        view.setTag(holder);
-        Timber.d(cursor.getString(cursor.getColumnIndex(MusicDatabase.SONG_TITLE)));
+        ViewHolder holder = (ViewHolder) view.getTag();
         holder.title.setText(cursor.getString(cursor.getColumnIndex(MusicDatabase.SONG_TITLE)));
         holder.artist.setText(cursor.getString(cursor.getColumnIndex(MusicDatabase.SONG_ARTIST)));
 
@@ -52,20 +43,16 @@ public class SongsAdapter extends CursorAdapter {
     public View newView(Context context, Cursor cursor, ViewGroup parent) {
         LayoutInflater inflater = LayoutInflater.from(mContext);
         View view = inflater.inflate(R.layout.song_list_row_item, parent, false);
-
+        ViewHolder holder = new ViewHolder();
+        holder.title = (TextView)view.findViewById(R.id.list_song_title);
+        holder.artist = (TextView)view.findViewById(R.id.list_song_artist);
+        view.setTag(holder);
         return view;
     }
 
-    static class ViewHolder {
-        @InjectView(R.id.list_song_title)
+    private static class ViewHolder {
         TextView title;
-        @InjectView(R.id.list_song_artist)
         TextView artist;
-
-
-        public ViewHolder(View view) {
-            ButterKnife.inject(this, view);
-        }
     }
 
     /**

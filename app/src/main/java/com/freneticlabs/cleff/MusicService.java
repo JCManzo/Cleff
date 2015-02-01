@@ -7,6 +7,7 @@ import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
@@ -14,10 +15,14 @@ import android.os.IBinder;
 import android.os.PowerManager;
 import android.provider.MediaStore;
 import android.support.v4.app.NotificationCompat;
+import android.util.Log;
 import android.widget.RemoteViews;
 
 import com.freneticlabs.cleff.activities.MainActivity;
+import com.freneticlabs.cleff.fragments.BuildLibraryTaskFragment;
 import com.freneticlabs.cleff.models.Song;
+import com.freneticlabs.cleff.models.events.QueryAllSongsEvent;
+import com.squareup.otto.Subscribe;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -46,10 +51,6 @@ public class MusicService extends Service implements
 
     private NotificationCompat.Builder mNotificationBuilder;
 
-
-    private ArrayList<Song> mSongs;
-    private CleffApp mCleffApp;
-
     public enum PlayerState {
         IDLE, PAUSED, PLAYING
     }
@@ -58,59 +59,41 @@ public class MusicService extends Service implements
 
     private boolean mShuffle = false;
     private boolean mRepeat = false;
+    private static boolean mRunning = false;
+
     private Random mRandom;
+    private ArrayList<Song> mSongs;
+    private Cursor mCursor;
+    private CleffApp mCleffApp;
 
     // Keep track of the current song position in the Array
     private int mCurrentSongPosition;
 
     private int mPreviousSongPosition;
 
-    //PrepareServiceListener instance.
-    private PrepareServiceListener mPrepareServiceListener;
-
     /**
      * Starts playing the current song in the playing queue.
      */
-
     public  MusicService() {
 
     }
 
-    /**
-     * Public interface that provides access to
-     * major events during the service startup
-     * process.
-     *
-     */
-    public interface PrepareServiceListener {
-
-        /**
-         * Called when the service is up and running.
-         */
-        public void onServiceRunning(MusicService service);
-
-        /**
-         * Called when the service failed to start.
-         * Also returns the failure reason via the exception
-         * parameter.
-         */
-        public void onServiceFailed(Exception exception);
-
+    @Subscribe
+    public void onQueryAllSongsEvent(QueryAllSongsEvent event) {
+        Timber.d("CALLED!");
     }
 
-    /**
-     * Returns an instance of the PrepareServiceListener.
-     */
-    public PrepareServiceListener getPrepareServiceListener() {
-        return mPrepareServiceListener;
-    }
-
-    /**
-     * Sets the mPrepareServiceListener object.
-     */
-    public void setPrepareServiceListener(PrepareServiceListener listener) {
-        mPrepareServiceListener = listener;
-    }
+    public BuildLibraryTaskFragment.BuildCursorListener buildCursorListener = new BuildLibraryTaskFragment.BuildCursorListener() {
+        @Override
+        public void onCursorReady(Cursor cursor, int currentSongIndex, boolean playAll) {
+            if(cursor != null) {
+                Log.d("TAG", "NOT NULL");
+            } else {
+                Log.d("TAG", "NULL");
+            }
+            setSongsCursor(cursor);
+        }
+    };
 
     @Override
     public void onCreate() {
@@ -141,14 +124,9 @@ public class MusicService extends Service implements
 
         mContext = getApplicationContext();
         mCleffApp = (CleffApp) getApplicationContext();
-
-        mCurrentSongPosition = 0;
         mService = this;
         mSettings = mCleffApp.getSharedPreferences();
-
-
         initMediaPlayer();
-        initService();
 
         // Get audiofocus
         mAudioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
@@ -165,15 +143,12 @@ public class MusicService extends Service implements
         return START_STICKY;
     }
 
-    /**
-     *  Initialize the service listeners.
-     */
-    void initService() {
-        mCleffApp.setService(this);
+    public static boolean isRunning() {
+        return mRunning;
+    }
 
-        //The service has been successfully started.
-        setPrepareServiceListener(mCleffApp.getPlaybackManager());
-        getPrepareServiceListener().onServiceRunning((MusicService) mService);
+    public static void setRunning(boolean running) {
+        mRunning = running;
     }
 
     /**
@@ -198,8 +173,15 @@ public class MusicService extends Service implements
         }
     }
 
-    public void setSong(int songPosition){
-        mCurrentSongPosition = songPosition;
+    public void setSongsCursor(Cursor cursor) {
+        mCursor = cursor;
+    }
+
+    public Cursor getSongsCursor() {
+        return mCursor;
+    }
+    public void setSong(int file){
+        mCurrentSongPosition = file;
     }
 
     public int getCurrentSongPosition(){
@@ -235,11 +217,10 @@ public class MusicService extends Service implements
     public void playSong() {
         if (mMediaPlayer == null) initMediaPlayer();
 
-        Song currentSong = mSongs.get(mCurrentSongPosition);
-        Timber.d("Playing song: " + currentSong.getTitle());
+       // Song currentSong = mSongs.get(mCurrentSongPosition);
+       // Timber.d("Playing song: " + currentSong.getTitle());
 
-        Uri trackUri = ContentUris.withAppendedId(MediaStore.Audio.Media.
-                EXTERNAL_CONTENT_URI, currentSong.getID());
+        Uri trackUri = ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, mCurrentSongPosition);
         Timber.d(trackUri.toString());
         try {
             mMediaPlayer.reset();
@@ -250,11 +231,11 @@ public class MusicService extends Service implements
             mMediaPlayer.prepareAsync();
             mPlayerSate = PlayerState.PLAYING;
 
-            SharedPreferences.Editor editor = mSettings.edit();
-            editor.putInt(CleffApp.LAST_PLAYED_SONG, mCurrentSongPosition);
+           // SharedPreferences.Editor editor = mSettings.edit();
+            //editor.putInt(CleffApp.LAST_PLAYED_SONG, mCurrentSongPosition);
 
             // Commit the edits!
-            editor.apply();
+            //editor.apply();
 
         } catch (Exception e) {
             Timber.d("Error setting the data source", e);

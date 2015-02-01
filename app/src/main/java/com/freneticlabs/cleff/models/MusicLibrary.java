@@ -1,12 +1,10 @@
-package com.freneticlabs.cleff;
+package com.freneticlabs.cleff.models;
 
 import android.content.ContentProvider;
 import android.content.ContentValues;
 import android.content.UriMatcher;
 import android.database.Cursor;
 import android.net.Uri;
-
-import com.freneticlabs.cleff.models.MusicDatabase;
 
 import timber.log.Timber;
 
@@ -46,9 +44,10 @@ public class MusicLibrary extends ContentProvider {
     @Override
     public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
         int uriType = sURIMatcher.match(uri);
+        Timber.d(Integer.toString(uriType));
         switch (uriType) {
             case SONGS:
-                return mMusicLibrary.getSongs();
+                return mMusicLibrary.getAllSongs();
             default:
                 throw new IllegalArgumentException("Unknown URI: " + uri);
         }

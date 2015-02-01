@@ -6,7 +6,8 @@ import android.content.SharedPreferences;
 
 import com.freneticlabs.cleff.models.MusicDatabase;
 import com.freneticlabs.cleff.utils.PlaybackManager;
-import com.squareup.picasso.Picasso;
+import com.squareup.otto.Bus;
+import com.squareup.otto.ThreadEnforcer;
 
 import timber.log.Timber;
 
@@ -16,19 +17,19 @@ import timber.log.Timber;
 public class CleffApp extends Application {
 
     private static final String TAG = CleffApp.class.getSimpleName();
-    private static CleffApp sCleffApp;
 
     //Context.
     private Context mContext;
 
-    //Service reference and flags.
-    private MusicService mService;
-    private PlaybackManager mPlaybackManager;
-    private MusicDatabase mMusicDatabase;
-    private Picasso mPicasso;
+    private static CleffApp sCleffApp;
+    private static MusicService mService;
+    private static PlaybackManager mPlaybackManager;
+    private static MusicDatabase mMusicDatabase;
+    private static SharedPreferences mSharedPreferences;
+
+    private static Bus mEventBus;
     private boolean mIsServiceRunning = false;
     private static boolean mIsActivityVisible = false;
-    private static SharedPreferences mSharedPreferences;
 
     //SharedPreferences keys.
     public static final String REPEAT_MODE = "RepeatMode";
@@ -91,9 +92,10 @@ public class CleffApp extends Application {
         return mMusicDatabase;
     }
 
-    public Picasso getPicasso() {
-        return mPicasso;
+    public static Bus getEventBus() {
+        return mEventBus;
     }
+
 
     @Override
     public void onCreate() {
@@ -106,10 +108,12 @@ public class CleffApp extends Application {
             Timber.plant(new CrashReportingTree());
         }
 
+
+
         mContext = getApplicationContext();
-        mPicasso = new Picasso.Builder(mContext).build();
-        mMusicDatabase = new MusicDatabase(mContext);
         mPlaybackManager = new PlaybackManager(this.getApplicationContext());
+        mEventBus = new Bus(ThreadEnforcer.ANY);
+        mMusicDatabase = new MusicDatabase(mContext);
     }
 
     /** A tree which logs important information for crash reporting. */
