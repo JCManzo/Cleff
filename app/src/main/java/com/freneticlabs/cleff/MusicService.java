@@ -19,7 +19,6 @@ import android.util.Log;
 import android.widget.RemoteViews;
 
 import com.freneticlabs.cleff.activities.MainActivity;
-import com.freneticlabs.cleff.fragments.BuildLibraryTaskFragment;
 import com.freneticlabs.cleff.models.Song;
 import com.freneticlabs.cleff.models.events.QueryAllSongsEvent;
 import com.squareup.otto.Subscribe;
@@ -78,28 +77,21 @@ public class MusicService extends Service implements
 
     }
 
-
+    /**
+     * Sets the song cursor
+     * @param event contains a cursor will all songs from the Cleff databse.
+     */
     @Subscribe
     public void onQueryAllSongsEvent(QueryAllSongsEvent event) {
-        Timber.d("CALLED!");
-    }
+        mCursor = event.mCursor;
 
-    public BuildLibraryTaskFragment.BuildCursorListener buildCursorListener = new BuildLibraryTaskFragment.BuildCursorListener() {
-        @Override
-        public void onCursorReady(Cursor cursor, int currentSongIndex, boolean playAll) {
-            if(cursor != null) {
-                Log.d("TAG", "NOT NULL");
-            } else {
-                Log.d("TAG", "NULL");
-            }
-            setSongsCursor(cursor);
-        }
-    };
+    }
 
     @Override
     public void onCreate() {
         // Create the service
         super.onCreate();
+        CleffApp.getEventBus().register(this);
         Timber.d("onCreate()");
         mRandom = new Random();
     }
@@ -107,6 +99,8 @@ public class MusicService extends Service implements
     @Override
     public void onDestroy() {
         super.onDestroy();
+        CleffApp.getEventBus().unregister(this);
+
         Timber.d("onDestroy()");
         if(mMediaPlayer != null) {
             mMediaPlayer.release();
@@ -128,12 +122,7 @@ public class MusicService extends Service implements
         mSettings = mCleffApp.getSharedPreferences();
 
         mCleffApp.setService(this);
-        if(mCleffApp.getService() == null) {
-            Log.d("CHAIN", "NULL SERVICE");
-        } else {
-            Log.d("CHAIN", "SERVICE OK");
 
-        }
         initMediaPlayer();
 
         // Get audiofocus

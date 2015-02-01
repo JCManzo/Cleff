@@ -79,9 +79,17 @@ public class SongsFragment extends Fragment
     }
 
     @Override
-    public void onDestroyView() {
-        super.onDestroyView();
+    public void onResume() {
+        super.onResume();
+        CleffApp.getEventBus().register(this);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        CleffApp.getEventBus().unregister(this);
         saveListPosition();
+
     }
 
     @Override
@@ -310,6 +318,7 @@ public class SongsFragment extends Fragment
                 null           // Default sort order
         );
     }
+
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
         mSongsAdapter.swapCursor(null);

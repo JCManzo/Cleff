@@ -7,7 +7,6 @@ import android.content.SharedPreferences;
 import com.freneticlabs.cleff.models.MusicDatabase;
 import com.freneticlabs.cleff.utils.MusicServiceManager;
 import com.squareup.otto.Bus;
-import com.squareup.otto.ThreadEnforcer;
 
 import timber.log.Timber;
 
@@ -27,7 +26,7 @@ public class CleffApp extends Application {
     private static MusicDatabase mMusicDatabase;
     private static SharedPreferences mSharedPreferences;
 
-    private static Bus mEventBus;
+    private static final Bus mEventBus = new Bus();
     private boolean mIsServiceRunning = false;
     private static boolean mIsActivityVisible = false;
 
@@ -112,7 +111,6 @@ public class CleffApp extends Application {
 
         mContext = getApplicationContext();
         mPlaybackManager = new MusicServiceManager(mContext);
-        mEventBus = new Bus(ThreadEnforcer.ANY);
         mMusicDatabase = new MusicDatabase(mContext);
     }
 

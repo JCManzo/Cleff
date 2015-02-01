@@ -12,14 +12,15 @@ import com.freneticlabs.cleff.MusicService;
  */
 public class MusicServiceManager {
     private Context mContext;
-    private CleffApp mCleffApp;
 
     public MusicServiceManager(Context context) {
         mContext = context;
     }
 
+    /**
+     * Check to see if music service is already running.
+     */
     public void initPlayback() {
-        mCleffApp = (CleffApp) mContext.getApplicationContext();
 
         if(!MusicService.isRunning()) {
             // Service is not running, start it.
@@ -32,7 +33,9 @@ public class MusicServiceManager {
         }
     }
 
-
+    /**
+     * Starts the music service
+     */
     private void startService() {
         Log.d("CHAIN", "Starting Service");
         Intent intent = new Intent(mContext, MusicService.class);
@@ -41,6 +44,4 @@ public class MusicServiceManager {
         MusicService.setRunning(true);
 
     }
-
-
 }

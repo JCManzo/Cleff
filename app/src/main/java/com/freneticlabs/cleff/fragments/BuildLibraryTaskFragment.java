@@ -13,13 +13,11 @@ import android.support.v4.app.Fragment;
 import android.util.Log;
 
 import com.freneticlabs.cleff.CleffApp;
-import com.freneticlabs.cleff.models.MusicLibrary;
 import com.freneticlabs.cleff.R;
 import com.freneticlabs.cleff.models.MusicDatabase;
+import com.freneticlabs.cleff.models.MusicLibrary;
 
 import java.util.HashMap;
-
-import timber.log.Timber;
 
 
 /**
@@ -58,8 +56,6 @@ public class BuildLibraryTaskFragment extends Fragment {
     }
 
     private BuildLibraryTaskCallbacks mBuildLibraryTaskCallbacks;
-    private BuildCursorListener mBuildCursorListener;
-
     private BuildLibraryTask mTask;
 
     /**
@@ -139,12 +135,6 @@ public class BuildLibraryTaskFragment extends Fragment {
             super.onPostExecute(cursor);
             if(mBuildLibraryTaskCallbacks != null) {
                 mBuildLibraryTaskCallbacks.onPostExecute();
-            }
-
-            if (cursor != null) {
-                getBuildCursorListener().onCursorReady(cursor, 0, true);
-            } else {
-                Timber.d("NULL CURSOR");
             }
         }
 
@@ -357,14 +347,6 @@ public class BuildLibraryTaskFragment extends Fragment {
                     .append(CONTENTDIR)
                     .toString());
         }
-    }
-
-    public BuildCursorListener getBuildCursorListener() {
-        return mBuildCursorListener;
-    }
-
-    public void setBuildCursorListener(BuildCursorListener listener) {
-        mBuildCursorListener = listener;
     }
 
 }
