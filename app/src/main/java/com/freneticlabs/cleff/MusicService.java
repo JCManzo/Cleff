@@ -78,6 +78,7 @@ public class MusicService extends Service implements
 
     }
 
+
     @Subscribe
     public void onQueryAllSongsEvent(QueryAllSongsEvent event) {
         Timber.d("CALLED!");
@@ -120,12 +121,19 @@ public class MusicService extends Service implements
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         super.onStartCommand(intent, flags, startId);
-        Timber.d("onStartCommand()");
+        Log.d("CHAIN", "onStartCommand()");
 
         mContext = getApplicationContext();
         mCleffApp = (CleffApp) getApplicationContext();
-        mService = this;
         mSettings = mCleffApp.getSharedPreferences();
+
+        mCleffApp.setService(this);
+        if(mCleffApp.getService() == null) {
+            Log.d("CHAIN", "NULL SERVICE");
+        } else {
+            Log.d("CHAIN", "SERVICE OK");
+
+        }
         initMediaPlayer();
 
         // Get audiofocus
