@@ -20,15 +20,15 @@ public class Song implements Parcelable{
     private static final String JSON_PLAYS      = "plays";
     private static final String JSON_YEAR       = "year";
 
-    private long mID;
-    private long mAlbumID;
+    private String mID;
+    private String mAlbumID;
 
     private String mTitle;
     private String mArtist;
     private String mAlbum;
     private String mGenre;
     private String mPath;
-
+    private String mYear;
     private float mSongRating;
 
 
@@ -36,8 +36,8 @@ public class Song implements Parcelable{
     public Song() {
 
     }
-    public Song(long songID, String songTitle, String songArtist,
-                String album, long albumID, String genre) {
+    public Song(String songID, String songTitle, String songArtist,
+                String album, String albumID, String genre) {
         mID = songID;
         mTitle = songTitle;
         mArtist = songArtist;
@@ -48,11 +48,11 @@ public class Song implements Parcelable{
     }
 
     public Song(JSONObject jsonObject) throws  JSONException {
-        mID = jsonObject.getLong(JSON_ID);
+        mID = jsonObject.getString(JSON_ID);
         mTitle = jsonObject.getString(JSON_TITLE);
         mArtist = jsonObject.getString(JSON_ARTIST);
         mAlbum = jsonObject.getString(JSON_ALBUM);
-        mAlbumID = jsonObject.getLong(JSON_ALBUM_ID);
+        mAlbumID = jsonObject.getString(JSON_ALBUM_ID);
         mSongRating = Float.parseFloat(jsonObject.getString(JSON_RATING));
         mGenre = jsonObject.getString(JSON_GENRE);
     }
@@ -91,7 +91,7 @@ public class Song implements Parcelable{
         mSongRating = songRating;
     }
 
-    public long getID() {
+    public String getID() {
         return mID;
     }
 
@@ -102,11 +102,11 @@ public class Song implements Parcelable{
     public void setAlbum(String album) {
         mAlbum = album;
     }
-    public long getAlbumID() {
+    public String getAlbumID() {
         return mAlbumID;
     }
 
-    public void setID(long ID) {
+    public void setID(String ID) {
         mID = ID;
     }
 
@@ -134,6 +134,18 @@ public class Song implements Parcelable{
         return mPath;
     }
 
+    public void setAlbumID(String albumID) {
+        mAlbumID = albumID;
+    }
+
+    public String getYear() {
+        return mYear;
+    }
+
+    public void setYear(String year) {
+        mYear = year;
+    }
+
     @Override
     public String toString() {
      return getTitle();
@@ -147,8 +159,8 @@ public class Song implements Parcelable{
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeLong(this.mID);
-        dest.writeLong(this.mAlbumID);
+        dest.writeString(this.mID);
+        dest.writeString(this.mAlbumID);
         dest.writeString(this.mTitle);
         dest.writeString(this.mArtist);
         dest.writeString(this.mAlbum);
@@ -157,8 +169,8 @@ public class Song implements Parcelable{
     }
 
     private Song(Parcel in) {
-        this.mID = in.readLong();
-        this.mAlbumID = in.readLong();
+        this.mID = in.readString();
+        this.mAlbumID = in.readString();
         this.mTitle = in.readString();
         this.mArtist = in.readString();
         this.mAlbum = in.readString();

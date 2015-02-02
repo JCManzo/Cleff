@@ -11,7 +11,7 @@ import timber.log.Timber;
 /**
  * Created by jcmanzo on 1/10/15.
  */
-public class MusicLibrary extends ContentProvider {
+public class MusicProvider extends ContentProvider {
     private MusicDatabase mMusicLibrary;
     private static final String AUTHORITY = "com.freneticlabs.cleff";
     private static final String BASE_PATH = "musiclibrary";

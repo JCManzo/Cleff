@@ -31,7 +31,7 @@
         </activity>
         <provider
             android:authorities="com.freneticlabs.cleff"
-            android:name=".models.MusicLibrary"
+            android:name=".models.MusicProvider"
             android:exported="false"/>
 
         <receiver android:name=".utils.StopServiceBroadcastReceiver" >

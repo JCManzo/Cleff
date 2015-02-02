@@ -23,7 +23,8 @@ import com.freneticlabs.cleff.MusicService;
 import com.freneticlabs.cleff.R;
 import com.freneticlabs.cleff.activities.PlayerActivity;
 import com.freneticlabs.cleff.models.MusicDatabase;
-import com.freneticlabs.cleff.models.MusicLibrary;
+import com.freneticlabs.cleff.models.MusicProvider;
+import com.freneticlabs.cleff.models.Song;
 import com.freneticlabs.cleff.models.events.QueryAllSongsEvent;
 import com.freneticlabs.cleff.views.adapters.SongsAdapter;
 import com.getbase.floatingactionbutton.FloatingActionButton;
@@ -122,13 +123,13 @@ public class SongsFragment extends Fragment
        mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Intent i = new Intent(getActivity(), PlayerActivity.class);
+                Intent playerIntent = new Intent(getActivity(), PlayerActivity.class);
                 Cursor cursor = (Cursor) parent.getItemAtPosition(position);
-                String path = cursor.getString(cursor.getColumnIndexOrThrow(MusicDatabase.SONG_FILE_PATH));
-                Timber.d(path);
+                String songId = cursor.getString(cursor.getColumnIndexOrThrow(MusicDatabase._ID));
 
-                // i.putExtra(PlayerFragment.EXTRA_SONG_ID, 3);
-               // startActivity(i);
+                playerIntent.putExtra(PlayerFragment.EXTRA_SONG_ID, songId);
+                startActivity(playerIntent);
+                Timber.d(Integer.toString(position));
                //play((position));
             }
         });
@@ -306,7 +307,7 @@ public class SongsFragment extends Fragment
                 MusicDatabase.SONG_FILE_PATH
         };
 
-        Uri uri = MusicLibrary.CONTENT_URI;
+        Uri uri = MusicProvider.CONTENT_URI;
 
         // Returns a new CursorLoader
         return new CursorLoader(
@@ -330,8 +331,55 @@ public class SongsFragment extends Fragment
         // old cursor once we return.)
 
         // Post the event to any subscribers
+        saveResultsToArrayList(cursor);
         CleffApp.getEventBus().post(new QueryAllSongsEvent((cursor)));
         mSongsAdapter.swapCursor(cursor);
 
+    }
+
+    public void saveResultsToArrayList(Cursor cursor) {
+        if (cursor != null && cursor.moveToFirst()) {
+            int idColumn = cursor.getColumnIndexOrThrow(MusicDatabase._ID);
+            int artistColumn = cursor.getColumnIndexOrThrow(MusicDatabase.SONG_ARTIST);
+            int albumColumn = cursor.getColumnIndexOrThrow(MusicDatabase.SONG_ALBUM);
+           // int albumArtistColumn = cursor.getColumnIndexOrThrow(MusicDatabase.SONG_ALBUM_ARTIST);
+            int albumIdColumn = cursor.getColumnIndexOrThrow(MusicDatabase.SONG_ALBUM_ID);
+            int dateAddedColumn = cursor.getColumnIndexOrThrow(MusicDatabase.DATE_ADDED);
+            int dateModifiedColumn = cursor.getColumnIndexOrThrow(MusicDatabase.LAST_MODIFIED);
+            int durationColumn = cursor.getColumnIndexOrThrow(MusicDatabase.SONG_DURATION);
+            int genreColumn = cursor.getColumnIndexOrThrow(MusicDatabase.SONG_GENRE);
+            int titleColumn = cursor.getColumnIndexOrThrow(MusicDatabase.SONG_TITLE);
+            int yearColumn = cursor.getColumnIndexOrThrow(MusicDatabase.SONG_YEAR);
+            int filePathColumn = cursor.getColumnIndexOrThrow(MusicDatabase.SONG_FILE_PATH);
+            int songTrackColumn = cursor.getColumnIndexOrThrow(MusicDatabase.SONG_TRACK_NUMBER);
+
+            do {
+                String songId = cursor.getString(idColumn);
+                String songAlbumId = cursor.getString(albumIdColumn);
+                String songYear = cursor.getString(yearColumn);
+                String songTitle = cursor.getString(titleColumn);
+                String songArtist = cursor.getString(artistColumn);
+                String songAlbum = cursor.getString(albumColumn);
+                String songGenre = cursor.getString(genreColumn);
+                String songFilePath = cursor.getString(filePathColumn);
+                String songDuration = cursor.getString(durationColumn);
+                String songDateAdded = cursor.getString(dateAddedColumn);
+                String songDateModified = cursor.getString(dateModifiedColumn);
+               // String songAlbumArtist = cursor.getString(albumArtistColumn);
+                String songTrackNumber = cursor.getString(songTrackColumn);
+
+                Song song = new Song();
+                song.setID(songId);
+                song.setYear(songYear);
+                song.setTitle(songTitle);
+                song.setArtist(songArtist);
+                song.setAlbum(songAlbum);
+                song.setPath(songFilePath);
+                song.setAlbumID(songAlbumId);
+                song.setGenre(songGenre);
+
+                mCleffApp.addSong(song);
+            } while (cursor.moveToNext());
+        }
     }
 }

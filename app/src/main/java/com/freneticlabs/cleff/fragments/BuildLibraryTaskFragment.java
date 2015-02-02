@@ -15,7 +15,7 @@ import android.util.Log;
 import com.freneticlabs.cleff.CleffApp;
 import com.freneticlabs.cleff.R;
 import com.freneticlabs.cleff.models.MusicDatabase;
-import com.freneticlabs.cleff.models.MusicLibrary;
+import com.freneticlabs.cleff.models.MusicProvider;
 
 import java.util.HashMap;
 
@@ -149,7 +149,7 @@ public class BuildLibraryTaskFragment extends Fragment {
 
             if(mediaStoreCursor!=null && mediaStoreCursor.moveToFirst()){
                 /** These are the columns in the music cursor that we are interested in. */
-                int idColumn = mediaStoreCursor.getColumnIndex(MediaStore.Audio.Media._ID);
+                int idColumn = mediaStoreCursor.getColumnIndexOrThrow(MediaStore.Audio.Media._ID);
                 int artistColumn = mediaStoreCursor.getColumnIndexOrThrow(MediaStore.Audio.Media.ARTIST);
                 int albumColumn = mediaStoreCursor.getColumnIndexOrThrow(MediaStore.Audio.Media.ALBUM);
                 int albumArtistColumn = mediaStoreCursor.getColumnIndexOrThrow(MediaStore.Audio.Albums.ARTIST);
@@ -163,9 +163,6 @@ public class BuildLibraryTaskFragment extends Fragment {
                 int songTrackColumn = mediaStoreCursor.getColumnIndexOrThrow(MediaStore.Audio.Media.TRACK);
 
                 do {
-                    // long thisSongId = musicCursor.getLong(idColumn);
-                    int thisSongId = Integer.parseInt(mediaStoreCursor.getString(idColumn));
-
                     String songAlbumId = mediaStoreCursor.getString(albumIdColumn);
                     String songId = mediaStoreCursor.getString(idColumn);
                     String songYear = mediaStoreCursor.getString(yearColumn);
@@ -200,12 +197,14 @@ public class BuildLibraryTaskFragment extends Fragment {
                     values.put(MusicDatabase.DATE_ADDED, songDateAdded);
                     values.put(MusicDatabase.LAST_MODIFIED, songDateModified);
 
-                    mContext.getContentResolver().insert(MusicLibrary.CONTENT_URI, values);
+                    mContext.getContentResolver().insert(MusicProvider.CONTENT_URI, values);
                 }
                 while (mediaStoreCursor.moveToNext());
             }
+
             if(mediaStoreCursor != null) mediaStoreCursor.close();
         }
+
 
         private String getSongGenre(String filePath) {
             if (mGenresHashMap!=null)
@@ -221,6 +220,7 @@ public class BuildLibraryTaskFragment extends Fragment {
                 return mContext.getResources().getString(R.string.unknown_genre_name);
         }
 
+
         /**
          * Retrives all songs from the MediaStore with no folder contraint
          */
@@ -230,7 +230,8 @@ public class BuildLibraryTaskFragment extends Fragment {
 
             Cursor mediaStoreCursor = null;
             String sortOrder = null;
-            String projection[] = { MediaStore.Audio.Media.TITLE,
+            String projection[] = {
+                    MediaStore.Audio.Media.TITLE,
                     MediaStore.Audio.Media.ARTIST,
                     MediaStore.Audio.Media.ALBUM,
                     MediaStore.Audio.Media.ALBUM_ID,
@@ -263,7 +264,7 @@ public class BuildLibraryTaskFragment extends Fragment {
             Uri uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
             String selection = MediaStore.Audio.Media.IS_MUSIC + "=1";
 
-            mediaStoreCursor = contentResolver.query(uri, null, selection, null, sortOrder);
+            mediaStoreCursor = contentResolver.query(uri, projection, selection, null, sortOrder);
 
             return mediaStoreCursor;
         }

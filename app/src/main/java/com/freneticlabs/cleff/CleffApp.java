@@ -5,8 +5,11 @@ import android.content.Context;
 import android.content.SharedPreferences;
 
 import com.freneticlabs.cleff.models.MusicDatabase;
+import com.freneticlabs.cleff.models.Song;
 import com.freneticlabs.cleff.utils.MusicServiceManager;
 import com.squareup.otto.Bus;
+
+import java.util.ArrayList;
 
 import timber.log.Timber;
 
@@ -29,6 +32,8 @@ public class CleffApp extends Application {
     private static final Bus mEventBus = new Bus();
     private boolean mIsServiceRunning = false;
     private static boolean mIsActivityVisible = false;
+
+    private ArrayList<Song> mSongsList;
 
     //SharedPreferences keys.
     public static final String REPEAT_MODE = "RepeatMode";
@@ -95,6 +100,22 @@ public class CleffApp extends Application {
         return mEventBus;
     }
 
+    public ArrayList<Song> getSongList() {
+        return mSongsList;
+    }
+
+    public void addSong(Song song) {
+        mSongsList.add(song);
+    }
+
+    public Song getSong(String id) {
+        for(Song song : getSongList()) {
+            if(song.getID().equals(id)) {
+                return song;
+            }
+        }
+        return null;
+    }
 
     @Override
     public void onCreate() {
@@ -108,7 +129,7 @@ public class CleffApp extends Application {
         }
 
 
-
+        mSongsList = new ArrayList<>();
         mContext = getApplicationContext();
         mPlaybackManager = new MusicServiceManager(mContext);
         mMusicDatabase = new MusicDatabase(mContext);
