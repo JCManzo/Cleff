@@ -8,9 +8,9 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.Toolbar;
 
-import com.freneticlabs.cleff.CleffApp;
 import com.freneticlabs.cleff.R;
 import com.freneticlabs.cleff.fragments.PlayerFragment;
+import com.freneticlabs.cleff.models.MusicLibrary;
 import com.freneticlabs.cleff.models.Song;
 
 import java.util.ArrayList;
@@ -20,7 +20,6 @@ import butterknife.InjectView;
 
 public class PlayerActivity extends ActionBarActivity {
     private ArrayList<Song> mSongs;
-    private CleffApp mCleffApp;
     @InjectView(R.id.toolbar) Toolbar mToolbar;
     @InjectView(R.id.player_activity_pager) ViewPager mViewPager;
 
@@ -37,15 +36,15 @@ public class PlayerActivity extends ActionBarActivity {
             mToolbar.setNavigationIcon(R.drawable.ic_action_arrow_back);
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
-        mCleffApp = (CleffApp)getApplication();
-        mSongs = mCleffApp.getSongList();
+
+        mSongs = MusicLibrary.get(this).getSongs();
 
         FragmentManager fm = getSupportFragmentManager();
         mViewPager.setAdapter(new FragmentPagerAdapter(fm) {
             @Override
             public Fragment getItem(int position) {
                 Song song = mSongs.get(position);
-                return PlayerFragment.newInstance(song.getID());
+                return PlayerFragment.newInstance(song.getId());
             }
 
             @Override
@@ -53,9 +52,9 @@ public class PlayerActivity extends ActionBarActivity {
                 return mSongs.size();
             }
         });
-        String songId = (String)getIntent().getSerializableExtra(PlayerFragment.EXTRA_SONG_ID);
+        long songId = (long)getIntent().getSerializableExtra(PlayerFragment.EXTRA_SONG_ID);
         for (int i = 0; i < mSongs.size(); i++) {
-            if(mSongs.get(i).getID().equals(songId)) {
+            if(mSongs.get(i).getId() == songId) {
                 mViewPager.setCurrentItem(i);
                 break;
             }

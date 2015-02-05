@@ -3,14 +3,9 @@ package com.freneticlabs.cleff.fragments;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.database.Cursor;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.LoaderManager;
-import android.support.v4.content.CursorLoader;
-import android.support.v4.content.Loader;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,13 +17,13 @@ import com.freneticlabs.cleff.CleffApp;
 import com.freneticlabs.cleff.MusicService;
 import com.freneticlabs.cleff.R;
 import com.freneticlabs.cleff.activities.PlayerActivity;
-import com.freneticlabs.cleff.models.MusicDatabase;
-import com.freneticlabs.cleff.models.MusicProvider;
+import com.freneticlabs.cleff.models.MusicLibrary;
 import com.freneticlabs.cleff.models.Song;
-import com.freneticlabs.cleff.models.events.QueryAllSongsEvent;
 import com.freneticlabs.cleff.views.adapters.SongsAdapter;
 import com.getbase.floatingactionbutton.FloatingActionButton;
 import com.getbase.floatingactionbutton.FloatingActionsMenu;
+
+import java.util.ArrayList;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
@@ -38,8 +33,7 @@ import static android.support.v7.widget.RecyclerView.SCROLL_STATE_DRAGGING;
 import static android.support.v7.widget.RecyclerView.SCROLL_STATE_IDLE;
 import static android.support.v7.widget.RecyclerView.SCROLL_STATE_SETTLING;
 
-public class SongsFragment extends Fragment
-        implements LoaderManager.LoaderCallbacks<Cursor> {
+public class SongsFragment extends Fragment {
 
     @InjectView(R.id.recycler_view_songs)
     ListView mListView;
@@ -58,6 +52,7 @@ public class SongsFragment extends Fragment
     private CleffApp mCleffApp;
     private Context mContext;
     private SongsAdapter mSongsAdapter;
+    private ArrayList<Song> mSongs;
     private int mLastPosition = 0;
     private int mPositionOffset = 0;
 
@@ -72,6 +67,7 @@ public class SongsFragment extends Fragment
         mContext = getActivity().getApplicationContext();
         mCleffApp = (CleffApp) getActivity().getApplication();
         mSettings = mCleffApp.getSharedPreferences();
+        mSongs = MusicLibrary.get(mContext).getSongs();
     }
 
     @Override
@@ -100,10 +96,8 @@ public class SongsFragment extends Fragment
         View rootView = inflater.inflate(R.layout.fragment_song_list, container, false);
         ButterKnife.inject(this, rootView);
 
-        mSongsAdapter = new SongsAdapter(getActivity(), null, 0);
+        mSongsAdapter = new SongsAdapter(mContext, mSongs);
         mListView.setAdapter(mSongsAdapter);
-
-        getLoaderManager().initLoader(URL_LOADER, null, this);
 
         initListeners();
         return rootView;
@@ -121,18 +115,16 @@ public class SongsFragment extends Fragment
         // Listener for when a list item is clicked
 
        mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Intent playerIntent = new Intent(getActivity(), PlayerActivity.class);
-                Cursor cursor = (Cursor) parent.getItemAtPosition(position);
-                String songId = cursor.getString(cursor.getColumnIndexOrThrow(MusicDatabase._ID));
+           @Override
+           public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+               Intent playerIntent = new Intent(getActivity(), PlayerActivity.class);
+               Song song = mSongs.get(position);
 
-                playerIntent.putExtra(PlayerFragment.EXTRA_SONG_ID, songId);
-                startActivity(playerIntent);
-                Timber.d(Integer.toString(position));
-               //play((position));
-            }
-        });
+               playerIntent.putExtra(PlayerFragment.EXTRA_SONG_ID, song.getId());
+               startActivity(playerIntent);
+               playSong((position));
+           }
+       });
 
         mListView.setOnScrollListener(new AbsListView.OnScrollListener() {
             @Override
@@ -206,8 +198,6 @@ public class SongsFragment extends Fragment
         int position = mSettings.getInt(CleffApp.LAST_VIEWED_ITEM, 0);
         int offset = mSettings.getInt(CleffApp.LAST_VIEWED_OFFSET, 0);
 
-        Timber.d("I: " + position + " " + "I2: " + " " + offset);
-
         mListView.setSelectionFromTop(position, offset);
     }
 
@@ -222,10 +212,10 @@ public class SongsFragment extends Fragment
         }
     }
 
-    public void play(int file) {
+    public void playSong(int song) {
         mCleffApp.getPlaybackManager().initPlayback();
-        mCleffApp.getService().setSong(file);
-        mCleffApp.getService().playSong();
+        mCleffApp.getService().setSong(song);
+        mCleffApp.getService().play();
     }
 
     public void updatePlayer(int selectedSong) {
@@ -234,7 +224,7 @@ public class SongsFragment extends Fragment
         if (mCleffApp.getService().getPlayerSate().equals(MusicService.PlayerState.IDLE)) {
             Timber.d("PLAYER IS NOW PLAYING");
 
-            play(selectedSong);
+            playSong(selectedSong);
 
         } else if (mCleffApp.getService().getPlayerSate().equals(MusicService.PlayerState.PLAYING)) {
             int lastPlayedSong = mSettings.getInt(CleffApp.LAST_PLAYED_SONG, selectedSong);
@@ -243,7 +233,7 @@ public class SongsFragment extends Fragment
                 Timber.d("PLAYER IS NOW PAUSED");
             } else {
                 Timber.d("PLAYING NEW SONG");
-                play(selectedSong);
+                playSong(selectedSong);
             }
         } else if (mCleffApp.getService().getPlayerSate().equals(MusicService.PlayerState.PAUSED)) {
             int lastPlayedSong = mSettings.getInt(CleffApp.LAST_PLAYED_SONG, selectedSong);
@@ -256,7 +246,7 @@ public class SongsFragment extends Fragment
 
             } else {
                 Timber.d("PLAYING NEW SONG");
-                play(selectedSong);
+                playSong(selectedSong);
             }
         } else {
             Timber.d("NONE");
@@ -292,94 +282,4 @@ public class SongsFragment extends Fragment
     }
 
 
-    /**
-     * Queries the Cleff database for all songs
-     * @param loaderId
-     * @param args
-     * @return a cursor containing all the songs in the library
-     */
-    @Override
-    public Loader<Cursor> onCreateLoader(int loaderId, Bundle args) {
-        final String[] projection = {
-                MusicDatabase._ID,
-                MusicDatabase.SONG_ARTIST,
-                MusicDatabase.SONG_TITLE,
-                MusicDatabase.SONG_FILE_PATH
-        };
-
-        Uri uri = MusicProvider.CONTENT_URI;
-
-        // Returns a new CursorLoader
-        return new CursorLoader(
-                getActivity(),   // Parent activity context
-                uri,        // Table to query
-                projection,     // Projection to return
-                null,            // No selection clause
-                null,            // No selection arguments
-                null           // Default sort order
-        );
-    }
-
-    @Override
-    public void onLoaderReset(Loader<Cursor> loader) {
-        mSongsAdapter.swapCursor(null);
-    }
-
-    @Override
-    public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
-        // Swap the new cursor in.  (The framework will take care of closing the
-        // old cursor once we return.)
-
-        // Post the event to any subscribers
-        saveResultsToArrayList(cursor);
-        CleffApp.getEventBus().post(new QueryAllSongsEvent((cursor)));
-        mSongsAdapter.swapCursor(cursor);
-
-    }
-
-    public void saveResultsToArrayList(Cursor cursor) {
-        if (cursor != null && cursor.moveToFirst()) {
-            int idColumn = cursor.getColumnIndexOrThrow(MusicDatabase._ID);
-            int artistColumn = cursor.getColumnIndexOrThrow(MusicDatabase.SONG_ARTIST);
-            int albumColumn = cursor.getColumnIndexOrThrow(MusicDatabase.SONG_ALBUM);
-           // int albumArtistColumn = cursor.getColumnIndexOrThrow(MusicDatabase.SONG_ALBUM_ARTIST);
-            int albumIdColumn = cursor.getColumnIndexOrThrow(MusicDatabase.SONG_ALBUM_ID);
-            int dateAddedColumn = cursor.getColumnIndexOrThrow(MusicDatabase.DATE_ADDED);
-            int dateModifiedColumn = cursor.getColumnIndexOrThrow(MusicDatabase.LAST_MODIFIED);
-            int durationColumn = cursor.getColumnIndexOrThrow(MusicDatabase.SONG_DURATION);
-            int genreColumn = cursor.getColumnIndexOrThrow(MusicDatabase.SONG_GENRE);
-            int titleColumn = cursor.getColumnIndexOrThrow(MusicDatabase.SONG_TITLE);
-            int yearColumn = cursor.getColumnIndexOrThrow(MusicDatabase.SONG_YEAR);
-            int filePathColumn = cursor.getColumnIndexOrThrow(MusicDatabase.SONG_FILE_PATH);
-            int songTrackColumn = cursor.getColumnIndexOrThrow(MusicDatabase.SONG_TRACK_NUMBER);
-
-            do {
-                String songId = cursor.getString(idColumn);
-                String songAlbumId = cursor.getString(albumIdColumn);
-                String songYear = cursor.getString(yearColumn);
-                String songTitle = cursor.getString(titleColumn);
-                String songArtist = cursor.getString(artistColumn);
-                String songAlbum = cursor.getString(albumColumn);
-                String songGenre = cursor.getString(genreColumn);
-                String songFilePath = cursor.getString(filePathColumn);
-                String songDuration = cursor.getString(durationColumn);
-                String songDateAdded = cursor.getString(dateAddedColumn);
-                String songDateModified = cursor.getString(dateModifiedColumn);
-               // String songAlbumArtist = cursor.getString(albumArtistColumn);
-                String songTrackNumber = cursor.getString(songTrackColumn);
-
-                Song song = new Song();
-                song.setID(songId);
-                song.setYear(songYear);
-                song.setTitle(songTitle);
-                song.setArtist(songArtist);
-                song.setAlbum(songAlbum);
-                song.setPath(songFilePath);
-                song.setAlbumID(songAlbumId);
-                song.setGenre(songGenre);
-
-                mCleffApp.addSong(song);
-            } while (cursor.moveToNext());
-        }
-    }
 }

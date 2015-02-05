@@ -29,10 +29,6 @@
             <meta-data android:name="android.support.PARENT_ACTIVITY"
                        android:value=".activities.MainActivity" />
         </activity>
-        <provider
-            android:authorities="com.freneticlabs.cleff"
-            android:name=".models.MusicProvider"
-            android:exported="false"/>
 
         <receiver android:name=".utils.StopServiceBroadcastReceiver" >
             <intent-filter>

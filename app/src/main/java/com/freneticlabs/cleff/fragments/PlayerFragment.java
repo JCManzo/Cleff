@@ -8,8 +8,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.freneticlabs.cleff.CleffApp;
 import com.freneticlabs.cleff.R;
+import com.freneticlabs.cleff.models.MusicLibrary;
 import com.freneticlabs.cleff.models.Song;
 
 import butterknife.ButterKnife;
@@ -21,13 +21,12 @@ import butterknife.InjectView;
 public class PlayerFragment extends Fragment {
     public static final String EXTRA_SONG_ID = "com.freneticlabs.cleff.song_id";
     private Song mSong;
-    private CleffApp mCleffApp;
     @InjectView(R.id.player_song_name) TextView mSongName;
     public PlayerFragment() {
         // Required empty public constructor
     }
 
-    public static PlayerFragment newInstance(String songId) {
+    public static PlayerFragment newInstance(long songId) {
         Bundle args = new Bundle();
         args.putSerializable(EXTRA_SONG_ID, songId);
 
@@ -42,9 +41,8 @@ public class PlayerFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
-        mCleffApp = (CleffApp)getActivity().getApplication();
-        String songId = (String)getArguments().getSerializable(EXTRA_SONG_ID);
-        mSong = mCleffApp.getSong(songId);
+        long songId = (long)getArguments().getSerializable(EXTRA_SONG_ID);
+        mSong = MusicLibrary.get(getActivity()).getSong(songId);
 
     }
 
@@ -55,7 +53,7 @@ public class PlayerFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_player, container, false);
         ButterKnife.inject(this, view);
 
-       //mSongName.setText(mSong.getTitle());
+        mSongName.setText(mSong.getTitle());
         return view;
     }
 

@@ -2,7 +2,6 @@ package com.freneticlabs.cleff.fragments;
 
 import android.app.Activity;
 import android.content.ContentResolver;
-import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
@@ -14,10 +13,12 @@ import android.util.Log;
 
 import com.freneticlabs.cleff.CleffApp;
 import com.freneticlabs.cleff.R;
-import com.freneticlabs.cleff.models.MusicDatabase;
-import com.freneticlabs.cleff.models.MusicProvider;
+import com.freneticlabs.cleff.models.MusicLibrary;
+import com.freneticlabs.cleff.models.Song;
 
 import java.util.HashMap;
+
+import timber.log.Timber;
 
 
 /**
@@ -28,6 +29,8 @@ import java.util.HashMap;
  * to handle interaction events.
  */
 public class BuildLibraryTaskFragment extends Fragment {
+    private static final String TAG = BuildLibraryTaskFragment.class.getSimpleName();
+    private static final String ALBUM_ART_PATH = "content://media/external/audio/albumart";
     private static final Uri EXTERNAL_CONTENT = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
 
     private Context mContext;
@@ -56,6 +59,8 @@ public class BuildLibraryTaskFragment extends Fragment {
     }
 
     private BuildLibraryTaskCallbacks mBuildLibraryTaskCallbacks;
+    private BuildCursorListener mBuildCursorListener;
+
     private BuildLibraryTask mTask;
 
     /**
@@ -127,7 +132,6 @@ public class BuildLibraryTaskFragment extends Fragment {
             if (mBuildLibraryTaskCallbacks != null) {
                 mBuildLibraryTaskCallbacks.onCancelled();
             }
-
         }
 
         @Override
@@ -135,6 +139,12 @@ public class BuildLibraryTaskFragment extends Fragment {
             super.onPostExecute(cursor);
             if(mBuildLibraryTaskCallbacks != null) {
                 mBuildLibraryTaskCallbacks.onPostExecute();
+            }
+
+            if (cursor != null) {
+                getBuildCursorListener().onCursorReady(cursor, 0, true);
+            } else {
+                Timber.d("NULL CURSOR");
             }
         }
 
@@ -147,9 +157,11 @@ public class BuildLibraryTaskFragment extends Fragment {
             String mUnknownArtist = getActivity().getApplicationContext().getString(R.string.unknown_artist_name);
             String mUnknownTitle = getActivity().getApplicationContext().getString(R.string.unknown_title_name);
 
+
             if(mediaStoreCursor!=null && mediaStoreCursor.moveToFirst()){
+
                 /** These are the columns in the music cursor that we are interested in. */
-                int idColumn = mediaStoreCursor.getColumnIndexOrThrow(MediaStore.Audio.Media._ID);
+                int idColumn = mediaStoreCursor.getColumnIndex(MediaStore.Audio.Media._ID);
                 int artistColumn = mediaStoreCursor.getColumnIndexOrThrow(MediaStore.Audio.Media.ARTIST);
                 int albumColumn = mediaStoreCursor.getColumnIndexOrThrow(MediaStore.Audio.Media.ALBUM);
                 int albumArtistColumn = mediaStoreCursor.getColumnIndexOrThrow(MediaStore.Audio.Albums.ARTIST);
@@ -161,10 +173,12 @@ public class BuildLibraryTaskFragment extends Fragment {
                 int yearColumn = mediaStoreCursor.getColumnIndexOrThrow(MediaStore.Audio.Media.YEAR);
                 int filePathColumn = mediaStoreCursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DATA);
                 int songTrackColumn = mediaStoreCursor.getColumnIndexOrThrow(MediaStore.Audio.Media.TRACK);
-
                 do {
+                    // long thisSongId = musicCursor.getLong(idColumn);
+                    int thisSongId = Integer.parseInt(mediaStoreCursor.getString(idColumn));
+
                     String songAlbumId = mediaStoreCursor.getString(albumIdColumn);
-                    String songId = mediaStoreCursor.getString(idColumn);
+                    Long songId = mediaStoreCursor.getLong(idColumn);
                     String songYear = mediaStoreCursor.getString(yearColumn);
                     String songTitle = mediaStoreCursor.getString(titleColumn);
                     String songArtist = mediaStoreCursor.getString(artistColumn);
@@ -184,27 +198,21 @@ public class BuildLibraryTaskFragment extends Fragment {
                     if(unknownAlbum) songAlbum = mUnknownAlbum;
                     if(unknownTitle) songTitle = mUnknownTitle;
 
-                    ContentValues values = new ContentValues();
-                    values.put(MusicDatabase.SONG_TITLE, songTitle);
-                    values.put(MusicDatabase.SONG_FILE_PATH, songFilePath);
-                    values.put(MusicDatabase.SONG_ARTIST, songArtist);
-                    values.put(MusicDatabase.SONG_GENRE, getSongGenre(songFilePath));
-                    values.put(MusicDatabase.SONG_ALBUM, songAlbum);
-                    values.put(MusicDatabase.SONG_ALBUM_ID, songAlbumId);
-                    values.put(MusicDatabase.SONG_YEAR, songYear);
-                    values.put(MusicDatabase.SONG_DURATION, songDuration);
-                    values.put(MusicDatabase.SONG_TRACK_NUMBER, songTrackNumber);
-                    values.put(MusicDatabase.DATE_ADDED, songDateAdded);
-                    values.put(MusicDatabase.LAST_MODIFIED, songDateModified);
+                    Song song = new Song();
+                    song.setID(songId);
+                    song.setYear(songYear);
+                    song.setTitle(songTitle);
+                    song.setArtist(songArtist);
+                    song.setAlbum(songAlbum);
+                    song.setPath(songFilePath);
+                    song.setAlbumID(songAlbumId);
 
-                    mContext.getContentResolver().insert(MusicProvider.CONTENT_URI, values);
+                    MusicLibrary.get(mContext).addSong(song);
                 }
                 while (mediaStoreCursor.moveToNext());
             }
-
             if(mediaStoreCursor != null) mediaStoreCursor.close();
         }
-
 
         private String getSongGenre(String filePath) {
             if (mGenresHashMap!=null)
@@ -220,7 +228,6 @@ public class BuildLibraryTaskFragment extends Fragment {
                 return mContext.getResources().getString(R.string.unknown_genre_name);
         }
 
-
         /**
          * Retrives all songs from the MediaStore with no folder contraint
          */
@@ -230,8 +237,7 @@ public class BuildLibraryTaskFragment extends Fragment {
 
             Cursor mediaStoreCursor = null;
             String sortOrder = null;
-            String projection[] = {
-                    MediaStore.Audio.Media.TITLE,
+            String projection[] = { MediaStore.Audio.Media.TITLE,
                     MediaStore.Audio.Media.ARTIST,
                     MediaStore.Audio.Media.ALBUM,
                     MediaStore.Audio.Media.ALBUM_ID,
@@ -264,7 +270,7 @@ public class BuildLibraryTaskFragment extends Fragment {
             Uri uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
             String selection = MediaStore.Audio.Media.IS_MUSIC + "=1";
 
-            mediaStoreCursor = contentResolver.query(uri, projection, selection, null, sortOrder);
+            mediaStoreCursor = contentResolver.query(uri, null, selection, null, sortOrder);
 
             return mediaStoreCursor;
         }
@@ -318,12 +324,6 @@ public class BuildLibraryTaskFragment extends Fragment {
                         mGenresHashMap.put(cursor.getString(0), genreName);
                         mGenresSongCountHashMap.put(genreName, cursor.getCount());
                     }
-                    ContentValues values = new ContentValues();
-                    values.put(MusicDatabase.GENRE_NAME, genreName);
-                    values.put(MusicDatabase.GENRES_SONG_COUNT, getSongGenreCount(genreName));
-                    mCleffApp.getMusicDatabase()
-                            .getWritableDatabase()
-                            .insert(MusicDatabase.GENRE_TABLE, null, values);
 
                     cursor.close();
                 }
@@ -348,6 +348,14 @@ public class BuildLibraryTaskFragment extends Fragment {
                     .append(CONTENTDIR)
                     .toString());
         }
+    }
+
+    public BuildCursorListener getBuildCursorListener() {
+        return mBuildCursorListener;
+    }
+
+    public void setBuildCursorListener(BuildCursorListener listener) {
+        mBuildCursorListener = listener;
     }
 
 }

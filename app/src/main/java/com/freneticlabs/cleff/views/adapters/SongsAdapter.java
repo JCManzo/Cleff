@@ -1,55 +1,80 @@
 package com.freneticlabs.cleff.views.adapters;
 
 import android.content.Context;
-import android.database.Cursor;
-import android.support.v4.widget.CursorAdapter;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
 import com.freneticlabs.cleff.R;
-import com.freneticlabs.cleff.models.MusicDatabase;
+import com.freneticlabs.cleff.models.Song;
+
+import java.util.ArrayList;
 
 /**
  * Created by jcmanzo on 12/14/14.
  */
-public class SongsAdapter extends CursorAdapter {
+public class SongsAdapter extends ArrayAdapter<Song> {
     private final Context mContext;
+    private ArrayList<Song> mSongs;
+    private LayoutInflater mSongInflater;
 
     // Remember the last item shown on screen
     private int lastPosition = -1;
 
 
-    public SongsAdapter(Context context, Cursor cursor, int flags) {
-        super(context, cursor, flags);
+    public SongsAdapter(Context context, ArrayList<Song> songs) {
+        super(context, 0, songs);
         mContext = context;
-    }
-
-
-    @Override
-    public void bindView(View view, Context context, Cursor cursor) {
-        ViewHolder holder = (ViewHolder) view.getTag();
-        holder.title.setText(cursor.getString(cursor.getColumnIndex(MusicDatabase.SONG_TITLE)));
-        holder.artist.setText(cursor.getString(cursor.getColumnIndex(MusicDatabase.SONG_ARTIST)));
-
-        setAnimation(view, cursor.getPosition());
+        mSongs = songs;
+        mSongInflater = LayoutInflater.from(context);
 
     }
 
     @Override
-    public View newView(Context context, Cursor cursor, ViewGroup parent) {
-        LayoutInflater inflater = LayoutInflater.from(mContext);
-        View view = inflater.inflate(R.layout.song_list_row_item, parent, false);
-        ViewHolder holder = new ViewHolder();
-        holder.title = (TextView)view.findViewById(R.id.list_song_title);
-        holder.artist = (TextView)view.findViewById(R.id.list_song_artist);
-        view.setTag(holder);
+    public Song getItem(int position) {
+        return mSongs.get(position);
+    }
+
+    @Override
+    public long getItemId(int position) {
+        return position;
+    }
+
+    @Override
+    public View getView(final int position, View view, ViewGroup parent) {
+        ViewHolder holder;
+        if(view == null) {
+            //map to song layout
+            view = mSongInflater.inflate(R.layout.song_list_row_item, parent, false);
+
+            // Set up up the ViewHolder
+            holder = new ViewHolder();
+            holder.title = (TextView)view.findViewById(R.id.list_song_title);
+            holder.artist = (TextView)view.findViewById(R.id.list_song_artist);
+
+            view.setTag(holder);
+
+        } else {
+            // View already exists
+            holder = (ViewHolder)view.getTag();
+        }
+
+        //get song using position
+        final Song song = mSongs.get(position);
+        //get title and artist strings
+        holder.title.setText(song.getTitle());
+        holder.artist.setText(song.getArtist());
+
         return view;
     }
 
+    /**
+     * ViewHolder pattern allows ListView to scroll more smoothly
+     */
     private static class ViewHolder {
         TextView title;
         TextView artist;

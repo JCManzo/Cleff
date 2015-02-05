@@ -7,7 +7,6 @@ import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.database.Cursor;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
@@ -19,9 +18,8 @@ import android.util.Log;
 import android.widget.RemoteViews;
 
 import com.freneticlabs.cleff.activities.MainActivity;
+import com.freneticlabs.cleff.models.MusicLibrary;
 import com.freneticlabs.cleff.models.Song;
-import com.freneticlabs.cleff.models.events.QueryAllSongsEvent;
-import com.squareup.otto.Subscribe;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -62,7 +60,6 @@ public class MusicService extends Service implements
 
     private Random mRandom;
     private ArrayList<Song> mSongs;
-    private Cursor mCursor;
     private CleffApp mCleffApp;
 
     // Keep track of the current song position in the Array
@@ -77,15 +74,6 @@ public class MusicService extends Service implements
 
     }
 
-    /**
-     * Sets the song cursor
-     * @param event contains a cursor will all songs from the Cleff databse.
-     */
-    @Subscribe
-    public void onQueryAllSongsEvent(QueryAllSongsEvent event) {
-        mCursor = event.mCursor;
-
-    }
 
     @Override
     public void onCreate() {
@@ -122,7 +110,7 @@ public class MusicService extends Service implements
         mSettings = mCleffApp.getSharedPreferences();
 
         mCleffApp.setService(this);
-
+        mSongs = MusicLibrary.get(mContext).getSongs();
         initMediaPlayer();
 
         // Get audiofocus
@@ -170,20 +158,15 @@ public class MusicService extends Service implements
         }
     }
 
-    public void setSongsCursor(Cursor cursor) {
-        mCursor = cursor;
-    }
 
-    public Cursor getSongsCursor() {
-        return mCursor;
-    }
-    public void setSong(int file){
-        mCurrentSongPosition = file;
+    public void setSong(int songPosition){
+        mCurrentSongPosition = songPosition;
     }
 
     public int getCurrentSongPosition(){
         return mCurrentSongPosition;
     }
+
     public void setShuffle() {
         if(mShuffle) mShuffle=false;
         else mShuffle=true;
@@ -192,6 +175,7 @@ public class MusicService extends Service implements
     public boolean isShuffle() {
         return mShuffle;
     }
+
     public void setRepeat() {
         if(mRepeat) mRepeat=false;
         else mRepeat=true;
@@ -208,16 +192,16 @@ public class MusicService extends Service implements
     public PlayerState isPaused() {
         return mPlayerSate;
     }
+
     /**
-     * Play song that was set by setSong()
+     * Plays the current song in mCurrentSongPosition
      */
-    public void playSong() {
+    public void play() {
         if (mMediaPlayer == null) initMediaPlayer();
 
-       // Song currentSong = mSongs.get(mCurrentSongPosition);
-       // Timber.d("Playing song: " + currentSong.getTitle());
+        Song currentSong = mSongs.get(mCurrentSongPosition);
 
-        Uri trackUri = ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, mCurrentSongPosition);
+        Uri trackUri = ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, currentSong.getId());
         Timber.d(trackUri.toString());
         try {
             mMediaPlayer.reset();
@@ -298,7 +282,7 @@ public class MusicService extends Service implements
      */
     public void togglePlayer() {
         if(mPlayerSate.equals(PlayerState.PLAYING)) {
-            playSong();
+            play();
         } else {
             mMediaPlayer.reset();
             mPlayerSate = PlayerState.IDLE;
@@ -419,7 +403,7 @@ public class MusicService extends Service implements
         Timber.d("Song completed.");
         if(mediaPlayer.getCurrentPosition() > 0) {
             if(mRepeat) {
-             playSong();
+             play();
             } else {
                 playNext();
             }

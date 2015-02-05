@@ -4,7 +4,6 @@ import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
 
-import com.freneticlabs.cleff.models.MusicDatabase;
 import com.freneticlabs.cleff.models.Song;
 import com.freneticlabs.cleff.utils.MusicServiceManager;
 import com.squareup.otto.Bus;
@@ -26,7 +25,6 @@ public class CleffApp extends Application {
     private static CleffApp sCleffApp;
     private static MusicService mService;
     private static MusicServiceManager mPlaybackManager;
-    private static MusicDatabase mMusicDatabase;
     private static SharedPreferences mSharedPreferences;
 
     private static final Bus mEventBus = new Bus();
@@ -92,9 +90,6 @@ public class CleffApp extends Application {
         return mSharedPreferences;
     }
 
-    public MusicDatabase getMusicDatabase() {
-        return mMusicDatabase;
-    }
 
     public static Bus getEventBus() {
         return mEventBus;
@@ -110,7 +105,7 @@ public class CleffApp extends Application {
 
     public Song getSong(String id) {
         for(Song song : getSongList()) {
-            if(song.getID().equals(id)) {
+            if(song.getId().equals(id)) {
                 return song;
             }
         }
@@ -132,7 +127,6 @@ public class CleffApp extends Application {
         mSongsList = new ArrayList<>();
         mContext = getApplicationContext();
         mPlaybackManager = new MusicServiceManager(mContext);
-        mMusicDatabase = new MusicDatabase(mContext);
     }
 
     /** A tree which logs important information for crash reporting. */
