@@ -3,8 +3,10 @@ Cleff
 
 Android Music Player
 
-Status
-  Completed:
+=========
+Status  
+=========
+  Done:
     • Basic play/pause functionality
     • Songs tab
   
