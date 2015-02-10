@@ -20,6 +20,7 @@ import android.widget.RemoteViews;
 import com.freneticlabs.cleff.activities.MainActivity;
 import com.freneticlabs.cleff.models.MusicLibrary;
 import com.freneticlabs.cleff.models.Song;
+import com.freneticlabs.cleff.models.events.MusicStateChangeEvent;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -144,10 +145,8 @@ public class MusicService extends Service implements
             mMediaPlayer.release();
             mMediaPlayer = null;
         }
-
         mMediaPlayer = new MediaPlayer();
         mMediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
-
 
         try {
             mMediaPlayer.setWakeMode(mContext, PowerManager.PARTIAL_WAKE_LOCK);
@@ -212,6 +211,9 @@ public class MusicService extends Service implements
             mMediaPlayer.prepareAsync();
             mPlayerSate = PlayerState.PLAYING;
 
+            CleffApp.getEventBus().post(new MusicStateChangeEvent(CleffApp.MUSIC_PLAYING));
+
+
            // SharedPreferences.Editor editor = mSettings.edit();
             //editor.putInt(CleffApp.LAST_PLAYED_SONG, mCurrentSongPosition);
 
@@ -226,13 +228,26 @@ public class MusicService extends Service implements
     }
 
     /**
+     * Pauses the player if it is in a playing state.
+     */
+    public void pause() {
+        if(mPlayerSate.equals(PlayerState.PLAYING)) {
+            mMediaPlayer.pause();
+            mPlayerSate = PlayerState.PAUSED;
+            CleffApp.getEventBus().post(new MusicStateChangeEvent(CleffApp.MUSIC_PAUSED));
+
+        }
+    }
+    /**
      * Stop the current playing song and the service.
      *
      */
-    public void stopPlayer() {
+    public void stop() {
         if (mPlayerSate.equals(PlayerState.PLAYING) || mPlayerSate.equals(PlayerState.PAUSED)) {
             //mIsPlaying = false;
             mPlayerSate = PlayerState.IDLE;
+            CleffApp.getEventBus().post(new MusicStateChangeEvent(CleffApp.MUSIC_IDLE));
+
             if (mMediaPlayer != null) {
                 Timber.d("Stopping player.");
                 mMediaPlayer.stop();
@@ -286,18 +301,12 @@ public class MusicService extends Service implements
         } else {
             mMediaPlayer.reset();
             mPlayerSate = PlayerState.IDLE;
+            CleffApp.getEventBus().post(new MusicStateChangeEvent(CleffApp.MUSIC_IDLE));
+
         }
     }
 
-    /**
-     * Pauses the player if it is in a playing state.
-     */
-    public void pausePlayer() {
-        if(mPlayerSate.equals(PlayerState.PLAYING)) {
-            mMediaPlayer.pause();
-            mPlayerSate = PlayerState.PAUSED;
-        }
-    }
+
 
     /**
      * Resumes the player if was previously paused.
@@ -305,6 +314,8 @@ public class MusicService extends Service implements
     public void resumePlayer() {
         mMediaPlayer.start();
         mPlayerSate = PlayerState.PLAYING;
+        CleffApp.getEventBus().post(new MusicStateChangeEvent(CleffApp.MUSIC_PLAYING));
+
     }
 
     /**

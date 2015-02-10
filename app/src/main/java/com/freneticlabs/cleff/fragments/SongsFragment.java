@@ -19,9 +19,11 @@ import com.freneticlabs.cleff.R;
 import com.freneticlabs.cleff.activities.PlayerActivity;
 import com.freneticlabs.cleff.models.MusicLibrary;
 import com.freneticlabs.cleff.models.Song;
+import com.freneticlabs.cleff.models.events.MusicStateChangeEvent;
 import com.freneticlabs.cleff.views.adapters.SongsAdapter;
 import com.getbase.floatingactionbutton.FloatingActionButton;
 import com.getbase.floatingactionbutton.FloatingActionsMenu;
+import com.squareup.otto.Subscribe;
 
 import java.util.ArrayList;
 
@@ -111,6 +113,21 @@ public class SongsFragment extends Fragment {
         restoreListPosition();
     }
 
+    @Subscribe
+    public void onMusicStateChange(MusicStateChangeEvent event) {
+        Timber.d(event.musicState);
+        if(event.musicState.equals(CleffApp.MUSIC_IDLE)) {
+
+        } else if(event.musicState.equals(CleffApp.MUSIC_PLAYING)) {
+            // Update UI
+            mFloatingPlayButton.setIcon(R.drawable.ic_orange_pause);
+
+        } if(event.musicState.equals(CleffApp.MUSIC_PAUSED)) {
+
+            mFloatingPlayButton.setIcon(R.drawable.ic_orange_play_arrow);
+
+        }
+    }
     private void initListeners() {
         // Listener for when a list item is clicked
 
@@ -141,7 +158,6 @@ public class SongsFragment extends Fragment {
 
             }
         });
-
 
         // Set up the floating player action listeners
         mFloatingActionsMenu.setOnFloatingActionsMenuUpdateListener(new FloatingActionsMenu.OnFloatingActionsMenuUpdateListener() {
@@ -201,17 +217,6 @@ public class SongsFragment extends Fragment {
         mListView.setSelectionFromTop(position, offset);
     }
 
-    public void updateUi() {
-        if (mCleffApp.getService().getPlayerSate().equals(MusicService.PlayerState.PLAYING)) {
-            Timber.d("PLAYER UI CHANGED TO PLAY");
-            mFloatingPlayButton.setIcon(R.drawable.ic_orange_pause);
-
-        } else {
-            Timber.d("PLAYER UI CHANGED TO PAUSED");
-            mFloatingPlayButton.setIcon(R.drawable.ic_orange_play_arrow);
-        }
-    }
-
     public void playSong(int song) {
         mCleffApp.getPlaybackManager().initPlayback();
         mCleffApp.getService().setSong(song);
@@ -227,14 +232,7 @@ public class SongsFragment extends Fragment {
             playSong(selectedSong);
 
         } else if (mCleffApp.getService().getPlayerSate().equals(MusicService.PlayerState.PLAYING)) {
-            int lastPlayedSong = mSettings.getInt(CleffApp.LAST_PLAYED_SONG, selectedSong);
-            if (lastPlayedSong == selectedSong) {
-                mCleffApp.getService().pausePlayer();
-                Timber.d("PLAYER IS NOW PAUSED");
-            } else {
-                Timber.d("PLAYING NEW SONG");
-                playSong(selectedSong);
-            }
+
         } else if (mCleffApp.getService().getPlayerSate().equals(MusicService.PlayerState.PAUSED)) {
             int lastPlayedSong = mSettings.getInt(CleffApp.LAST_PLAYED_SONG, selectedSong);
             Timber.d("Last played song: " + Integer.toString(lastPlayedSong));
@@ -249,11 +247,9 @@ public class SongsFragment extends Fragment {
                 playSong(selectedSong);
             }
         } else {
-            Timber.d("NONE");
             throw new RuntimeException("Not a valid state");
         }
 
-        updateUi();
     }
 
     public void saveLastPlayedSong(int position) {

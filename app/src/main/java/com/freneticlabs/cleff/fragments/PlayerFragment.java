@@ -43,7 +43,6 @@ public class PlayerFragment extends Fragment {
         setHasOptionsMenu(true);
         long songId = (long)getArguments().getSerializable(EXTRA_SONG_ID);
         mSong = MusicLibrary.get(getActivity()).getSong(songId);
-
     }
 
     @Override

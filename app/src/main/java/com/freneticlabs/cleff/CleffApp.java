@@ -38,6 +38,10 @@ public class CleffApp extends Application {
     public static final String SERVICE_RUNNING = "ServiceRunning";
     public static final String SHUFFLE_ON = "ShuffleOn";
     public static final String FIRST_RUN = "FirstRun";
+    public static final String MUSIC_PLAYING = "MusicPlaying";
+    public static final String MUSIC_PAUSED = "MusicPaused";
+    public static final String MUSIC_IDLE = "MusicIdle";
+
     public static final String LAST_PLAYED_SONG = "LastPlayedSong";
 
     // Keys used in SongsFragment

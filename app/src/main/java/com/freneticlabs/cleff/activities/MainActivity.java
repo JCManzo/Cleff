@@ -21,6 +21,7 @@ import com.freneticlabs.cleff.R;
 import com.freneticlabs.cleff.fragments.BuildLibraryTaskFragment;
 import com.freneticlabs.cleff.fragments.NavigationDrawerFragment;
 import com.freneticlabs.cleff.fragments.PageSlidingTabStripFragment;
+import com.freneticlabs.cleff.models.MusicLibrary;
 import com.nispok.snackbar.Snackbar;
 import com.nispok.snackbar.SnackbarManager;
 import com.nononsenseapps.filepicker.FilePickerFragment;
@@ -126,9 +127,11 @@ public class MainActivity extends ActionBarActivity implements
     public void onStop() {
         super.onStop();
     }
+
     @Override
     public void onPause() {
         super.onPause();
+        MusicLibrary.get(this).saveLibrary();
         CleffApp.activityPaused();
 
     }
@@ -137,6 +140,7 @@ public class MainActivity extends ActionBarActivity implements
     public void onResume() {
         super.onResume();
         mCleffApp.getPlaybackManager().initPlayback();
+        MusicLibrary.get(this);
         CleffApp.activityResumed();
 
     }
@@ -228,8 +232,6 @@ public class MainActivity extends ActionBarActivity implements
 
         mLinearLayout.setVisibility(View.GONE);
 
-        Log.i("TASK", "Main onPostExecute");
-
         // Library has been created. No need to run this fragment again.
         SharedPreferences settings = mCleffApp.getSharedPreferences();
 
@@ -239,11 +241,14 @@ public class MainActivity extends ActionBarActivity implements
         // Commit the edits!
         editor.apply();
 
+        MusicLibrary.get(this).saveLibrary();
+
         // Display the library in a listview
         FragmentManager fragmentManager = getSupportFragmentManager();
         fragmentManager.beginTransaction()
                 .replace(R.id.container, new PageSlidingTabStripFragment())
                 .commit();
+
     }
 
     @Override

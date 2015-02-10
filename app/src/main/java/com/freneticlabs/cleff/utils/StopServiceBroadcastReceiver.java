@@ -21,7 +21,7 @@ public class StopServiceBroadcastReceiver extends BroadcastReceiver {
             CleffApp app = (CleffApp) context.getApplicationContext();
             //app.getService().stopSelf();
             MusicService.setRunning(false);
-            app.getService().stopPlayer();
+            app.getService().stop();
 
             // Ready up the service if the main activity is still visible.
             if(CleffApp.isActivityVisible()) {
