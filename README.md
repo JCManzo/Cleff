@@ -3,6 +3,8 @@ Cleff
 
 Android Music Player
 
+Requires Android 4.0+
+
 =========
 Status  
 =========
