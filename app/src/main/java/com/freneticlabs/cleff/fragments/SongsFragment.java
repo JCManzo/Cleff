@@ -58,6 +58,7 @@ public class SongsFragment extends Fragment {
     private int mLastPosition = 0;
     private int mPositionOffset = 0;
     private int mCurrentSongPosition =0;
+    private static String mPlayerState = CleffApp.MUSIC_IDLE;
     public SongsFragment() {
         // Required empty public constructor
     }
@@ -102,15 +103,17 @@ public class SongsFragment extends Fragment {
         mListView.setAdapter(mSongsAdapter);
 
         initListeners();
+
         return rootView;
     }
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        //updateUi();
+        updateFloatingUi();
         updateState(SCROLL_STATE_IDLE);
         restoreListPosition();
+
     }
 
     /**
@@ -119,20 +122,27 @@ public class SongsFragment extends Fragment {
      */
     @Subscribe
     public void onMusicStateChange(MusicStateChangeEvent event) {
-        Timber.d(event.musicState);
-        if(event.musicState.equals(CleffApp.MUSIC_IDLE)) {
+        mPlayerState = event.musicState;
+        Timber.d(mPlayerState);
+        updateFloatingUi();
 
-        } else if(event.musicState.equals(CleffApp.MUSIC_PLAYING)) {
+    }
+
+    private void updateFloatingUi() {
+        Timber.d(mPlayerState);
+
+        if(mPlayerState.equals(CleffApp.MUSIC_IDLE)) {
+
+        } else if(mPlayerState.equals(CleffApp.MUSIC_PLAYING)) {
 
             mFloatingPlayButton.setIcon(R.drawable.ic_orange_pause);
 
-        } else if(event.musicState.equals(CleffApp.MUSIC_PAUSED)) {
+        } else if(mPlayerState.equals(CleffApp.MUSIC_PAUSED)) {
 
             mFloatingPlayButton.setIcon(R.drawable.ic_orange_play_arrow);
 
         }
     }
-
     /**
      * Sets up listerners
      */

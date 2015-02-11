@@ -82,6 +82,8 @@ public class MusicService extends Service implements
     public void onCreate() {
         // Create the service
         super.onCreate();
+        mSongs = MusicLibrary.get(mContext).getSongs();
+
         CleffApp.getEventBus().register(this);
         Timber.d("onCreate()");
         mRandom = new Random();
@@ -113,7 +115,6 @@ public class MusicService extends Service implements
         mSettings = mCleffApp.getSharedPreferences();
 
         mCleffApp.setService(this);
-        mSongs = MusicLibrary.get(mContext).getSongs();
         initMediaPlayer();
 
         // Get audiofocus
