@@ -20,6 +20,7 @@ import com.freneticlabs.cleff.activities.PlayerActivity;
 import com.freneticlabs.cleff.models.MusicLibrary;
 import com.freneticlabs.cleff.models.Song;
 import com.freneticlabs.cleff.models.events.MusicStateChangeEvent;
+import com.freneticlabs.cleff.models.events.SongSelectedEvent;
 import com.freneticlabs.cleff.views.adapters.SongsAdapter;
 import com.getbase.floatingactionbutton.FloatingActionButton;
 import com.getbase.floatingactionbutton.FloatingActionsMenu;
@@ -57,7 +58,7 @@ public class SongsFragment extends Fragment {
     private ArrayList<Song> mSongs;
     private int mLastPosition = 0;
     private int mPositionOffset = 0;
-
+    private int mCurrentSongPosition =0;
     public SongsFragment() {
         // Required empty public constructor
     }
@@ -119,7 +120,7 @@ public class SongsFragment extends Fragment {
         if(event.musicState.equals(CleffApp.MUSIC_IDLE)) {
 
         } else if(event.musicState.equals(CleffApp.MUSIC_PLAYING)) {
-            // Update UI
+
             mFloatingPlayButton.setIcon(R.drawable.ic_orange_pause);
 
         } if(event.musicState.equals(CleffApp.MUSIC_PAUSED)) {
@@ -135,11 +136,14 @@ public class SongsFragment extends Fragment {
            @Override
            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                Intent playerIntent = new Intent(getActivity(), PlayerActivity.class);
-               Song song = mSongs.get(position);
+               mCurrentSongPosition = position;
+               Song song = mSongs.get(mCurrentSongPosition);
+
+               CleffApp.getEventBus().post(new SongSelectedEvent(position));
 
                playerIntent.putExtra(PlayerFragment.EXTRA_SONG_ID, song.getId());
                startActivity(playerIntent);
-               playSong((position));
+              // playSong((position));
            }
        });
 
@@ -176,8 +180,7 @@ public class SongsFragment extends Fragment {
         mFloatingPlayButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                updatePlayer(mCleffApp.getService().getCurrentSongPosition());
-
+               updatePlayer(mCleffApp.getService().getCurrentSongPosition());
             }
         });
 
@@ -220,33 +223,33 @@ public class SongsFragment extends Fragment {
     public void playSong(int song) {
         mCleffApp.getPlaybackManager().initPlayback();
         mCleffApp.getService().setSong(song);
-        mCleffApp.getService().play();
     }
 
     public void updatePlayer(int selectedSong) {
         Timber.d("Updating player..");
 
         if (mCleffApp.getService().getPlayerSate().equals(MusicService.PlayerState.IDLE)) {
-            Timber.d("PLAYER IS NOW PLAYING");
-
-            playSong(selectedSong);
+            CleffApp.getEventBus().post(new SongSelectedEvent(selectedSong));
 
         } else if (mCleffApp.getService().getPlayerSate().equals(MusicService.PlayerState.PLAYING)) {
+            int lastPlayedSong = mSettings.getInt(CleffApp.LAST_PLAYED_SONG, selectedSong);
+            if (lastPlayedSong == selectedSong) {
+                mCleffApp.getService().pause();
+            } else {
+                CleffApp.getEventBus().post(new SongSelectedEvent(selectedSong));
 
+            }
         } else if (mCleffApp.getService().getPlayerSate().equals(MusicService.PlayerState.PAUSED)) {
             int lastPlayedSong = mSettings.getInt(CleffApp.LAST_PLAYED_SONG, selectedSong);
-            Timber.d("Last played song: " + Integer.toString(lastPlayedSong));
-            Timber.d("Current song: " + Integer.toString(selectedSong));
 
             if (lastPlayedSong == selectedSong) {
                 mCleffApp.getService().resumePlayer();
-                Timber.d("RESUMING PLAYER");
 
             } else {
-                Timber.d("PLAYING NEW SONG");
-                playSong(selectedSong);
+                CleffApp.getEventBus().post(new SongSelectedEvent(selectedSong));
             }
         } else {
+            Timber.d("NONE");
             throw new RuntimeException("Not a valid state");
         }
 

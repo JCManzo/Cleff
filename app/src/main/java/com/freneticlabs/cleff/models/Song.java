@@ -20,7 +20,7 @@ public class Song implements Parcelable{
     private static final String JSON_PLAYS      = "plays";
     private static final String JSON_YEAR       = "year";
 
-    private Long mID;
+    private Long mSongId;
     private String mAlbumID;
 
     private String mTitle;
@@ -38,7 +38,7 @@ public class Song implements Parcelable{
     }
     public Song(Long songID, String songTitle, String songArtist,
                 String album, String albumID, String genre) {
-        mID = songID;
+        mSongId = songID;
         mTitle = songTitle;
         mArtist = songArtist;
         mAlbum = album;
@@ -48,7 +48,7 @@ public class Song implements Parcelable{
     }
 
     public Song(JSONObject jsonObject) throws  JSONException {
-        mID = jsonObject.getLong(JSON_ID);
+        mSongId = jsonObject.getLong(JSON_ID);
         mTitle = jsonObject.getString(JSON_TITLE);
         mArtist = jsonObject.getString(JSON_ARTIST);
         mAlbum = jsonObject.getString(JSON_ALBUM);
@@ -64,7 +64,7 @@ public class Song implements Parcelable{
      */
     public JSONObject toJSON() throws JSONException {
         JSONObject jsonObject = new JSONObject();
-        jsonObject.put(JSON_ID, String.valueOf(mID));
+        jsonObject.put(JSON_ID, String.valueOf(mSongId));
         jsonObject.put(JSON_TITLE, mTitle);
         jsonObject.put(JSON_ARTIST, mArtist);
         jsonObject.put(JSON_ALBUM, mAlbum);
@@ -92,7 +92,7 @@ public class Song implements Parcelable{
     }
 
     public Long getId() {
-        return mID;
+        return mSongId;
     }
 
     public String getAlbum() {
@@ -106,8 +106,8 @@ public class Song implements Parcelable{
         return mAlbumID;
     }
 
-    public void setID(Long ID) {
-        mID = ID;
+    public void setID(Long songId) {
+        mSongId = songId;
     }
 
     public String getTitle() {
@@ -159,7 +159,7 @@ public class Song implements Parcelable{
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeLong(this.mID);
+        dest.writeLong(this.mSongId);
         dest.writeString(this.mAlbumID);
         dest.writeString(this.mTitle);
         dest.writeString(this.mArtist);
@@ -169,7 +169,7 @@ public class Song implements Parcelable{
     }
 
     private Song(Parcel in) {
-        this.mID = in.readLong();
+        this.mSongId = in.readLong();
         this.mAlbumID = in.readString();
         this.mTitle = in.readString();
         this.mArtist = in.readString();

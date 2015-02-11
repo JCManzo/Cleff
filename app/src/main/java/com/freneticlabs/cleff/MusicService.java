@@ -21,6 +21,8 @@ import com.freneticlabs.cleff.activities.MainActivity;
 import com.freneticlabs.cleff.models.MusicLibrary;
 import com.freneticlabs.cleff.models.Song;
 import com.freneticlabs.cleff.models.events.MusicStateChangeEvent;
+import com.freneticlabs.cleff.models.events.SongSelectedEvent;
+import com.squareup.otto.Subscribe;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -192,6 +194,12 @@ public class MusicService extends Service implements
         return mPlayerSate;
     }
 
+
+    @Subscribe
+    public void onSongSelected(SongSelectedEvent event) {
+        mCurrentSongPosition = event.songPosition;
+        play();
+    }
     /**
      * Plays the current song in mCurrentSongPosition
      */
@@ -297,8 +305,13 @@ public class MusicService extends Service implements
      */
     public void togglePlayer() {
         if(mPlayerSate.equals(PlayerState.PLAYING)) {
+            pause();
+            CleffApp.getEventBus().post(new MusicStateChangeEvent(CleffApp.MUSIC_PAUSED));
+        } if(mPlayerSate.equals(PlayerState.PAUSED)) {
             play();
-        } else {
+            CleffApp.getEventBus().post(new MusicStateChangeEvent(CleffApp.MUSIC_PLAYING));
+        }
+        else {
             mMediaPlayer.reset();
             mPlayerSate = PlayerState.IDLE;
             CleffApp.getEventBus().post(new MusicStateChangeEvent(CleffApp.MUSIC_IDLE));
@@ -414,7 +427,7 @@ public class MusicService extends Service implements
         Timber.d("Song completed.");
         if(mediaPlayer.getCurrentPosition() > 0) {
             if(mRepeat) {
-             play();
+            // play();
             } else {
                 playNext();
             }
