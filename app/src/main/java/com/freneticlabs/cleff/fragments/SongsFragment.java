@@ -14,7 +14,6 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 
 import com.freneticlabs.cleff.CleffApp;
-import com.freneticlabs.cleff.MusicService;
 import com.freneticlabs.cleff.R;
 import com.freneticlabs.cleff.activities.PlayerActivity;
 import com.freneticlabs.cleff.models.MusicLibrary;
@@ -114,6 +113,10 @@ public class SongsFragment extends Fragment {
         restoreListPosition();
     }
 
+    /**
+     * Called when the player global state has changed.
+     * @param event is the state of the MediaPlayer
+     */
     @Subscribe
     public void onMusicStateChange(MusicStateChangeEvent event) {
         Timber.d(event.musicState);
@@ -123,12 +126,16 @@ public class SongsFragment extends Fragment {
 
             mFloatingPlayButton.setIcon(R.drawable.ic_orange_pause);
 
-        } if(event.musicState.equals(CleffApp.MUSIC_PAUSED)) {
+        } else if(event.musicState.equals(CleffApp.MUSIC_PAUSED)) {
 
             mFloatingPlayButton.setIcon(R.drawable.ic_orange_play_arrow);
 
         }
     }
+
+    /**
+     * Sets up listerners
+     */
     private void initListeners() {
         // Listener for when a list item is clicked
 
@@ -143,7 +150,6 @@ public class SongsFragment extends Fragment {
 
                playerIntent.putExtra(PlayerFragment.EXTRA_SONG_ID, song.getId());
                startActivity(playerIntent);
-              // playSong((position));
            }
        });
 
@@ -180,7 +186,8 @@ public class SongsFragment extends Fragment {
         mFloatingPlayButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-               updatePlayer(mCleffApp.getService().getCurrentSongPosition());
+               mCleffApp.getService().togglePlayer();
+
             }
         });
 
@@ -201,6 +208,9 @@ public class SongsFragment extends Fragment {
         });
     }
 
+    /**
+     * Saves last position in the list to a preferences files.
+     */
     private void saveListPosition() {
         Timber.d(Integer.toString(mLastPosition));
 
@@ -213,46 +223,14 @@ public class SongsFragment extends Fragment {
         editor.apply();
     }
 
+    /**
+     * Restores the previous position of the list
+     */
     private void restoreListPosition() {
         int position = mSettings.getInt(CleffApp.LAST_VIEWED_ITEM, 0);
         int offset = mSettings.getInt(CleffApp.LAST_VIEWED_OFFSET, 0);
 
         mListView.setSelectionFromTop(position, offset);
-    }
-
-    public void playSong(int song) {
-        mCleffApp.getPlaybackManager().initPlayback();
-        mCleffApp.getService().setSong(song);
-    }
-
-    public void updatePlayer(int selectedSong) {
-        Timber.d("Updating player..");
-
-        if (mCleffApp.getService().getPlayerSate().equals(MusicService.PlayerState.IDLE)) {
-            CleffApp.getEventBus().post(new SongSelectedEvent(selectedSong));
-
-        } else if (mCleffApp.getService().getPlayerSate().equals(MusicService.PlayerState.PLAYING)) {
-            int lastPlayedSong = mSettings.getInt(CleffApp.LAST_PLAYED_SONG, selectedSong);
-            if (lastPlayedSong == selectedSong) {
-                mCleffApp.getService().pause();
-            } else {
-                CleffApp.getEventBus().post(new SongSelectedEvent(selectedSong));
-
-            }
-        } else if (mCleffApp.getService().getPlayerSate().equals(MusicService.PlayerState.PAUSED)) {
-            int lastPlayedSong = mSettings.getInt(CleffApp.LAST_PLAYED_SONG, selectedSong);
-
-            if (lastPlayedSong == selectedSong) {
-                mCleffApp.getService().resumePlayer();
-
-            } else {
-                CleffApp.getEventBus().post(new SongSelectedEvent(selectedSong));
-            }
-        } else {
-            Timber.d("NONE");
-            throw new RuntimeException("Not a valid state");
-        }
-
     }
 
     public void saveLastPlayedSong(int position) {

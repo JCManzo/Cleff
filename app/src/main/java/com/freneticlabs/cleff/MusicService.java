@@ -66,8 +66,8 @@ public class MusicService extends Service implements
     private CleffApp mCleffApp;
 
     // Keep track of the current song position in the Array
-    private int mCurrentSongPosition;
-
+    private int mCurrentSongPosition = 0;
+    private int mLastSongPosition = -1;
     private int mPreviousSongPosition;
 
     /**
@@ -198,12 +198,31 @@ public class MusicService extends Service implements
     @Subscribe
     public void onSongSelected(SongSelectedEvent event) {
         mCurrentSongPosition = event.songPosition;
-        play();
+        int lastPlayedSong = mSettings.getInt(CleffApp.LAST_PLAYED_SONG, mLastSongPosition);
+
+        if (getPlayerSate().equals(PlayerState.IDLE)) {
+            play();
+        } else if (getPlayerSate().equals(PlayerState.PLAYING)) {
+            if(lastPlayedSong == mCurrentSongPosition) {
+                pause();
+            } else {
+                play();
+            }
+        } else if (getPlayerSate().equals(PlayerState.PAUSED)) {
+            if(lastPlayedSong == mCurrentSongPosition) {
+                resume();
+            } else {
+                play();
+            }
+        }
+
     }
+
     /**
      * Plays the current song in mCurrentSongPosition
-     */
+     **/
     public void play() {
+        Timber.d("Play Called");
         if (mMediaPlayer == null) initMediaPlayer();
 
         Song currentSong = mSongs.get(mCurrentSongPosition);
@@ -221,12 +240,11 @@ public class MusicService extends Service implements
 
             CleffApp.getEventBus().post(new MusicStateChangeEvent(CleffApp.MUSIC_PLAYING));
 
+            // Saves the position of the previously played song to a file.
+            SharedPreferences.Editor editor = mSettings.edit();
+            editor.putInt(CleffApp.LAST_PLAYED_SONG, mLastSongPosition);
 
-           // SharedPreferences.Editor editor = mSettings.edit();
-            //editor.putInt(CleffApp.LAST_PLAYED_SONG, mCurrentSongPosition);
-
-            // Commit the edits!
-            //editor.apply();
+            editor.apply();
 
         } catch (Exception e) {
             Timber.d("Error setting the data source", e);
@@ -239,6 +257,7 @@ public class MusicService extends Service implements
      * Pauses the player if it is in a playing state.
      */
     public void pause() {
+        Timber.d("Paused Called");
         if(mPlayerSate.equals(PlayerState.PLAYING)) {
             mMediaPlayer.pause();
             mPlayerSate = PlayerState.PAUSED;
@@ -251,6 +270,8 @@ public class MusicService extends Service implements
      *
      */
     public void stop() {
+        Timber.d("Stop Called");
+
         if (mPlayerSate.equals(PlayerState.PLAYING) || mPlayerSate.equals(PlayerState.PAUSED)) {
             //mIsPlaying = false;
             mPlayerSate = PlayerState.IDLE;
@@ -284,7 +305,7 @@ public class MusicService extends Service implements
             }
         }
 
-        togglePlayer();
+        play();
     }
 
     /**
@@ -296,7 +317,7 @@ public class MusicService extends Service implements
             mCurrentSongPosition = mSongs.size() - 1;
         }
 
-        togglePlayer();
+        play();
     }
 
     /**
@@ -306,25 +327,21 @@ public class MusicService extends Service implements
     public void togglePlayer() {
         if(mPlayerSate.equals(PlayerState.PLAYING)) {
             pause();
-            CleffApp.getEventBus().post(new MusicStateChangeEvent(CleffApp.MUSIC_PAUSED));
-        } if(mPlayerSate.equals(PlayerState.PAUSED)) {
-            play();
-            CleffApp.getEventBus().post(new MusicStateChangeEvent(CleffApp.MUSIC_PLAYING));
-        }
-        else {
+        } else if(mPlayerSate.equals(PlayerState.PAUSED)) {
+            resume();
+        } else if(mPlayerSate.equals(PlayerState.IDLE)) {
             mMediaPlayer.reset();
-            mPlayerSate = PlayerState.IDLE;
-            CleffApp.getEventBus().post(new MusicStateChangeEvent(CleffApp.MUSIC_IDLE));
+            mPlayerSate = PlayerState.PLAYING;
+            play();
 
         }
     }
 
-
-
     /**
-     * Resumes the player if was previously paused.
+     * Resumes the player if it was previously paused.
      */
-    public void resumePlayer() {
+    public void resume() {
+        Timber.d("Resume Called");
         mMediaPlayer.start();
         mPlayerSate = PlayerState.PLAYING;
         CleffApp.getEventBus().post(new MusicStateChangeEvent(CleffApp.MUSIC_PLAYING));
@@ -411,14 +428,13 @@ public class MusicService extends Service implements
     @Override
     public void onPrepared(MediaPlayer mediaPlayer) {
         mediaPlayer.start();
-        Timber.d("onPrepared()");
         Notification notification = updateNotification();
         startForeground(NOTIFICATION_ID, notification);
     }
 
     @Override
     public boolean onError(MediaPlayer mediaPlayer, int i, int i2) {
-        Timber.e("ERROR in onError()" + Integer.toString(i) + " " + Integer.toString(i2));
+        Timber.e("Error in onError()" + Integer.toString(i) + " " + Integer.toString(i2));
         return false;
     }
 
