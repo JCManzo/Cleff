@@ -14,7 +14,6 @@ import android.os.IBinder;
 import android.os.PowerManager;
 import android.provider.MediaStore;
 import android.support.v4.app.NotificationCompat;
-import android.util.Log;
 import android.widget.RemoteViews;
 
 import com.freneticlabs.cleff.activities.MainActivity;
@@ -82,8 +81,6 @@ public class MusicService extends Service implements
     public void onCreate() {
         // Create the service
         super.onCreate();
-        mSongs = MusicLibrary.get(mContext).getSongs();
-
         CleffApp.getEventBus().register(this);
         Timber.d("onCreate()");
         mRandom = new Random();
@@ -108,11 +105,12 @@ public class MusicService extends Service implements
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         super.onStartCommand(intent, flags, startId);
-        Log.d("CHAIN", "onStartCommand()");
+        Timber.d("onStartCommand() called");
 
         mContext = getApplicationContext();
         mCleffApp = (CleffApp) getApplicationContext();
         mSettings = mCleffApp.getSharedPreferences();
+        mSongs = MusicLibrary.get(mContext).getSongs();
 
         mCleffApp.setService(this);
         initMediaPlayer();

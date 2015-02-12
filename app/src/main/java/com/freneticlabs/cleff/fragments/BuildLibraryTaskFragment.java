@@ -38,6 +38,7 @@ public class BuildLibraryTaskFragment extends Fragment {
     private String mMediaStoreSelection = null;
     private HashMap<String, String> mGenresHashMap = new HashMap<String, String>();
     private HashMap<String, Integer> mGenresSongCountHashMap = new HashMap<String, Integer>();
+    private ContentResolver mContentResolver;
 
     public BuildLibraryTaskFragment() {
         // Required empty public constructor
@@ -85,6 +86,8 @@ public class BuildLibraryTaskFragment extends Fragment {
         super.onCreate(savedInstanceState);
         mContext = getActivity();
         mCleffApp = (CleffApp)mContext.getApplicationContext();
+        mContentResolver = mContext.getContentResolver();
+
         // Retain this fragment across configuration changes.
         setRetainInstance(true);
 
@@ -100,7 +103,7 @@ public class BuildLibraryTaskFragment extends Fragment {
         mBuildLibraryTaskCallbacks = null;
     }
 
-    private class BuildLibraryTask extends AsyncTask <Void, Void, Cursor>{
+    private class BuildLibraryTask extends AsyncTask <Void, Void, Void>{
 
         public BuildLibraryTask(Context context) {
             super();
@@ -118,7 +121,7 @@ public class BuildLibraryTaskFragment extends Fragment {
         }
 
         @Override
-        protected Cursor doInBackground(Void... voids) {
+        protected Void doInBackground(Void... voids) {
             Cursor mediaStoreCursor = getSongsFromMediaStore();
             if (mediaStoreCursor!=null) {
                 saveMediaStoreDataToDB(mediaStoreCursor);
@@ -135,23 +138,16 @@ public class BuildLibraryTaskFragment extends Fragment {
         }
 
         @Override
-        protected void onPostExecute(Cursor cursor) {
-            super.onPostExecute(cursor);
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
             if(mBuildLibraryTaskCallbacks != null) {
                 mBuildLibraryTaskCallbacks.onPostExecute();
-            }
-
-            if (cursor != null) {
-                getBuildCursorListener().onCursorReady(cursor, 0, true);
-            } else {
-                Timber.d("NULL CURSOR");
             }
         }
 
         public void saveMediaStoreDataToDB(Cursor mediaStoreCursor) {
             // Populates the ArrayList in MusicLibrary with Song objects.
 
-            buildGenresTable();
 
             String mUnknownAlbum = getActivity().getApplicationContext().getString(R.string.unknown_album_name);
             String mUnknownArtist = getActivity().getApplicationContext().getString(R.string.unknown_artist_name);
@@ -173,12 +169,18 @@ public class BuildLibraryTaskFragment extends Fragment {
                 int yearColumn = mediaStoreCursor.getColumnIndexOrThrow(MediaStore.Audio.Media.YEAR);
                 int filePathColumn = mediaStoreCursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DATA);
                 int songTrackColumn = mediaStoreCursor.getColumnIndexOrThrow(MediaStore.Audio.Media.TRACK);
+
+                // Queries for this Genre columns.
+                String[] genresProjection = {
+                        MediaStore.Audio.Genres.NAME,
+                        MediaStore.Audio.Genres._ID
+                };
+
                 do {
-                    // long thisSongId = musicCursor.getLong(idColumn);
-                    int thisSongId = Integer.parseInt(mediaStoreCursor.getString(idColumn));
+
+                    int songId = mediaStoreCursor.getInt(idColumn);
 
                     String songAlbumId = mediaStoreCursor.getString(albumIdColumn);
-                    Long songId = mediaStoreCursor.getLong(idColumn);
                     String songYear = mediaStoreCursor.getString(yearColumn);
                     String songTitle = mediaStoreCursor.getString(titleColumn);
                     String songArtist = mediaStoreCursor.getString(artistColumn);
@@ -189,7 +191,21 @@ public class BuildLibraryTaskFragment extends Fragment {
                     String songDateModified = mediaStoreCursor.getString(dateModifiedColumn);
                     String songAlbumArtist = mediaStoreCursor.getString(albumArtistColumn);
                     String songTrackNumber = mediaStoreCursor.getString(songTrackColumn);
+                    String songGenre= "";
 
+                    /* TODO find an alternative to getContentUriForAudioID in order to use it in lower versions*/
+                    Uri songGenreUri = MediaStore.Audio.Genres.getContentUriForAudioId("external", songId);
+                    Cursor genresCursor = mContentResolver.query(songGenreUri, genresProjection, null, null, null);
+                    int genresIdColumn = genresCursor.getColumnIndexOrThrow(MediaStore.Audio.Genres.NAME);
+
+                    if(genresCursor.moveToFirst()) {
+                        do {
+                            songGenre += genresCursor.getString(genresIdColumn) + " ";
+                        } while (genresCursor.moveToNext());
+                    }
+
+                    Timber.d(songGenre);
+                    genresCursor.close();
                     boolean unknownArtist = songArtist == null || songArtist.equals(MediaStore.UNKNOWN_STRING);
                     boolean unknownAlbum = songAlbum == null || songAlbum.equals(MediaStore.UNKNOWN_STRING);
                     boolean unknownTitle = songTitle == null || songTitle.equals(MediaStore.UNKNOWN_STRING);
@@ -206,6 +222,7 @@ public class BuildLibraryTaskFragment extends Fragment {
                     song.setAlbum(songAlbum);
                     song.setPath(songFilePath);
                     song.setAlbumID(songAlbumId);
+                    song.setGenre(songGenre);
 
                     MusicLibrary.get(mContext).addSong(song);
                 }
@@ -266,11 +283,10 @@ public class BuildLibraryTaskFragment extends Fragment {
                 //Close the music folders cursor.
                 musicFoldersCursor.close();*/
             // }
-            ContentResolver contentResolver = mContext.getContentResolver();
             Uri uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
             String selection = MediaStore.Audio.Media.IS_MUSIC + "=1";
 
-            mediaStoreCursor = contentResolver.query(uri, null, selection, null, sortOrder);
+            mediaStoreCursor = mContentResolver.query(uri, null, selection, null, sortOrder);
 
             return mediaStoreCursor;
         }
@@ -279,7 +295,7 @@ public class BuildLibraryTaskFragment extends Fragment {
          * Builds a HashMap of all songs, their genres and the amount of songs
          * of each genre.
          */
-        private void buildGenresTable() {
+        private String getGenreForSong() {
             // Queries for this Genre columns.
             String[] genresProjection = {
                     MediaStore.Audio.Genres.NAME,
@@ -332,6 +348,8 @@ public class BuildLibraryTaskFragment extends Fragment {
 
             if (genresCursor!=null)
                 genresCursor.close();
+
+            return "";
 
         }
 

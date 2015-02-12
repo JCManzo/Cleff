@@ -17,11 +17,11 @@ public class StopServiceBroadcastReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         if(intent.getAction().equals(MusicService.STOP_SERVICE)) {
-            //Stop the service.
             CleffApp app = (CleffApp) context.getApplicationContext();
             //app.getService().stopSelf();
             MusicService.setRunning(false);
-            app.getService().stop();
+            //Stop the service.
+            app.getService().stopSelf();
 
             // Ready up the service if the main activity is still visible.
             if(CleffApp.isActivityVisible()) {

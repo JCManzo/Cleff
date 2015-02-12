@@ -24,14 +24,13 @@ public class CleffApp extends Application {
 
     private static CleffApp sCleffApp;
     private static MusicService mService;
-    private static MusicServiceManager mPlaybackManager;
+    private static MusicServiceManager mMusicServiceManager;
     private static SharedPreferences mSharedPreferences;
 
     private static final Bus mEventBus = new Bus();
     private boolean mIsServiceRunning = false;
     private static boolean mIsActivityVisible = false;
 
-    private ArrayList<Song> mSongsList;
 
     //SharedPreferences keys.
     public static final String REPEAT_MODE = "RepeatMode";
@@ -87,7 +86,7 @@ public class CleffApp extends Application {
     }
 
     public MusicServiceManager getPlaybackManager() {
-        return mPlaybackManager;
+        return mMusicServiceManager;
     }
 
     public SharedPreferences getSharedPreferences() {
@@ -97,23 +96,6 @@ public class CleffApp extends Application {
 
     public static Bus getEventBus() {
         return mEventBus;
-    }
-
-    public ArrayList<Song> getSongList() {
-        return mSongsList;
-    }
-
-    public void addSong(Song song) {
-        mSongsList.add(song);
-    }
-
-    public Song getSong(String id) {
-        for(Song song : getSongList()) {
-            if(song.getId().equals(id)) {
-                return song;
-            }
-        }
-        return null;
     }
 
     @Override
@@ -128,9 +110,8 @@ public class CleffApp extends Application {
         }
 
 
-        mSongsList = new ArrayList<>();
         mContext = getApplicationContext();
-        mPlaybackManager = new MusicServiceManager(mContext);
+        mMusicServiceManager = new MusicServiceManager(mContext);
     }
 
     /** A tree which logs important information for crash reporting. */

@@ -20,7 +20,7 @@ public class Song implements Parcelable{
     private static final String JSON_PLAYS      = "plays";
     private static final String JSON_YEAR       = "year";
 
-    private Long mSongId;
+    private int mSongId;
     private String mAlbumID;
 
     private String mTitle;
@@ -36,7 +36,7 @@ public class Song implements Parcelable{
     public Song() {
 
     }
-    public Song(Long songID, String songTitle, String songArtist,
+    public Song(int songID, String songTitle, String songArtist,
                 String album, String albumID, String genre) {
         mSongId = songID;
         mTitle = songTitle;
@@ -48,7 +48,7 @@ public class Song implements Parcelable{
     }
 
     public Song(JSONObject jsonObject) throws  JSONException {
-        mSongId = jsonObject.getLong(JSON_ID);
+        mSongId = jsonObject.getInt(JSON_ID);
         mTitle = jsonObject.getString(JSON_TITLE);
         mArtist = jsonObject.getString(JSON_ARTIST);
         mAlbum = jsonObject.getString(JSON_ALBUM);
@@ -91,7 +91,7 @@ public class Song implements Parcelable{
         mSongRating = songRating;
     }
 
-    public Long getId() {
+    public int getId() {
         return mSongId;
     }
 
@@ -106,7 +106,7 @@ public class Song implements Parcelable{
         return mAlbumID;
     }
 
-    public void setID(Long songId) {
+    public void setID(int songId) {
         mSongId = songId;
     }
 
@@ -169,7 +169,7 @@ public class Song implements Parcelable{
     }
 
     private Song(Parcel in) {
-        this.mSongId = in.readLong();
+        this.mSongId = in.readInt();
         this.mAlbumID = in.readString();
         this.mTitle = in.readString();
         this.mArtist = in.readString();

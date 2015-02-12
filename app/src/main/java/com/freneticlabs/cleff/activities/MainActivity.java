@@ -131,16 +131,16 @@ public class MainActivity extends ActionBarActivity implements
     @Override
     public void onPause() {
         super.onPause();
-        MusicLibrary.get(this).saveLibrary();
         CleffApp.activityPaused();
+        MusicLibrary.get(this).saveLibrary();
 
     }
 
     @Override
     public void onResume() {
         super.onResume();
+
         mCleffApp.getPlaybackManager().initPlayback();
-        MusicLibrary.get(this);
         CleffApp.activityResumed();
 
     }
@@ -240,8 +240,6 @@ public class MainActivity extends ActionBarActivity implements
 
         // Commit the edits!
         editor.apply();
-
-        MusicLibrary.get(this).saveLibrary();
 
         // Display the library in a listview
         FragmentManager fragmentManager = getSupportFragmentManager();

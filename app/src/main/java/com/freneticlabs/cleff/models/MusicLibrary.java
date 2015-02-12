@@ -9,6 +9,8 @@ import com.freneticlabs.cleff.utils.CleffJSONSerializer;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import timber.log.Timber;
+
 /**
  * Created by jcmanzo on 8/16/14.
  */
@@ -27,13 +29,13 @@ public class MusicLibrary {
     private static final String FILENAME = "songs.json";
 
     public MusicLibrary(Context context) {
-        Log.i(TAG, "LIBRARY INIT");
         mContext = context;
         mSongs = new ArrayList<Song>();
         mCleffJSONSerializer = new CleffJSONSerializer(mContext, FILENAME);
 
         try {
             mSongs = mCleffJSONSerializer.loadLibrary();
+            Timber.d("Opening library");
         } catch (Exception e) {
             mSongs = new ArrayList<Song>();
             Log.e(TAG, "Error loading library: ", e);
