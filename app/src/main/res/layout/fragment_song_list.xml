@@ -6,7 +6,7 @@
              tools:context="com.freneticlabs.cleff.fragments.SongsFragment">
 
     <ListView
-        android:id="@+id/recycler_view_songs"
+        android:id="@+id/list_view_songs"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@drawable/song_list_selected_item"

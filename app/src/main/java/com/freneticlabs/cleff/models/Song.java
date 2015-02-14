@@ -9,7 +9,8 @@ import org.json.JSONObject;
 /**
  * Created by jcmanzo on 8/7/14.
  */
-public class Song implements Parcelable{
+public class Song extends Music implements Parcelable {
+
     private static final String JSON_ID         = "id";
     private static final String JSON_TITLE      = "title";
     private static final String JSON_ARTIST     = "artist";
@@ -36,16 +37,7 @@ public class Song implements Parcelable{
     public Song() {
 
     }
-    public Song(int songID, String songTitle, String songArtist,
-                String album, String albumID, String genre) {
-        mSongId = songID;
-        mTitle = songTitle;
-        mArtist = songArtist;
-        mAlbum = album;
-        mSongRating = 0;
-        mAlbumID = albumID;
-        mGenre = genre;
-    }
+
 
     public Song(JSONObject jsonObject) throws  JSONException {
         mSongId = jsonObject.getInt(JSON_ID);
@@ -57,12 +49,15 @@ public class Song implements Parcelable{
         mGenre = jsonObject.getString(JSON_GENRE);
     }
 
+
     /**
      * Creates a JSON representation of a Song object
      * @return JSONG Song object
      * @throws JSONException
      */
+    @Override
     public JSONObject toJSON() throws JSONException {
+        super.toJSON();
         JSONObject jsonObject = new JSONObject();
         jsonObject.put(JSON_ID, String.valueOf(mSongId));
         jsonObject.put(JSON_TITLE, mTitle);
@@ -91,9 +86,6 @@ public class Song implements Parcelable{
         mSongRating = songRating;
     }
 
-    public int getId() {
-        return mSongId;
-    }
 
     public String getAlbum() {
         return mAlbum;
@@ -106,8 +98,16 @@ public class Song implements Parcelable{
         return mAlbumID;
     }
 
-    public void setID(int songId) {
-        mSongId = songId;
+    @Override
+    public int getId() {
+        super.getId();
+        return mSongId;
+    }
+
+    @Override
+    public void setId(int iD) {
+        super.setId(iD);
+        mSongId = iD;
     }
 
     public String getTitle() {

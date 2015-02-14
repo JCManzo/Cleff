@@ -1,13 +1,10 @@
 package com.freneticlabs.cleff.models;
 
 import android.content.Context;
-import android.graphics.drawable.Drawable;
-import android.util.Log;
 
 import com.freneticlabs.cleff.utils.CleffJSONSerializer;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 import timber.log.Timber;
 
@@ -15,35 +12,40 @@ import timber.log.Timber;
  * Created by jcmanzo on 8/16/14.
  */
 public class MusicLibrary {
-
-    private ArrayList<Song> mSongs;
     private static MusicLibrary sMusicLibrary;
-
-    private CleffJSONSerializer mCleffJSONSerializer;
     private Context mContext;
 
+    private ArrayList<Song> mSongs;
+    private ArrayList<Album> mAlbums;
 
-    private static final String TAG = MusicLibrary.class.getSimpleName();
-    private HashMap<Integer, Drawable> mAlbumArtCache;
 
-    private static final String FILENAME = "songs.json";
+    private CleffJSONSerializer mSongsJSONSerializer;
+    private CleffJSONSerializer mAlbumsJSONSerializer;
+
+    private static final String SONGS_FILE = "songs.json";
+    private static final String ALBUMS_FILE = "albums.json";
 
     public MusicLibrary(Context context) {
         mContext = context;
-        mSongs = new ArrayList<Song>();
-        mCleffJSONSerializer = new CleffJSONSerializer(mContext, FILENAME);
-
+        mSongs = new ArrayList<>();
+        mAlbums = new ArrayList<>();
+        mSongsJSONSerializer = new CleffJSONSerializer(mContext, SONGS_FILE);
+        mAlbumsJSONSerializer = new CleffJSONSerializer(mContext, ALBUMS_FILE);
         try {
-            mSongs = mCleffJSONSerializer.loadLibrary();
+            mSongs = mSongsJSONSerializer.loadSongs();
+            mAlbums = mAlbumsJSONSerializer.loadAlbums();
             Timber.d("Opening library");
         } catch (Exception e) {
             mSongs = new ArrayList<Song>();
-            Log.e(TAG, "Error loading library: ", e);
+            Timber.e("Error loading library: ", e);
         }
     }
 
     public void addSong(Song song) {
         mSongs.add(song);
+    }
+    public void addAlbum(Album album) {
+        mAlbums.add(album);
     }
 
     public static MusicLibrary get(Context context) {
@@ -55,6 +57,10 @@ public class MusicLibrary {
 
     public ArrayList<Song> getSongs() {
         return mSongs;
+    }
+
+    public ArrayList<Album> getAlbums() {
+        return mAlbums;
     }
 
     public Song getSong(long id) {
@@ -89,18 +95,19 @@ public class MusicLibrary {
 
     public void printLib() {
         for(Song song : mSongs) {
-            Log.i(TAG, song.getTitle());
-            Log.i(TAG, String.valueOf(song.getSongRating()));
+            Timber.i(song.getTitle());
+            Timber.i(String.valueOf(song.getSongRating()));
         }
     }
 
     public boolean saveLibrary() {
         try {
-            mCleffJSONSerializer.saveLibrary(mSongs);
-            Log.i(TAG, "library saved");
+            mSongsJSONSerializer.saveSongs(mSongs);
+            mAlbumsJSONSerializer.saveAlbums(mAlbums);
+            Timber.i("library saved");
             return true;
         } catch (Exception e) {
-            Log.e(TAG, "Error saving library: ", e);
+            Timber.e("Error saving library: ", e);
             return false;
         }
     }

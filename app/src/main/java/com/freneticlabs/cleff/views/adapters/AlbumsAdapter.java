@@ -13,7 +13,6 @@ import android.widget.TextView;
 import com.freneticlabs.cleff.CleffApp;
 import com.freneticlabs.cleff.R;
 import com.freneticlabs.cleff.models.Album;
-import com.freneticlabs.cleff.views.widgets.CheckableImageButton;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -28,58 +27,82 @@ import butterknife.InjectView;
 public class AlbumsAdapter extends ArrayAdapter<Album> {
     private ArrayList<Album> mAlbumList;
     private final Context mContext;
-
+    private LayoutInflater mAlbumsInflater;
+    private String mSongCount;
     private CleffApp mCleffApp;
-    private CheckableImageButton mCurrentButton = null;
     // Remember the last item shown on screen
-    private int lastPosition = -1;
     private static final String ART_WORK_PATH = "content://media/external/audio/albumart";
 
 
-    public AlbumsAdapter(Context context, int resource, ArrayList<Album> albums) {
-        super(context, resource, albums);
+    public AlbumsAdapter(Context context, ArrayList<Album> albums) {
+        super(context, 0, albums);
         mContext = context;
         mAlbumList = albums;
         mCleffApp = (CleffApp) mContext.getApplicationContext();
+        mAlbumsInflater = LayoutInflater.from(context);
+        mSongCount = mCleffApp.getResources().getString(R.string.album_song_count);
     }
 
-    static class ViewHolderItem {
+    static class ViewHolder {
         @InjectView(R.id.grid_album_title)
         TextView title;
         @InjectView(R.id.grid_album_num_songs)
-        TextView songNumber;
+        TextView songCount;
         @InjectView(R.id.grid_album_image)
         ImageView artwork;
 
 
-        public ViewHolderItem(View view) {
+        public ViewHolder(View view) {
             ButterKnife.inject(this, view);
         }
     }
 
     @Override
-    public View getView(final int position, View view, ViewGroup parent) {
-        ViewHolderItem holder;
-        final Album album = getItem(position);
+    public int getCount() {
+        return mAlbumList.size();
+    }
 
-        // reuse views
-        if (view != null) {
-            holder = (ViewHolderItem) view.getTag();
+    @Override
+    public Album getItem(int position) {
+        return mAlbumList.get(position);
+    }
+
+    @Override
+    public long getItemId(int position) {
+        return position;
+    }
+
+    @Override
+    public View getView(final int position, View view, ViewGroup parent) {
+        ViewHolder holder;
+        if(view == null) {
+            //map to song layout
+            view = mAlbumsInflater.inflate(R.layout.albums_grid_item, parent, false);
+
+            // Set up up the ViewHolder
+            holder = new ViewHolder(view);
+            holder.title = (TextView)view.findViewById(R.id.grid_album_title);
+
+            view.setTag(holder);
 
         } else {
-            LayoutInflater inflater = (LayoutInflater)mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            view = inflater.inflate(R.layout.albums_grid_item, null);
-            holder = new ViewHolderItem(view);
-            view.setTag(holder);
+            // View already exists
+            holder = (ViewHolder)view.getTag();
         }
 
-        holder.title.setText(album.getAlbum());
+        //get song using position
+        final Album album = mAlbumList.get(position);
+        //get title and artist strings
+        holder.title.setText(album.getAlbumName());
+        holder.songCount.setText(mSongCount + Integer.toString(album.getNumOfSongs()));
+
         Uri uri = ContentUris.withAppendedId(Uri.parse(ART_WORK_PATH), album.getAlbumId());
         Picasso.with(mContext)
                 .load(uri)
                 .resize(300,300)
                 .placeholder(R.drawable.adele)
                 .into(holder.artwork);
+
         return view;
     }
 

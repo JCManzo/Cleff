@@ -13,6 +13,7 @@ import android.util.Log;
 
 import com.freneticlabs.cleff.CleffApp;
 import com.freneticlabs.cleff.R;
+import com.freneticlabs.cleff.models.Album;
 import com.freneticlabs.cleff.models.MusicLibrary;
 import com.freneticlabs.cleff.models.Song;
 
@@ -123,9 +124,16 @@ public class BuildLibraryTaskFragment extends Fragment {
         @Override
         protected Void doInBackground(Void... voids) {
             Cursor mediaStoreCursor = getSongsFromMediaStore();
+            Cursor albumStoreCursor = getAlbumsFromMediaStore();
+
             if (mediaStoreCursor!=null) {
-                saveMediaStoreDataToDB(mediaStoreCursor);
+                buildSongList(mediaStoreCursor);
                 mediaStoreCursor.close();
+            }
+
+            if(albumStoreCursor  != null) {
+                buildAlbumList(albumStoreCursor);
+                albumStoreCursor.close();
             }
             return null;
         }
@@ -145,7 +153,7 @@ public class BuildLibraryTaskFragment extends Fragment {
             }
         }
 
-        public void saveMediaStoreDataToDB(Cursor mediaStoreCursor) {
+        public void buildSongList(Cursor mediaStoreCursor) {
             // Populates the ArrayList in MusicLibrary with Song objects.
 
 
@@ -214,8 +222,9 @@ public class BuildLibraryTaskFragment extends Fragment {
                     if(unknownAlbum) songAlbum = mUnknownAlbum;
                     if(unknownTitle) songTitle = mUnknownTitle;
 
+
                     Song song = new Song();
-                    song.setID(songId);
+                    song.setId(songId);
                     song.setYear(songYear);
                     song.setTitle(songTitle);
                     song.setArtist(songArtist);
@@ -231,18 +240,36 @@ public class BuildLibraryTaskFragment extends Fragment {
             if(mediaStoreCursor != null) mediaStoreCursor.close();
         }
 
-        private String getSongGenre(String filePath) {
-            if (mGenresHashMap!=null)
-                return mGenresHashMap.get(filePath);
-            else
-                return mContext.getResources().getString(R.string.unknown_genre_name);
-        }
+        public void buildAlbumList(Cursor cursor) {
+            String mUnknownAlbum = getActivity().getApplicationContext().getString(R.string.unknown_album_name);
 
-        private String getSongGenreCount(String filePath) {
-            if (mGenresSongCountHashMap!=null)
-                return Integer.toString(mGenresSongCountHashMap.get(filePath));
-            else
-                return mContext.getResources().getString(R.string.unknown_genre_name);
+            if (cursor != null && cursor.moveToFirst()) {
+                int albumIdColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Albums._ID);
+                int albumNameColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Albums.ALBUM);
+                int albumArtistColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Albums.ARTIST);
+                int albumSongCountColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Albums.NUMBER_OF_SONGS);
+
+                do {
+                    Long albumId = cursor.getLong(albumIdColumn);
+                    int albumSongCount = cursor.getInt(albumSongCountColumn);
+                    String albumName = cursor.getString(albumNameColumn);
+                    String albumArtist = cursor.getString(albumArtistColumn);
+
+                    boolean isUnknownAlbum = albumName == null || albumName.equals(MediaStore.UNKNOWN_STRING);
+
+                    if(isUnknownAlbum) albumName = mUnknownAlbum;
+
+                    Album album = new Album();
+                    album.setAlbumId(albumId);
+                    album.setAlbumName(albumName);
+                    album.setAlbumArtist(albumArtist);
+                    album.setNumOfSongs(albumSongCount);
+
+                    MusicLibrary.get(mContext).addAlbum(album);
+                } while (cursor.moveToNext());
+            }
+            if(cursor != null) cursor.close();
+            Timber.d(Integer.toString(MusicLibrary.get(mContext).getAlbums().size()));
         }
 
         /**
@@ -253,8 +280,8 @@ public class BuildLibraryTaskFragment extends Fragment {
             // Cursor musicFoldersCursor = mContext.getDBAccessHelper().getAllMusicFolderPaths();
 
             Cursor mediaStoreCursor = null;
-            String sortOrder = null;
-            String projection[] = { MediaStore.Audio.Media.TITLE,
+            String projection[] = {
+                    MediaStore.Audio.Media.TITLE,
                     MediaStore.Audio.Media.ARTIST,
                     MediaStore.Audio.Media.ALBUM,
                     MediaStore.Audio.Media.ALBUM_ID,
@@ -265,7 +292,7 @@ public class BuildLibraryTaskFragment extends Fragment {
                     MediaStore.Audio.Media.DATE_ADDED,
                     MediaStore.Audio.Media.DATE_MODIFIED,
                     MediaStore.Audio.Media.TRACK,
-                    MediaStore.Audio.Media._ID
+                    MediaStore.Audio.Media._ID,
             };
 
             //Grab the cursor of MediaStore entries.
@@ -286,11 +313,25 @@ public class BuildLibraryTaskFragment extends Fragment {
             Uri uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
             String selection = MediaStore.Audio.Media.IS_MUSIC + "=1";
 
-            mediaStoreCursor = mContentResolver.query(uri, null, selection, null, sortOrder);
+            mediaStoreCursor = mContentResolver.query(uri, projection, selection, null, MediaStore.Audio.Media.TITLE);
 
             return mediaStoreCursor;
         }
 
+        private Cursor getAlbumsFromMediaStore() {
+            Cursor cursor = null;
+            String projection[] = {
+                    MediaStore.Audio.Albums._ID,
+                    MediaStore.Audio.Albums.ALBUM,
+                    MediaStore.Audio.Albums.ARTIST,
+                    MediaStore.Audio.Albums.NUMBER_OF_SONGS
+            };
+            Uri uri = MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI;
+
+            cursor = mContentResolver.query(uri, projection, null, null, MediaStore.Audio.Albums.ALBUM);
+
+            return cursor;
+        }
         /**
          * Builds a HashMap of all songs, their genres and the amount of songs
          * of each genre.
@@ -368,12 +409,19 @@ public class BuildLibraryTaskFragment extends Fragment {
         }
     }
 
-    public BuildCursorListener getBuildCursorListener() {
-        return mBuildCursorListener;
+
+    private String getSongGenre(String filePath) {
+        if (mGenresHashMap!=null)
+            return mGenresHashMap.get(filePath);
+        else
+            return mContext.getResources().getString(R.string.unknown_genre_name);
     }
 
-    public void setBuildCursorListener(BuildCursorListener listener) {
-        mBuildCursorListener = listener;
+    private String getSongGenreCount(String filePath) {
+        if (mGenresSongCountHashMap!=null)
+            return Integer.toString(mGenresSongCountHashMap.get(filePath));
+        else
+            return mContext.getResources().getString(R.string.unknown_genre_name);
     }
 
 }

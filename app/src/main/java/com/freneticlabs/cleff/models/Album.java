@@ -6,7 +6,7 @@ import org.json.JSONObject;
 /**
  * Created by jcmanzo on 12/28/14.
  */
-public class Album {
+public class Album extends Music{
     private static final String JSON_ID         = "id";
     private static final String JSON_ALBUM      = "album";
     private static final String JSON_ALBUM_ARTIST     = "artist";
@@ -19,7 +19,10 @@ public class Album {
     private String mAlbum;
     private String mAlbumArtist;
 
-    public Album(long albumId, int numOfSongs, String album, String albumArtist) {
+    public Album() {
+
+    }
+    public Album(int albumId, int numOfSongs, String album, String albumArtist) {
         mAlbumId = albumId;
         mNumOfSongs = numOfSongs;
         mAlbum = album;
@@ -53,9 +56,25 @@ public class Album {
         return isEqual;
     }
 
+    public void setAlbumId(Long albumId) {
+        mAlbumId = albumId;
+    }
+
+    public void setNumOfSongs(int numOfSongs) {
+        mNumOfSongs = numOfSongs;
+    }
+
+    public void setAlbumName(String album) {
+        mAlbum = album;
+    }
+
+    public void setAlbumArtist(String albumArtist) {
+        mAlbumArtist = albumArtist;
+    }
+
     @Override
     public String toString() {
-        return getAlbum();
+        return getAlbumName();
     }
 
     public long getAlbumId() {
@@ -66,13 +85,11 @@ public class Album {
         return mAlbumArtist;
     }
 
-
     public int getNumOfSongs() {
         return mNumOfSongs;
     }
 
-
-    public String getAlbum() {
+    public String getAlbumName() {
         return mAlbum;
     }
 

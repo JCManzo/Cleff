@@ -30,4 +30,7 @@
     <string name="title_activity_player">PlayerActivity</string>
     <string name="hello_world">Hello world!</string>
 
+    <!-- Albums -->
+    <string name="album_song_count">"Songs: "</string>
+
 </resources>

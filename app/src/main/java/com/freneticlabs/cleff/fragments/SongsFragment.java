@@ -37,7 +37,7 @@ import static android.support.v7.widget.RecyclerView.SCROLL_STATE_SETTLING;
 
 public class SongsFragment extends Fragment {
 
-    @InjectView(R.id.recycler_view_songs)
+    @InjectView(R.id.list_view_songs)
     ListView mListView;
     @InjectView(R.id.action_play)
     FloatingActionButton mFloatingPlayButton;
@@ -101,7 +101,6 @@ public class SongsFragment extends Fragment {
 
         mSongsAdapter = new SongsAdapter(mContext, mSongs);
         mListView.setAdapter(mSongsAdapter);
-
         initListeners();
 
         return rootView;

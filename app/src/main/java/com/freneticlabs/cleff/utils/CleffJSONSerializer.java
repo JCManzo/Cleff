@@ -2,6 +2,7 @@ package com.freneticlabs.cleff.utils;
 
 import android.content.Context;
 
+import com.freneticlabs.cleff.models.Album;
 import com.freneticlabs.cleff.models.Song;
 
 import org.json.JSONArray;
@@ -26,33 +27,59 @@ public class CleffJSONSerializer {
     private Context mContext;
     private String mFilename;
 
+    public CleffJSONSerializer() {
+
+    }
     public CleffJSONSerializer(Context context, String filename) {
         mContext = context;
         mFilename = filename;
     }
 
-    public void saveLibrary(ArrayList<Song> songs)
-            throws JSONException, IOException {
+    public void saveSongs(ArrayList<Song> songs)
+            throws JSONException, IOException{
         // Builds the JSON array
         JSONArray jsonArray = new JSONArray();
-        for(Song song : songs) {
-            jsonArray.put(song.toJSON());
+
+        for(Song item : songs) {
+            jsonArray.put(item.toJSON());
         }
 
+        saveArrayToDisk(jsonArray);
+
+    }
+
+    public void saveAlbums(ArrayList<Album> albums)
+            throws JSONException, IOException{
+        // Builds the JSON array
+        JSONArray jsonArray = new JSONArray();
+
+        for(Album item : albums) {
+            jsonArray.put(item.toJSON());
+        }
+        saveArrayToDisk(jsonArray);
+    }
+
+    private void saveArrayToDisk(JSONArray jsonArray) {
         //Writes the file to disk
         Writer writer = null;
         try {
             OutputStream outputStream = mContext.openFileOutput(mFilename, Context.MODE_PRIVATE);
             writer = new OutputStreamWriter(outputStream);
             writer.write(jsonArray.toString());
+        } catch (IOException e) {
+
         } finally {
             if(writer != null) {
-                writer.close();
+                try {
+                    writer.close();
+                } catch (IOException e) {
+
+                }
             }
         }
     }
 
-    public ArrayList<Song> loadLibrary() throws IOException, JSONException {
+    public ArrayList<Song> loadSongs() throws IOException, JSONException {
         ArrayList<Song> songs = new ArrayList<Song>();
         BufferedReader bufferedReader = null;
 
@@ -82,5 +109,37 @@ public class CleffJSONSerializer {
             }
         }
         return songs;
+    }
+
+    public ArrayList<Album> loadAlbums() throws IOException, JSONException {
+        ArrayList<Album> albums = new ArrayList<Album>();
+        BufferedReader bufferedReader = null;
+
+        try {
+            //Open and read the file
+            InputStream inputStream = mContext.openFileInput(mFilename);
+            bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
+            StringBuilder jsonString = new StringBuilder();
+            String line = null;
+
+            while ((line = bufferedReader.readLine()) != null) {
+                // Line nreas are ommited and irrevelant
+                jsonString.append(line);
+            }
+
+            // Parse JSON
+            JSONArray jsonArray = (JSONArray) new JSONTokener(jsonString.toString()).nextValue();
+            //Build the song array
+            for (int i = 0; i < jsonArray.length(); i++) {
+                albums.add(new Album(jsonArray.getJSONObject(i)));
+            }
+        } catch (FileNotFoundException e) {
+            // Ignore this one. It happens when starting fresh
+        } finally {
+            if (bufferedReader != null) {
+                bufferedReader.close();
+            }
+        }
+        return albums;
     }
 }
