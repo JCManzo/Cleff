@@ -31,9 +31,6 @@ import butterknife.ButterKnife;
 import butterknife.InjectView;
 import timber.log.Timber;
 
-import static android.support.v7.widget.RecyclerView.SCROLL_STATE_DRAGGING;
-import static android.support.v7.widget.RecyclerView.SCROLL_STATE_IDLE;
-import static android.support.v7.widget.RecyclerView.SCROLL_STATE_SETTLING;
 
 public class SongsFragment extends Fragment {
 
@@ -110,7 +107,6 @@ public class SongsFragment extends Fragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         updateFloatingUi();
-        updateState(SCROLL_STATE_IDLE);
         restoreListPosition();
 
     }
@@ -166,7 +162,6 @@ public class SongsFragment extends Fragment {
         mListView.setOnScrollListener(new AbsListView.OnScrollListener() {
             @Override
             public void onScrollStateChanged(AbsListView view, int scrollState) {
-                updateState(scrollState);
 
             }
 
@@ -249,24 +244,5 @@ public class SongsFragment extends Fragment {
 
         editor.apply();
     }
-
-    private void updateState(int scrollState) {
-        String stateName = "Undefined";
-        switch (scrollState) {
-            case SCROLL_STATE_IDLE:
-                stateName = "Idle";
-                break;
-
-            case SCROLL_STATE_DRAGGING:
-                stateName = "Dragging";
-                break;
-
-            case SCROLL_STATE_SETTLING:
-                stateName = "Flinging";
-                break;
-        }
-
-    }
-
 
 }

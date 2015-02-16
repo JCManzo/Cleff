@@ -18,11 +18,11 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
 import com.freneticlabs.cleff.R;
+import com.freneticlabs.cleff.views.adapters.NavDrawerAdapter;
 
 /**
  * Fragment used for managing interactions for and presentation of a navigation drawer.
@@ -98,15 +98,12 @@ public class NavigationDrawerFragment extends Fragment {
                 selectItem(position);
             }
         });
-       mDrawerListView.setAdapter(new ArrayAdapter<String>(
-                getActivity(),
-                android.R.layout.simple_list_item_1,
-                android.R.id.text1,
-                new String[]{
-                        getString(R.string.title_section1),
-                        getString(R.string.title_section2),
-                        getString(R.string.title_section3),
-                }));
+
+        View footer = inflater.inflate(R.layout.nav_drawer_footer, null);
+        NavDrawerAdapter navDrawerAdapter = new NavDrawerAdapter(getActivity(), getResources().getStringArray(R.array.nav_bar_titles));
+
+        mDrawerListView.addFooterView(footer, null, true);
+        mDrawerListView.setAdapter(navDrawerAdapter);
         mDrawerListView.setItemChecked(mCurrentSelectedPosition, true);
         return mDrawerListView;
     }

@@ -4,13 +4,11 @@ import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
 
-import com.freneticlabs.cleff.models.Song;
 import com.freneticlabs.cleff.utils.MusicServiceManager;
 import com.squareup.otto.Bus;
 
-import java.util.ArrayList;
-
 import timber.log.Timber;
+import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
 
 /**
  * Created by jcmanzo on 12/18/14.
@@ -112,6 +110,13 @@ public class CleffApp extends Application {
 
         mContext = getApplicationContext();
         mMusicServiceManager = new MusicServiceManager(mContext);
+
+        // Defines default font
+        CalligraphyConfig.initDefault(new CalligraphyConfig.Builder()
+                        .setDefaultFontPath("fonts/HelveticaNeue-Light.otf")
+                        .setFontAttrId(R.attr.fontPath)
+                        .build()
+        );
     }
 
     /** A tree which logs important information for crash reporting. */

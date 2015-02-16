@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center_vertical"
+    android:padding="12dp"
+    tools:ignore="MissingPrefix"
+    >
+
+    <include layout="@layout/item_divider"/>
+
+    <TextView
+        fontPath="fonts/HelveticaNeue-Light.otf"
+        android:textSize="16sp"
+        android:paddingTop="4dp"
+        android:padding="6dp"
+        android:text="@string/nav_drawer_settings"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="24dp"
+        android:gravity="center_vertical"
+        android:textColor="@color/text_primary"/>
+
+    <TextView
+        fontPath="fonts/HelveticaNeue-Light.otf"
+        android:textSize="16sp"
+        android:paddingTop="4dp"
+        android:padding="6dp"
+        android:text="@string/nav_drawer_about"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="24dp"
+        android:gravity="center_vertical"
+        android:textColor="@color/text_primary"/>
+
+    <TextView
+        fontPath="fonts/HelveticaNeue-Light.otf"
+        android:textSize="16sp"
+        android:paddingTop="4dp"
+        android:padding="6dp"
+        android:text="@string/nav_drawer_feedback"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="24dp"
+        android:gravity="center_vertical"
+        android:textColor="@color/text_primary"/>
+
+</LinearLayout>
