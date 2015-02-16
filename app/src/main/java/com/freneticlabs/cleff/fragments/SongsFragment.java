@@ -142,6 +142,7 @@ public class SongsFragment extends Fragment {
 
         }
     }
+
     /**
      * Sets up listerners
      */

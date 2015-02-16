@@ -22,6 +22,7 @@ public class PlayerFragment extends Fragment {
     public static final String EXTRA_SONG_ID = "com.freneticlabs.cleff.song_id";
     private Song mSong;
     @InjectView(R.id.player_song_name) TextView mSongName;
+
     public PlayerFragment() {
         // Required empty public constructor
     }

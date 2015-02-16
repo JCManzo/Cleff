@@ -68,7 +68,7 @@ public class SongsAdapter extends ArrayAdapter<Song> {
         //get title and artist strings
         holder.title.setText(song.getTitle());
         holder.artist.setText(song.getArtist());
-
+        setAnimation(view, position);
         return view;
     }
 

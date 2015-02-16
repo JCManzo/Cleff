@@ -8,10 +8,12 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.Toolbar;
 
+import com.freneticlabs.cleff.CleffApp;
 import com.freneticlabs.cleff.R;
 import com.freneticlabs.cleff.fragments.PlayerFragment;
 import com.freneticlabs.cleff.models.MusicLibrary;
 import com.freneticlabs.cleff.models.Song;
+import com.freneticlabs.cleff.models.events.SongSelectedEvent;
 
 import java.util.ArrayList;
 
@@ -30,7 +32,7 @@ public class PlayerActivity extends ActionBarActivity {
 
         ButterKnife.inject(this);
 
-        // Set up the toolbar to act as ac action bar
+        // Set up the toolbar to act as an action bar
         if(mToolbar != null) {
             setSupportActionBar(mToolbar);
             mToolbar.setNavigationIcon(R.drawable.ic_action_arrow_back);
@@ -40,10 +42,12 @@ public class PlayerActivity extends ActionBarActivity {
         mSongs = MusicLibrary.get(this).getSongs();
 
         FragmentManager fm = getSupportFragmentManager();
+
         mViewPager.setAdapter(new FragmentPagerAdapter(fm) {
             @Override
             public Fragment getItem(int position) {
                 Song song = mSongs.get(position);
+
                 return PlayerFragment.newInstance(song.getId());
             }
 
@@ -52,7 +56,8 @@ public class PlayerActivity extends ActionBarActivity {
                 return mSongs.size();
             }
         });
-        long songId = (long)getIntent().getSerializableExtra(PlayerFragment.EXTRA_SONG_ID);
+
+        int songId = (int)getIntent().getSerializableExtra(PlayerFragment.EXTRA_SONG_ID);
         for (int i = 0; i < mSongs.size(); i++) {
             if(mSongs.get(i).getId() == songId) {
                 mViewPager.setCurrentItem(i);
@@ -69,7 +74,9 @@ public class PlayerActivity extends ActionBarActivity {
                 Song song = mSongs.get(position);
                 if(song.getTitle() != null) {
                     setTitle(song.getTitle());
+
                 }
+                CleffApp.getEventBus().post(new SongSelectedEvent(position));
             }
 
             @Override
