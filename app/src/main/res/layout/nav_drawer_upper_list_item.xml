@@ -12,7 +12,6 @@
                android:id="@+id/drawer_item_icon"
                android:layout_width="24dp"
                android:layout_height="24dp"
-               android:layout_marginLeft="10sp"
                android:layout_marginRight="24dp"
                android:src="@drawable/ic_launcher"
         />

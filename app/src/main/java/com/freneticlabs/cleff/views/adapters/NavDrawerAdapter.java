@@ -24,7 +24,7 @@ public class NavDrawerAdapter extends ArrayAdapter {
     };
 
     public NavDrawerAdapter(Context context, String[] menuValues) {
-        super(context, R.layout.nav_drawer_item, menuValues);
+        super(context, R.layout.nav_drawer_upper_list_item, menuValues);
         mContext = context;
         mNavDrawerValues = menuValues;
     }
@@ -35,7 +35,7 @@ public class NavDrawerAdapter extends ArrayAdapter {
         if(rowView == null) {
             LayoutInflater inflater = (LayoutInflater)mContext
                     .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            rowView = inflater.inflate(R.layout.nav_drawer_item, parent, false);
+            rowView = inflater.inflate(R.layout.nav_drawer_upper_list_item, parent, false);
         }
         TextView textView = (TextView) rowView.findViewById(R.id.drawer_item_text);
         ImageView imageView = (ImageView) rowView.findViewById(R.id.drawer_item_icon);

@@ -23,6 +23,12 @@ import android.widget.Toast;
 
 import com.freneticlabs.cleff.R;
 import com.freneticlabs.cleff.views.adapters.NavDrawerAdapter;
+import com.nispok.snackbar.Snackbar;
+import com.nispok.snackbar.SnackbarManager;
+
+import butterknife.ButterKnife;
+import butterknife.InjectView;
+import butterknife.OnClick;
 
 /**
  * Fragment used for managing interactions for and presentation of a navigation drawer.
@@ -52,7 +58,7 @@ public class NavigationDrawerFragment extends Fragment {
      */
     private ActionBarDrawerToggle mDrawerToggle;
     private DrawerLayout mDrawerLayout;
-    private ListView mDrawerListView;
+
     private View mFragmentContainerView;
 
     private int mCurrentSelectedPosition = 0;
@@ -62,6 +68,7 @@ public class NavigationDrawerFragment extends Fragment {
     public NavigationDrawerFragment() {
     }
 
+    @InjectView(R.id.nav_drawer_list) ListView mDrawerListView;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -90,8 +97,10 @@ public class NavigationDrawerFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        mDrawerListView = (ListView) inflater.inflate(
-                R.layout.fragment_navigation_drawer, container, false);
+        View layout = inflater.inflate(R.layout.fragment_navigation_drawer, container, false);
+
+        ButterKnife.inject(this, layout);
+
         mDrawerListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -99,13 +108,26 @@ public class NavigationDrawerFragment extends Fragment {
             }
         });
 
-        View footer = inflater.inflate(R.layout.nav_drawer_footer, null);
         NavDrawerAdapter navDrawerAdapter = new NavDrawerAdapter(getActivity(), getResources().getStringArray(R.array.nav_bar_titles));
-
-        mDrawerListView.addFooterView(footer, null, true);
         mDrawerListView.setAdapter(navDrawerAdapter);
         mDrawerListView.setItemChecked(mCurrentSelectedPosition, true);
-        return mDrawerListView;
+
+        return layout;
+    }
+
+    @OnClick(R.id.nav_drawer_footer_about_button)
+    public void openAbout() {
+        SnackbarManager.show(Snackbar.with(getActivity()).text("About clicked"));
+    }
+
+    @OnClick(R.id.nav_drawer_footer_settings_button)
+    public void openSettings() {
+        SnackbarManager.show(Snackbar.with(getActivity()).text("Settings clicked"));
+    }
+
+    @OnClick(R.id.nav_drawer_footer_feedback_button)
+    public void openFeedback() {
+        SnackbarManager.show(Snackbar.with(getActivity()).text("Feedback clicked"));
     }
 
     public boolean isDrawerOpen() {

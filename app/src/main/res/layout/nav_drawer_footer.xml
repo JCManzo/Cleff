@@ -8,12 +8,15 @@
     android:gravity="center_vertical"
     android:padding="12dp"
     tools:ignore="MissingPrefix"
+
     >
 
     <include layout="@layout/item_divider"/>
 
-    <TextView
+    <Button
+        android:id="@+id/nav_drawer_footer_settings_button"
         fontPath="fonts/HelveticaNeue-Light.otf"
+        android:background="@null"
         android:textSize="16sp"
         android:paddingTop="4dp"
         android:padding="6dp"
@@ -24,8 +27,10 @@
         android:gravity="center_vertical"
         android:textColor="@color/text_primary"/>
 
-    <TextView
+    <Button
+        android:id="@+id/nav_drawer_footer_about_button"
         fontPath="fonts/HelveticaNeue-Light.otf"
+        android:background="@null"
         android:textSize="16sp"
         android:paddingTop="4dp"
         android:padding="6dp"
@@ -34,10 +39,14 @@
         android:layout_height="wrap_content"
         android:layout_marginRight="24dp"
         android:gravity="center_vertical"
-        android:textColor="@color/text_primary"/>
+        android:textColor="@color/text_primary"
+        android:clickable="true"
+        />
 
-    <TextView
+    <Button
+        android:id="@+id/nav_drawer_footer_feedback_button"
         fontPath="fonts/HelveticaNeue-Light.otf"
+        android:background="@null"
         android:textSize="16sp"
         android:paddingTop="4dp"
         android:padding="6dp"
