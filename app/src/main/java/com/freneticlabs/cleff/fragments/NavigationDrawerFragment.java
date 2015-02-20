@@ -19,9 +19,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.freneticlabs.cleff.R;
+import com.freneticlabs.cleff.models.MusicLibrary;
 import com.freneticlabs.cleff.views.adapters.NavDrawerAdapter;
 import com.nispok.snackbar.Snackbar;
 import com.nispok.snackbar.SnackbarManager;
@@ -69,6 +71,8 @@ public class NavigationDrawerFragment extends Fragment {
     }
 
     @InjectView(R.id.nav_drawer_list) ListView mDrawerListView;
+
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -108,7 +112,14 @@ public class NavigationDrawerFragment extends Fragment {
             }
         });
 
+        View header = inflater.inflate(R.layout.nav_drawer_header, container, false);
+        TextView songCount = (TextView)header.findViewById(R.id.nav_drawer_header_songs_count);
+
+        // Display total songs available in the side bar
+        songCount.setText(Integer.toString(MusicLibrary.get(getActivity()).getSongs().size()));
+
         NavDrawerAdapter navDrawerAdapter = new NavDrawerAdapter(getActivity(), getResources().getStringArray(R.array.nav_bar_titles));
+        mDrawerListView.addHeaderView(header);
         mDrawerListView.setAdapter(navDrawerAdapter);
         mDrawerListView.setItemChecked(mCurrentSelectedPosition, true);
 
@@ -146,7 +157,7 @@ public class NavigationDrawerFragment extends Fragment {
 
         // set a custom shadow that overlays the main content when the drawer opens
         //mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.START);
-        mDrawerLayout.setStatusBarBackgroundColor(getResources().getColor(R.color.primary));
+        mDrawerLayout.setStatusBarBackgroundColor(getResources().getColor(R.color.pickerPrimary));
         // set up the drawer's list view with items and click listener
 
         ActionBar actionBar = getActionBar();

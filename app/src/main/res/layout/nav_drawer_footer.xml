@@ -1,21 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:gravity="center_vertical"
     android:padding="12dp"
-    tools:ignore="MissingPrefix"
-
     >
 
-    <include layout="@layout/item_divider"/>
+    <include layout="@layout/item_divider_horizontal"/>
 
     <Button
         android:id="@+id/nav_drawer_footer_settings_button"
-        fontPath="fonts/HelveticaNeue-Light.otf"
         android:background="@null"
         android:textSize="16sp"
         android:paddingTop="4dp"
@@ -25,11 +21,11 @@
         android:layout_height="wrap_content"
         android:layout_marginRight="24dp"
         android:gravity="center_vertical"
-        android:textColor="@color/text_primary"/>
+        android:textColor="@color/gray_text"
+        android:textStyle="bold"/>
 
     <Button
         android:id="@+id/nav_drawer_footer_about_button"
-        fontPath="fonts/HelveticaNeue-Light.otf"
         android:background="@null"
         android:textSize="16sp"
         android:paddingTop="4dp"
@@ -39,13 +35,12 @@
         android:layout_height="wrap_content"
         android:layout_marginRight="24dp"
         android:gravity="center_vertical"
-        android:textColor="@color/text_primary"
-        android:clickable="true"
+        android:textColor="@color/gray_text"
+        android:textStyle="bold"
         />
 
     <Button
         android:id="@+id/nav_drawer_footer_feedback_button"
-        fontPath="fonts/HelveticaNeue-Light.otf"
         android:background="@null"
         android:textSize="16sp"
         android:paddingTop="4dp"
@@ -55,6 +50,7 @@
         android:layout_height="wrap_content"
         android:layout_marginRight="24dp"
         android:gravity="center_vertical"
-        android:textColor="@color/text_primary"/>
+        android:textColor="@color/gray_text"
+        android:textStyle="bold"/>
 
 </LinearLayout>
