@@ -2,7 +2,7 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 21
-    buildToolsVersion "21.1.2"
+    buildToolsVersion "22.0.1"
 
     defaultConfig {
         applicationId "com.freneticlabs.cleff"
@@ -16,32 +16,42 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
-
+    packagingOptions {
+        exclude 'META-INF/LICENSE'
+        exclude 'META-INF/NOTICE'
+        }
     }
 
     repositories {
         mavenCentral()
 
         maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
+        maven {url "http://repo1.maven.org/maven2/com/fasterxml/jackson/" }
     }
 }
 
 dependencies {
+
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile project(':libraries:floatingactionbutton')
     compile project(':libraries:filepicker')
 
     compile files('libs/jaudiotagger-2.2.2.jar')
 
-    compile 'com.android.support:appcompat-v7:21.0.3'
-    compile 'com.android.support:support-v4:21.0.3'
-    compile 'com.google.code.gson:gson:2.3.1'
-    compile 'uk.co.chrisjenx:calligraphy:2.0.1'
-    compile 'com.squareup:otto:1.3.6'
+    compile 'com.android.support:appcompat-v7:22.0.0'
+    compile 'com.android.support:support-v4:22.0.0'
+
+    compile 'com.fasterxml.jackson.core:jackson-core:2.5.1'
+    compile 'com.fasterxml.jackson.core:jackson-databind:2.5.1'
+
     compile 'com.jakewharton:butterknife:6.1.0'
     compile 'com.jakewharton.timber:timber:2.5.1'
-    compile 'com.nispok:snackbar:2.9.0'
-    compile 'com.squareup.picasso:picasso:2.5.0'
-    compile 'de.hdodenhof:circleimageview:1.2.1'
     compile 'com.jpardogo.materialtabstrip:library:1.0.8'
+    compile 'com.nispok:snackbar:2.9.0'
+    compile 'com.squareup:otto:1.3.6'
+    compile 'com.squareup.picasso:picasso:2.5.0'
+
+    compile 'uk.co.chrisjenx:calligraphy:2.0.1'
+    compile 'de.hdodenhof:circleimageview:1.2.1'
+
 }

@@ -135,7 +135,7 @@ public class MainActivity extends ActionBarActivity implements
         super.onPause();
         CleffApp.activityPaused();
         MusicLibrary.get(this).saveLibrary();
-
+        MusicLibrary.get(this).saveSongsToJSONFile();
     }
 
     @Override
