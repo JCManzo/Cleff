@@ -250,7 +250,7 @@ public class BuildLibraryTaskFragment extends Fragment {
                 int albumSongCountColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Albums.NUMBER_OF_SONGS);
 
                 do {
-                    Long albumId = cursor.getLong(albumIdColumn);
+                    int albumId = cursor.getInt(albumIdColumn);
                     int albumSongCount = cursor.getInt(albumSongCountColumn);
                     String albumName = cursor.getString(albumNameColumn);
                     String albumArtist = cursor.getString(albumArtistColumn);
@@ -260,7 +260,7 @@ public class BuildLibraryTaskFragment extends Fragment {
                     if(isUnknownAlbum) albumName = mUnknownAlbum;
 
                     Album album = new Album();
-                    album.setAlbumId(albumId);
+                    album.setId(albumId);
                     album.setAlbumName(albumName);
                     album.setAlbumArtist(albumArtist);
                     album.setNumOfSongs(albumSongCount);
@@ -318,6 +318,9 @@ public class BuildLibraryTaskFragment extends Fragment {
             return mediaStoreCursor;
         }
 
+        /**
+         * Retrives all albums from the MediaStore with no folder contraint
+         */
         private Cursor getAlbumsFromMediaStore() {
             Cursor cursor = null;
             String projection[] = {
@@ -332,6 +335,7 @@ public class BuildLibraryTaskFragment extends Fragment {
 
             return cursor;
         }
+
         /**
          * Builds a HashMap of all songs, their genres and the amount of songs
          * of each genre.

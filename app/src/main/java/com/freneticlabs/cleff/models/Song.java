@@ -3,24 +3,10 @@ package com.freneticlabs.cleff.models;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
 /**
  * Created by jcmanzo on 8/7/14.
  */
 public class Song extends Music implements Parcelable {
-
-    private static final String JSON_ID         = "id";
-    private static final String JSON_TITLE      = "title";
-    private static final String JSON_ARTIST     = "artist";
-    private static final String JSON_ALBUM      = "album";
-    private static final String JSON_ALBUM_ID   = "album_id";
-    private static final String JSON_GENRE      = "genre";
-    private static final String JSON_RATING     = "rating";
-    private static final String JSON_PLAYS      = "plays";
-    private static final String JSON_YEAR       = "year";
-
     private int mSongId;
     private String mAlbumID;
 
@@ -32,42 +18,8 @@ public class Song extends Music implements Parcelable {
     private String mYear;
     private float mSongRating;
 
-
-
     public Song() {
-
-    }
-
-
-    public Song(JSONObject jsonObject) throws  JSONException {
-        mSongId = jsonObject.getInt(JSON_ID);
-        mTitle = jsonObject.getString(JSON_TITLE);
-        mArtist = jsonObject.getString(JSON_ARTIST);
-        mAlbum = jsonObject.getString(JSON_ALBUM);
-        mAlbumID = jsonObject.getString(JSON_ALBUM_ID);
-        mSongRating = Float.parseFloat(jsonObject.getString(JSON_RATING));
-        mGenre = jsonObject.getString(JSON_GENRE);
-    }
-
-
-    /**
-     * Creates a JSON representation of a Song object
-     * @return JSONG Song object
-     * @throws JSONException
-     */
-    @Override
-    public JSONObject toJSON() throws JSONException {
-        super.toJSON();
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.put(JSON_ID, String.valueOf(mSongId));
-        jsonObject.put(JSON_TITLE, mTitle);
-        jsonObject.put(JSON_ARTIST, mArtist);
-        jsonObject.put(JSON_ALBUM, mAlbum);
-        jsonObject.put(JSON_ALBUM_ID, String.valueOf(mAlbumID));
-        jsonObject.put(JSON_RATING, String.valueOf(mSongRating));
-        jsonObject.put(JSON_GENRE, mGenre);
-
-        return jsonObject;
+        // Required empty constructor
     }
 
     public float getSongRating() {
@@ -105,9 +57,9 @@ public class Song extends Music implements Parcelable {
     }
 
     @Override
-    public void setId(int iD) {
-        super.setId(iD);
-        mSongId = iD;
+    public void setId(int id) {
+        super.setId(id);
+        mSongId = id;
     }
 
     public String getTitle() {

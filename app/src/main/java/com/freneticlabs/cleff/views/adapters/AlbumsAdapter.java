@@ -96,7 +96,7 @@ public class AlbumsAdapter extends ArrayAdapter<Album> {
         holder.title.setText(album.getAlbumName());
         holder.songCount.setText(mSongCount + Integer.toString(album.getNumOfSongs()));
 
-        Uri uri = ContentUris.withAppendedId(Uri.parse(ART_WORK_PATH), album.getAlbumId());
+        Uri uri = ContentUris.withAppendedId(Uri.parse(ART_WORK_PATH), album.getId());
         Picasso.with(mContext)
                 .load(uri)
                 .resize(300,300)

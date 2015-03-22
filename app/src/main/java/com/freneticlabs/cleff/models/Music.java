@@ -1,29 +1,19 @@
 package com.freneticlabs.cleff.models;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
 /**
  * Created by jcmanzo on 2/12/15.
  */
 public class Music {
-    private int iD;
+    private int id;
 
     public Music() {
     }
 
     public int getId() {
-        return iD;
+        return id;
     }
 
-    public void setId(int iD) {
-        this.iD = iD;
-    }
-
-    public JSONObject toJSON() throws JSONException {
-        JSONObject jsonObject = new JSONObject();
-
-
-        return jsonObject;
+    public void setId(int id) {
+        this.id = id;
     }
 }

@@ -97,18 +97,23 @@ public class MusicLibrary {
         return 0;
     }
 
-    public void printLib() {
+    public void printLibSongs() {
         for(Song song : mSongs) {
             Timber.i(song.getTitle());
         }
     }
 
-    public void printLib(ArrayList<Song> songs)  {
-        for(Song song : songs) {
-            Timber.i(song.getTitle());
+    public void printLibAlbums()  {
+        for(Album album : mAlbums) {
+            Timber.i(album.getAlbumName());
         }
     }
 
+    /**
+     * Saves all music data to JSON files.
+     *
+     * @return true if succesfull, false otherwise.
+     */
     public boolean saveLibrary() {
         try {
            // mSongsJSONSerializer.saveSongs(mSongs);
@@ -127,7 +132,6 @@ public class MusicLibrary {
      * Reads JSON file containing songs and creates an ArrayList
      * of Song POJO's
      *
-     * @return ArrayList of songs
      */
     public void loadSongsFromJSONFile() throws IOException {
         try {
@@ -145,7 +149,6 @@ public class MusicLibrary {
      * Reads JSON file containing songs and creates an ArrayList
      * of Album POJO's
      *
-     * @return ArrayList of songs
      */
     public void loadAlbumsFromJSONFile() throws IOException {
         try {
@@ -186,6 +189,9 @@ public class MusicLibrary {
 
     }
 
+    /**
+     * Saves the current albums to a JSON File
+     */
     public void saveAlbumsToJSONFile() {
         Writer writer = null;
         OutputStream outputStream;
