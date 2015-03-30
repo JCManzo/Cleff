@@ -8,7 +8,6 @@ import com.freneticlabs.cleff.utils.MusicServiceManager;
 import com.squareup.otto.Bus;
 
 import timber.log.Timber;
-import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
 
 /**
  * Created by jcmanzo on 12/18/14.
@@ -29,6 +28,7 @@ public class CleffApp extends Application {
     private boolean mIsServiceRunning = false;
     private static boolean mIsActivityVisible = false;
 
+    public static final String ART_WORK_PATH = "content://media/external/audio/albumart";
 
     //SharedPreferences keys.
     public static final String REPEAT_MODE = "RepeatMode";
@@ -112,11 +112,11 @@ public class CleffApp extends Application {
         mMusicServiceManager = new MusicServiceManager(mContext);
 
         // Defines default font
-        CalligraphyConfig.initDefault(new CalligraphyConfig.Builder()
+       /* CalligraphyConfig.initDefault(new CalligraphyConfig.Builder()
                         .setDefaultFontPath("fonts/HelveticaNeue-Light.otf")
                         .setFontAttrId(R.attr.fontPath)
                         .build()
-        );
+        );*/
     }
 
     /** A tree which logs important information for crash reporting. */

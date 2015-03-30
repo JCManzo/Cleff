@@ -30,9 +30,6 @@ public class AlbumsAdapter extends ArrayAdapter<Album> {
     private LayoutInflater mAlbumsInflater;
     private String mSongCount;
     private CleffApp mCleffApp;
-    // Remember the last item shown on screen
-    private static final String ART_WORK_PATH = "content://media/external/audio/albumart";
-
 
     public AlbumsAdapter(Context context, ArrayList<Album> albums) {
         super(context, 0, albums);
@@ -96,7 +93,7 @@ public class AlbumsAdapter extends ArrayAdapter<Album> {
         holder.title.setText(album.getAlbumName());
         holder.songCount.setText(mSongCount + Integer.toString(album.getNumOfSongs()));
 
-        Uri uri = ContentUris.withAppendedId(Uri.parse(ART_WORK_PATH), album.getId());
+        Uri uri = ContentUris.withAppendedId(Uri.parse(CleffApp.ART_WORK_PATH), album.getId());
         Picasso.with(mContext)
                 .load(uri)
                 .resize(300,300)

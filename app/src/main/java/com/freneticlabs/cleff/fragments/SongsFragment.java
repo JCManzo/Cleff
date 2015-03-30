@@ -155,7 +155,7 @@ public class SongsFragment extends Fragment {
                CleffApp.getEventBus().post(new SongSelectedEvent(position));
 
                playerIntent.putExtra(PlayerFragment.EXTRA_SONG_ID, song.getId());
-               startActivity(playerIntent);
+               startActivityForResult(playerIntent, 0);
            }
        });
 

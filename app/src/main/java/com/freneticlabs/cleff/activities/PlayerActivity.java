@@ -83,6 +83,8 @@ public class PlayerActivity extends ActionBarActivity {
             public void onPageScrollStateChanged(int state) {
 
             }
+
+
         });
     }
 

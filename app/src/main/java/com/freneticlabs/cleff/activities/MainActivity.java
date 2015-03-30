@@ -1,6 +1,5 @@
 package com.freneticlabs.cleff.activities;
 
-import android.content.Context;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
@@ -32,7 +31,6 @@ import java.util.List;
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 import timber.log.Timber;
-import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
 
 public class MainActivity extends ActionBarActivity implements
@@ -217,10 +215,10 @@ public class MainActivity extends ActionBarActivity implements
         return super.onOptionsItemSelected(item);
     }
 
-    @Override
+    /*@Override
     protected void attachBaseContext(Context newBase) {
         super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
-    }
+    }*/
 
     @Override
     public void onPreExecute() {

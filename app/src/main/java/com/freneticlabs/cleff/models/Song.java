@@ -8,7 +8,7 @@ import android.os.Parcelable;
  */
 public class Song extends Music implements Parcelable {
     private int mSongId;
-    private String mAlbumID;
+    private int mAlbumID;
 
     private String mTitle;
     private String mArtist;
@@ -46,7 +46,7 @@ public class Song extends Music implements Parcelable {
     public void setAlbum(String album) {
         mAlbum = album;
     }
-    public String getAlbumID() {
+    public int getAlbumID() {
         return mAlbumID;
     }
 
@@ -86,7 +86,7 @@ public class Song extends Music implements Parcelable {
         return mPath;
     }
 
-    public void setAlbumID(String albumID) {
+    public void setAlbumID(int albumID) {
         mAlbumID = albumID;
     }
 
@@ -112,7 +112,7 @@ public class Song extends Music implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeLong(this.mSongId);
-        dest.writeString(this.mAlbumID);
+        dest.writeInt(this.mAlbumID);
         dest.writeString(this.mTitle);
         dest.writeString(this.mArtist);
         dest.writeString(this.mAlbum);
@@ -122,7 +122,7 @@ public class Song extends Music implements Parcelable {
 
     private Song(Parcel in) {
         this.mSongId = in.readInt();
-        this.mAlbumID = in.readString();
+        this.mAlbumID = in.readInt();
         this.mTitle = in.readString();
         this.mArtist = in.readString();
         this.mAlbum = in.readString();

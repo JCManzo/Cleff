@@ -167,7 +167,7 @@ public class MusicLibrary {
      */
     public void saveSongsToJSONFile() {
         Writer writer = null;
-        OutputStream outputStream;
+        OutputStream outputStream = null;
 
         try {
             // Create the file

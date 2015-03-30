@@ -188,7 +188,7 @@ public class BuildLibraryTaskFragment extends Fragment {
 
                     int songId = mediaStoreCursor.getInt(idColumn);
 
-                    String songAlbumId = mediaStoreCursor.getString(albumIdColumn);
+                    int songAlbumId = mediaStoreCursor.getInt(albumIdColumn);
                     String songYear = mediaStoreCursor.getString(yearColumn);
                     String songTitle = mediaStoreCursor.getString(titleColumn);
                     String songArtist = mediaStoreCursor.getString(artistColumn);
@@ -264,7 +264,6 @@ public class BuildLibraryTaskFragment extends Fragment {
                     album.setAlbumName(albumName);
                     album.setAlbumArtist(albumArtist);
                     album.setNumOfSongs(albumSongCount);
-
                     MusicLibrary.get(mContext).addAlbum(album);
                 } while (cursor.moveToNext());
             }

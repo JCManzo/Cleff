@@ -1,27 +1,41 @@
 package com.freneticlabs.cleff.fragments;
 
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
+import android.widget.ImageView;
 
 import com.freneticlabs.cleff.R;
 import com.freneticlabs.cleff.models.MusicLibrary;
 import com.freneticlabs.cleff.models.Song;
+import com.freneticlabs.cleff.utils.MusicUtils;
+
+import org.jaudiotagger.audio.AudioFile;
+import org.jaudiotagger.audio.AudioFileIO;
+import org.jaudiotagger.tag.Tag;
+import org.jaudiotagger.tag.datatype.Artwork;
+
+import java.io.File;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
+import timber.log.Timber;
 
 /**
  * A simple {@link Fragment} subclass.
  */
 public class PlayerFragment extends Fragment {
     public static final String EXTRA_SONG_ID = "com.freneticlabs.cleff.song_id";
+
+    //@InjectView(R.id.player_song_name) TextView mSongName;
+    @InjectView(R.id.player_song_art) ImageView mSongArt;
     private Song mSong;
-    @InjectView(R.id.player_song_name) TextView mSongName;
 
     public PlayerFragment() {
         // Required empty public constructor
@@ -52,9 +66,60 @@ public class PlayerFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_player, container, false);
         ButterKnife.inject(this, view);
+        Bitmap bitmap = null;
+        final BitmapFactory.Options options = new BitmapFactory.Options();
 
-        mSongName.setText(mSong.getTitle());
+        try{
+            File file = new File(mSong.getPath());
+            AudioFile audioFile = AudioFileIO.read(file);
+            Tag tag = audioFile.getTag();
+            Artwork artwork = tag.getFirstArtwork();
+            if(artwork == null) {
+                Timber.d("Could not find embedded art.");
+            } else {
+                byte[] art = artwork.getBinaryData();
+
+                // Decode the covert art with 400x400 pixel resolution
+                bitmap = MusicUtils.decodeSampledBitmapFromResource(art, 400, 400);
+
+                // Create a scaled up version of the bitmap
+                int origImgWidth = bitmap.getWidth();
+                int origImgHeight = bitmap.getHeight();
+
+                int newWidth = getScreenWidth();
+                float scaleFactor = (float) newWidth / (float) origImgWidth;
+                int newHeight = (int) (origImgHeight * scaleFactor);
+
+                Bitmap scaledPicture = Bitmap.createScaledBitmap(bitmap, newWidth, newHeight, true);
+
+                if(!bitmap.isRecycled()) {
+                    bitmap.recycle();
+                    bitmap = null;
+                }
+                mSongArt.setImageBitmap(scaledPicture);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+       // mSongName.setText(mSong.getTitle());
+
+
         return view;
+    }
+
+    private int getScreenWidth() {
+        DisplayMetrics metrics = new DisplayMetrics();
+        getActivity().getWindowManager().getDefaultDisplay().getMetrics(metrics);
+
+        return metrics.widthPixels;
+
+    }
+
+    @Override
+    public void onDestroyView() {
+        mSongArt.setImageDrawable(null);
+        super.onDestroyView();
     }
 
 
