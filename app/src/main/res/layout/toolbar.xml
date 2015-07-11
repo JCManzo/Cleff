@@ -6,7 +6,9 @@
     android:layout_height="wrap_content"
     android:layout_width="match_parent"
     android:minHeight="?attr/actionBarSize"
-    android:background="?attr/colorPrimary"
+    android:background="@color/primary"
     app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
     app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
+    app:layout_scrollFlags="scroll|enterAlways"
+    app:layout_collapseMode="pin"
     />

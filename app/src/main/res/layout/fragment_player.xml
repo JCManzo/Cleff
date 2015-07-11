@@ -4,21 +4,11 @@
              android:layout_height="wrap_content"
              tools:context="com.freneticlabs.cleff.fragments.PlayerFragment">
 
-    <LinearLayout
-        android:layout_width="match_parent"
+    <ImageView
+        android:id="@+id/player_song_art"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
+        android:src="@drawable/adele"
+        />
 
-        >
-
-        <ImageView
-            android:id="@+id/player_song_art"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:src="@drawable/adele"
-
-            />
-
-
-    </LinearLayout>
 </FrameLayout>

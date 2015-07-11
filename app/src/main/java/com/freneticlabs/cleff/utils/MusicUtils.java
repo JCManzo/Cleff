@@ -6,6 +6,10 @@ import android.graphics.BitmapFactory;
 import android.util.DisplayMetrics;
 import android.view.WindowManager;
 
+import java.util.concurrent.TimeUnit;
+
+import timber.log.Timber;
+
 /**
  * Created by jcmanzo on 12/27/14.
  */
@@ -66,5 +70,79 @@ public class MusicUtils {
         WindowManager windowManager = (WindowManager)context.getSystemService(Context.WINDOW_SERVICE);
         windowManager.getDefaultDisplay().getMetrics(metrics);
         return metrics.widthPixels;
+    }
+
+    /**
+     * Function to convert milliseconds time to
+     * Timer Format
+     * Hours:Minutes:Seconds
+     * */
+    public static String milliSecondsToTimer(long milliseconds){
+        String finalTimerString = "";
+        String secondsString = "";
+
+        // Convert total duration into time
+        int hours = (int)( milliseconds / (1000*60*60));
+        int minutes = (int)(milliseconds % (1000*60*60)) / (1000*60);
+        int seconds = (int) ((milliseconds % (1000*60*60)) % (1000*60) / 1000);
+        // Add hours if there
+        if(hours > 0){
+            finalTimerString = hours + ":";
+        }
+
+        // Prepending 0 to seconds if it is one digit
+        if(seconds < 10){
+            secondsString = "0" + seconds;
+        }else{
+            secondsString = "" + seconds;}
+
+        finalTimerString = finalTimerString + minutes + ":" + secondsString;
+
+        // return timer string
+        return finalTimerString;
+    }
+
+    /**
+     * Function to get Progress percentage
+     * @param currentDuration
+     * @param totalDuration
+     * */
+    public static int getProgressPercentage(long currentDuration, long totalDuration){
+        Double percentage;
+
+        long currentSeconds = (int) (currentDuration / 1000);
+        long totalSeconds = (int) (totalDuration / 1000);
+
+        // calculating percentage
+        percentage = (((double)currentSeconds)/totalSeconds) * 100;
+
+        // return percentage
+        return percentage.intValue();
+    }
+
+    public static int progressToTimer(int progress, int totalDuration) {
+        int currentDuration = 0;
+        totalDuration = (int) (totalDuration / 1000);
+        currentDuration = (int) ((((double)progress) / 100) * totalDuration);
+
+        // return current duration in milliseconds
+        return currentDuration * 1000;
+    }
+
+    public static int millisecondsToTime(int totalDuration) {
+        String test = String.format("%d%d",
+                TimeUnit.MILLISECONDS.toMinutes(totalDuration),
+                TimeUnit.MILLISECONDS.toSeconds(totalDuration) -
+                        TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(totalDuration))
+        );
+
+        return Integer.parseInt(test);
+    }
+
+    public static int TimeToMilliseconds(int current_time) {
+        Timber.d(Integer.toString(current_time));
+                String test = String.format("%d",
+                        TimeUnit.MINUTES.toMillis(current_time));
+        return Integer.parseInt(test);
     }
 }

@@ -3,6 +3,7 @@ package com.freneticlabs.cleff.models;
 import android.content.Context;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.freneticlabs.cleff.CleffApp;
 import com.freneticlabs.cleff.utils.PojoMapper;
 
 import java.io.FileNotFoundException;
@@ -12,6 +13,8 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 
 import timber.log.Timber;
 
@@ -21,7 +24,7 @@ import timber.log.Timber;
 public class MusicLibrary {
     private static MusicLibrary sMusicLibrary;
     private Context mContext;
-
+    private CleffApp mCleffApp;
     private ArrayList<Song> mSongs;
     private ArrayList<Album> mAlbums;
 
@@ -35,6 +38,7 @@ public class MusicLibrary {
         mContext = context;
         mSongs = new ArrayList<>();
         mAlbums = new ArrayList<>();
+        mCleffApp = (CleffApp.getCleffApp());
         try {
             loadAlbumsFromJSONFile();
             loadSongsFromJSONFile();
@@ -216,4 +220,32 @@ public class MusicLibrary {
 
     }
 
+    public void sortSongsByTitle() {
+        Collections.sort(mSongs, new Comparator<Song>() {
+            public int compare(Song song1, Song song2) {
+                return song1.getTitle().compareTo(song2.getTitle());
+            }
+        });
+    }
+    public void sortSongsByAlbum() {
+        Collections.sort(mSongs, new Comparator<Song>() {
+            public int compare(Song song1, Song song2) {
+                return song1.getAlbum().compareTo(song2.getAlbum());
+            }
+        });
+    }
+    public void sortSongsByArtist() {
+        Collections.sort(mSongs, new Comparator<Song>() {
+            public int compare(Song song1, Song song2) {
+                return song1.getArtist().compareTo(song2.getArtist());
+            }
+        });
+    }
+    public void sortSongsByGenre() {
+        Collections.sort(mSongs, new Comparator<Song>() {
+            public int compare(Song song1, Song song2) {
+                return song1.getGenre().compareTo(song2.getGenre());
+            }
+        });
+    }
 }

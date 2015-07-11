@@ -76,7 +76,6 @@ public class MusicService extends Service implements
 
     }
 
-
     @Override
     public void onCreate() {
         // Create the service
@@ -109,7 +108,7 @@ public class MusicService extends Service implements
 
         mContext = getApplicationContext();
         mCleffApp = (CleffApp) getApplicationContext();
-        mSettings = mCleffApp.getSharedPreferences();
+        mSettings = mCleffApp.getAppPreferences();
         mSongs = MusicLibrary.get(mContext).getSongs();
 
         mCleffApp.setService(this);
@@ -158,15 +157,6 @@ public class MusicService extends Service implements
         }
     }
 
-
-    public void setSong(int songPosition){
-        mCurrentSongPosition = songPosition;
-    }
-
-    public int getCurrentSongPosition(){
-        return mCurrentSongPosition;
-    }
-
     public void setShuffle() {
         if(mShuffle) mShuffle=false;
         else mShuffle=true;
@@ -189,10 +179,13 @@ public class MusicService extends Service implements
         return mPlayerSate;
     }
 
-    public PlayerState isPaused() {
-        return mPlayerSate;
+    public boolean isPaused() {
+        return getPlayerSate().equals(PlayerState.PAUSED);
     }
 
+    public boolean isPlaying() {
+        return getPlayerSate().equals(PlayerState.PLAYING);
+    }
 
     @Subscribe
     public void onSongSelected(SongSelectedEvent event) {
@@ -264,6 +257,7 @@ public class MusicService extends Service implements
 
         }
     }
+
     /**
      * Stop the current playing song and the service.
      *
@@ -345,6 +339,18 @@ public class MusicService extends Service implements
         mPlayerSate = PlayerState.PLAYING;
         CleffApp.getEventBus().post(new MusicStateChangeEvent(CleffApp.MUSIC_PLAYING));
 
+    }
+
+    public int getCurrentPosition(){
+        return (mMediaPlayer != null) ? mMediaPlayer.getCurrentPosition() : -1;
+    }
+
+    public int getDuration(){
+        return (mMediaPlayer != null ) ? mMediaPlayer.getDuration() : -1;
+    }
+
+    public void seek(int songPosition){
+        mMediaPlayer.seekTo(songPosition);
     }
 
     /**

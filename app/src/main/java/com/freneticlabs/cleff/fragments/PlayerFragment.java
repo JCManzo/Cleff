@@ -32,9 +32,10 @@ import timber.log.Timber;
  */
 public class PlayerFragment extends Fragment {
     public static final String EXTRA_SONG_ID = "com.freneticlabs.cleff.song_id";
-
     //@InjectView(R.id.player_song_name) TextView mSongName;
     @InjectView(R.id.player_song_art) ImageView mSongArt;
+
+
     private Song mSong;
 
     public PlayerFragment() {
@@ -77,11 +78,12 @@ public class PlayerFragment extends Fragment {
             if(artwork == null) {
                 Timber.d("Could not find embedded art.");
             } else {
+                // TODO fetch cover art in asynctask
                 byte[] art = artwork.getBinaryData();
 
-                // Decode the covert art with 400x400 pixel resolution
-                bitmap = MusicUtils.decodeSampledBitmapFromResource(art, 400, 400);
-
+               // Decode the covert art with 400x400 pixel resolution
+                bitmap = MusicUtils.decodeSampledBitmapFromResource(art, 500, 500);
+                //bitmap = BitmapFactory.decodeByteArray(art, 0, art.length);
                 // Create a scaled up version of the bitmap
                 int origImgWidth = bitmap.getWidth();
                 int origImgHeight = bitmap.getHeight();
@@ -94,15 +96,16 @@ public class PlayerFragment extends Fragment {
 
                 if(!bitmap.isRecycled()) {
                     bitmap.recycle();
-                    bitmap = null;
                 }
                 mSongArt.setImageBitmap(scaledPicture);
+
+
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-       // mSongName.setText(mSong.getTitle());
+       //mSongName.setText(mSong.getTitle());
 
 
         return view;

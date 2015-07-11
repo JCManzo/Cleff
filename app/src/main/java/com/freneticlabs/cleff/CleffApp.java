@@ -3,6 +3,7 @@ package com.freneticlabs.cleff;
 import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 
 import com.freneticlabs.cleff.utils.MusicServiceManager;
 import com.squareup.otto.Bus;
@@ -31,10 +32,11 @@ public class CleffApp extends Application {
     public static final String ART_WORK_PATH = "content://media/external/audio/albumart";
 
     //SharedPreferences keys.
+    public static final String PREF_FIRST_RUN = "app_first_run";
+
     public static final String REPEAT_MODE = "RepeatMode";
     public static final String SERVICE_RUNNING = "ServiceRunning";
     public static final String SHUFFLE_ON = "ShuffleOn";
-    public static final String FIRST_RUN = "FirstRun";
     public static final String MUSIC_PLAYING = "MusicPlaying";
     public static final String MUSIC_PAUSED = "MusicPaused";
     public static final String MUSIC_IDLE = "MusicIdle";
@@ -87,7 +89,7 @@ public class CleffApp extends Application {
         return mMusicServiceManager;
     }
 
-    public SharedPreferences getSharedPreferences() {
+    public SharedPreferences getAppPreferences() {
         return mSharedPreferences;
     }
 
@@ -99,7 +101,6 @@ public class CleffApp extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        mSharedPreferences = this.getSharedPreferences("com.freneticlabs.cleff", Context.MODE_PRIVATE);
 
         if (BuildConfig.DEBUG) {
             Timber.plant(new Timber.DebugTree());
@@ -109,6 +110,7 @@ public class CleffApp extends Application {
 
 
         mContext = getApplicationContext();
+        mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(mContext);
         mMusicServiceManager = new MusicServiceManager(mContext);
 
         // Defines default font

@@ -45,7 +45,7 @@ public class AlbumsFragment extends Fragment {
         setHasOptionsMenu(true);
         mContext = getActivity().getApplicationContext();
         mCleffApp = (CleffApp)getActivity().getApplication();
-        mSettings = mCleffApp.getSharedPreferences();
+        mSettings = mCleffApp.getAppPreferences();
         mAlbums = MusicLibrary.get(mContext).getAlbums();
     }
 

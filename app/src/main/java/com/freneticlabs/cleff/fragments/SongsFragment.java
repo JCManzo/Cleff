@@ -55,78 +55,77 @@ public class SongsFragment extends Fragment {
     private int mLastPosition = 0;
     private int mPositionOffset = 0;
     private int mCurrentSongPosition =0;
-    private static String mPlayerState = CleffApp.MUSIC_IDLE;
-    public SongsFragment() {
-        // Required empty public constructor
-    }
+    private static String             mPlayerState = CleffApp.MUSIC_IDLE;
+            public SongsFragment() {
+                // Required empty public constructor
+            }
 
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setHasOptionsMenu(true);
-        mContext = getActivity().getApplicationContext();
-        mCleffApp = (CleffApp) getActivity().getApplication();
-        mSettings = mCleffApp.getSharedPreferences();
-        mSongs = MusicLibrary.get(mContext).getSongs();
-    }
+            @Override
+            public void onCreate(Bundle savedInstanceState) {
+                super.onCreate(savedInstanceState);
+                setHasOptionsMenu(true);
+                mContext = getActivity().getApplicationContext();
+                mCleffApp = (CleffApp) getActivity().getApplication();
+                mSettings = mCleffApp.getAppPreferences();
+                mSongs = MusicLibrary.get(mContext).getSongs();
+            }
 
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-    }
+            @Override
+            public void onSaveInstanceState(Bundle outState) {
+                super.onSaveInstanceState(outState);
+            }
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        CleffApp.getEventBus().register(this);
-    }
+            @Override
+            public void onResume() {
+                super.onResume();
+                CleffApp.getEventBus().register(this);
+            }
 
-    @Override
-    public void onPause() {
-        super.onPause();
-        CleffApp.getEventBus().unregister(this);
-        saveListPosition();
+            @Override
+            public void onPause() {
+                super.onPause();
+                CleffApp.getEventBus().unregister(this);
+                saveListPosition();
 
-    }
+            }
 
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+            @Override
+            public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                    Bundle savedInstanceState) {
 
-        View rootView = inflater.inflate(R.layout.fragment_song_list, container, false);
-        ButterKnife.inject(this, rootView);
+                View rootView = inflater.inflate(R.layout.fragment_song_list, container, false);
+                ButterKnife.inject(this, rootView);
 
-        mSongsAdapter = new SongsAdapter(mContext, mSongs);
-        mListView.setAdapter(mSongsAdapter);
-        initListeners();
+                mSongsAdapter = new SongsAdapter(mContext, mSongs);
+                mListView.setAdapter(mSongsAdapter);
+                initListeners();
 
-        return rootView;
-    }
+                return rootView;
+            }
 
-    @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-        updateFloatingUi();
-        restoreListPosition();
+            @Override
+            public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+                super.onViewCreated(view, savedInstanceState);
+                updateFloatingUi();
+                restoreListPosition();
 
-    }
+            }
 
-    /**
-     * Called when the player global state has changed.
-     * @param event is the state of the MediaPlayer
-     */
-    @Subscribe
-    public void onMusicStateChange(MusicStateChangeEvent event) {
-        mPlayerState = event.musicState;
-        Timber.d(mPlayerState);
-        updateFloatingUi();
+            /**
+             * Called when the player global state has changed.
+             * @param event is the state of the MediaPlayer
+             */
+            @Subscribe
+            public void onMusicStateChange(MusicStateChangeEvent event) {
+                mPlayerState = event.musicState;
+                Timber.d(mPlayerState);
+                updateFloatingUi();
+            }
 
-    }
+        private void updateFloatingUi() {
+            Timber.d(mPlayerState);
 
-    private void updateFloatingUi() {
-        Timber.d(mPlayerState);
-
-        if(mPlayerState.equals(CleffApp.MUSIC_IDLE)) {
+            if(mPlayerState.equals(CleffApp.MUSIC_IDLE)) {
 
         } else if(mPlayerState.equals(CleffApp.MUSIC_PLAYING)) {
 

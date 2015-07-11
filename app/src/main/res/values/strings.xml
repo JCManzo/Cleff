@@ -13,7 +13,7 @@
     <string name="action_scan">Scan</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="unknown_artist_name">Unknown artist</string>
-
+    <string name="placeholder_text">Placeholder test</string>
     <!-- Default name of album that doesn't have a name in the metadata -->
     <string name="unknown_album_name">Unknown album</string>
     <!-- Default name of song title that doesn't have a name in the metadata -->
@@ -26,6 +26,8 @@
     <string name="sort_songs_artist">Artist</string>
     <string name="sort_songs_album">Album</string>
     <string name="sort_songs_date_added">Date Added</string>
+    <string name="sort_songs_genre">Genre</string>
+
     <string name="sort_songs_time">Time</string>
     <string name="title_activity_player">PlayerActivity</string>
     <string name="hello_world">Hello world!</string>
@@ -33,7 +35,12 @@
     <!-- Albums -->
     <string name="album_song_count">"Songs: "</string>
 
-    <!-- Nav Drawer -->
+    <!-- Nav Drawer Menu Items-->
+    <string name="nav_drawer_library_title">Library</string>
+    <string name="nav_drawer_favorite_title">Favorites</string>
+    <string name="nav_drawer_queue_title">Queue</string>
+    <string name="nav_drawer_recent_title">Recent</string>
+
     <string name="nav_drawer_total_title">Songs</string>
     <string name="nav_drawer_faved_title">Favorites</string>
     <string name="nav_drawer_settings">Settings</string>

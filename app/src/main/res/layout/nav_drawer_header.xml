@@ -7,7 +7,7 @@
     android:minHeight="56dp"
     android:gravity="center"
     android:baselineAligned="false"
-    android:background="?attr/colorPrimary"
+    android:background="@color/primary"
     >
 
     <LinearLayout

@@ -2,13 +2,13 @@ package com.freneticlabs.cleff.fragments;
 
 
 import android.os.Bundle;
+import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.astuetz.PagerSlidingTabStrip;
 import com.freneticlabs.cleff.R;
 import com.freneticlabs.cleff.views.adapters.TabsPageAdapter;
 
@@ -42,11 +42,11 @@ public class PageSlidingTabStripFragment extends Fragment{
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        PagerSlidingTabStrip tabs = (PagerSlidingTabStrip)view.findViewById(R.id.tabs);
+        TabLayout tabs = (TabLayout)view.findViewById(R.id.tabs);
         ViewPager pager = (ViewPager) view.findViewById(R.id.pager);
         TabsPageAdapter adapter = new TabsPageAdapter(getChildFragmentManager());
         pager.setAdapter(adapter);
-        tabs.setViewPager(pager);
+        tabs.setupWithViewPager(pager);
     }
 
 

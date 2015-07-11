@@ -33,20 +33,21 @@ android {
 dependencies {
 
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile project(':libraries:floatingactionbutton')
     compile project(':libraries:filepicker')
+    compile project(':libraries:discrete_seekbar')
 
     compile files('libs/jaudiotagger-2.0.4.jar')
 
-    compile 'com.android.support:appcompat-v7:22.0.0'
-    compile 'com.android.support:support-v4:22.0.0'
+    compile 'com.android.support:appcompat-v7:22.2.0'
+    compile 'com.android.support:support-v4:22.2.0'
+    compile 'com.android.support:design:22.2.0'
 
     compile 'com.fasterxml.jackson.core:jackson-core:2.5.1'
     compile 'com.fasterxml.jackson.core:jackson-databind:2.5.1'
+    compile 'com.getbase:floatingactionbutton:1.9.1'
 
     compile 'com.jakewharton:butterknife:6.1.0'
     compile 'com.jakewharton.timber:timber:2.7.1'
-    compile 'com.jpardogo.materialtabstrip:library:1.0.9'
     compile 'com.nispok:snackbar:2.10.6'
     compile 'com.squareup:otto:1.3.6'
     compile 'com.squareup.picasso:picasso:2.5.2'
