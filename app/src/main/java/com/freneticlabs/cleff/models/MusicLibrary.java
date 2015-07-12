@@ -57,11 +57,16 @@ public class MusicLibrary {
     }
 
     public void addAlbum(Album album) {
-        mAlbums.add(album);
+        if(!mAlbums.contains(album)) {
+            mAlbums.add(album);
+        }
     }
 
     public void addArtist(Artist artist) {
-        mArtists.add(artist);
+        //TODO find more efficient method. Consider using a LinkedHashSet
+        if(!mArtists.contains(artist)) {
+            mArtists.add(artist);
+        }
     }
 
     public static MusicLibrary get(Context context) {
