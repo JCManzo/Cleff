@@ -12,9 +12,9 @@ import com.freneticlabs.cleff.fragments.SongsFragment;
 /**
  * Created by jcmanzo on 12/15/14.
  */
-public class TabsPageAdapter extends FragmentPagerAdapter {
+public class SlidingTabsAdapter extends FragmentPagerAdapter {
 
-    public TabsPageAdapter(FragmentManager fm) {
+    public SlidingTabsAdapter(FragmentManager fm) {
         super(fm);
     }
 

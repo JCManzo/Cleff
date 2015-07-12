@@ -10,20 +10,20 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.freneticlabs.cleff.R;
-import com.freneticlabs.cleff.views.adapters.TabsPageAdapter;
+import com.freneticlabs.cleff.views.adapters.SlidingTabsAdapter;
 
 /**
  * A simple {@link Fragment} subclass.
  */
-public class PageSlidingTabStripFragment extends Fragment{
+public class SlidingTabsFragment extends Fragment{
    // @InjectView(R.id.pager) ViewPager pager;
     //@InjectView(R.id.tabs) PagerSlidingTabStrip tabs;
-    public static final String TAG = PageSlidingTabStripFragment.class
+    public static final String TAG = SlidingTabsFragment.class
             .getSimpleName();
 
-    public static PageSlidingTabStripFragment newInstance() {
+    public static SlidingTabsFragment newInstance() {
 
-        return new PageSlidingTabStripFragment();
+        return new SlidingTabsFragment();
     }
 
     @Override
@@ -44,7 +44,7 @@ public class PageSlidingTabStripFragment extends Fragment{
 
         TabLayout tabs = (TabLayout)view.findViewById(R.id.tabs);
         ViewPager pager = (ViewPager) view.findViewById(R.id.pager);
-        TabsPageAdapter adapter = new TabsPageAdapter(getChildFragmentManager());
+        SlidingTabsAdapter adapter = new SlidingTabsAdapter(getChildFragmentManager());
         pager.setAdapter(adapter);
         tabs.setupWithViewPager(pager);
     }

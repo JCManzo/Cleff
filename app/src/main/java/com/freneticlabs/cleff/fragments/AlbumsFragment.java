@@ -73,6 +73,4 @@ public class AlbumsFragment extends Fragment {
         mGridView.setAdapter(mAlbumsAdapter);
         return rootView;
     }
-
-
 }

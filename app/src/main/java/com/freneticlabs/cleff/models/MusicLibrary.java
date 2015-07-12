@@ -27,21 +27,24 @@ public class MusicLibrary {
     private CleffApp mCleffApp;
     private ArrayList<Song> mSongs;
     private ArrayList<Album> mAlbums;
-
+    private ArrayList<Artist> mArtists;
 
 
     private static final String SONGS_FILE = "songs.json";
-
     private static final String ALBUMS_FILE = "albums.json";
+    private static final String ARTISTS_FILE = "artists.json";
 
     public MusicLibrary(Context context) {
         mContext = context;
         mSongs = new ArrayList<>();
         mAlbums = new ArrayList<>();
+        mArtists = new ArrayList<>();
+
         mCleffApp = (CleffApp.getCleffApp());
         try {
             loadAlbumsFromJSONFile();
             loadSongsFromJSONFile();
+            loadArtistsFromJSONFile();
         } catch (Exception e) {
             mSongs = new ArrayList<Song>();
             Timber.e("Error loading library: ", e);
@@ -52,8 +55,13 @@ public class MusicLibrary {
     public void addSong(Song song) {
         mSongs.add(song);
     }
+
     public void addAlbum(Album album) {
         mAlbums.add(album);
+    }
+
+    public void addArtist(Artist artist) {
+        mArtists.add(artist);
     }
 
     public static MusicLibrary get(Context context) {
@@ -69,6 +77,10 @@ public class MusicLibrary {
 
     public ArrayList<Album> getAlbums() {
         return mAlbums;
+    }
+
+    public ArrayList<Artist> getArtists() {
+        return mArtists;
     }
 
     public Song getSong(long id) {
@@ -123,6 +135,7 @@ public class MusicLibrary {
            // mSongsJSONSerializer.saveSongs(mSongs);
             saveAlbumsToJSONFile();
             saveSongsToJSONFile();
+            saveArtistsToJSONFile();
             Timber.i("library saved");
 
             return true;
@@ -165,6 +178,24 @@ public class MusicLibrary {
             // ignore. happens when app is first initialized
         }
     }
+
+    /**
+     * Reads JSON file containing artists and creates an ArrayList
+     * of Artist POJO's
+     *
+     */
+    public void loadArtistsFromJSONFile() throws IOException {
+        try {
+            //Open and read the file
+            InputStream inputStream = mContext.openFileInput(ARTISTS_FILE);
+
+            mArtists = PojoMapper.fromJson(inputStream, new TypeReference<ArrayList<Artist>>() { });
+            Timber.d("Artists loaded from file " + ARTISTS_FILE);
+        } catch (FileNotFoundException ex) {
+            // ignore. happens when app is first initialized
+        }
+    }
+
 
     /**
      * Saves the current songs to a JSON File
@@ -219,6 +250,34 @@ public class MusicLibrary {
         }
 
     }
+
+    /**
+     * Saves the current artists to a JSON File
+     */
+    public void saveArtistsToJSONFile() {
+        Writer writer = null;
+        OutputStream outputStream;
+
+        try {
+            // Create the file
+            outputStream = mContext.openFileOutput(ARTISTS_FILE, Context.MODE_PRIVATE);
+            writer = new OutputStreamWriter(outputStream);
+            Timber.d("Artists saved to file " + ARTISTS_FILE);
+
+        } catch (FileNotFoundException ex) {
+            ex.printStackTrace();
+        }
+
+        try {
+            // Write the json string to file.
+            PojoMapper.toJson(mArtists, writer, true);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
 
     public void sortSongsByTitle() {
         Collections.sort(mSongs, new Comparator<Song>() {

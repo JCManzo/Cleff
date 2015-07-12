@@ -22,7 +22,7 @@ import android.widget.ProgressBar;
 import com.freneticlabs.cleff.CleffApp;
 import com.freneticlabs.cleff.R;
 import com.freneticlabs.cleff.fragments.BuildLibraryTaskFragment;
-import com.freneticlabs.cleff.fragments.PageSlidingTabStripFragment;
+import com.freneticlabs.cleff.fragments.SlidingTabsFragment;
 import com.freneticlabs.cleff.models.MusicLibrary;
 import com.nispok.snackbar.Snackbar;
 import com.nispok.snackbar.SnackbarManager;
@@ -112,7 +112,7 @@ public class MainActivity extends ActionBarActivity implements
             // Library has been built. Show main fragment.
             mLinearLayout.setVisibility(View.GONE);
             fm.beginTransaction()
-                    .replace(R.id.main_container, new PageSlidingTabStripFragment())
+                    .replace(R.id.main_container, new SlidingTabsFragment())
                     .commit();
            Timber.d("Showing mainview");
 
@@ -200,6 +200,13 @@ public class MainActivity extends ActionBarActivity implements
         actionBar.setTitle(mTitle);
     }
 
+    private void startScanFragment() {
+        FragmentManager fm = getSupportFragmentManager();
+        fm.beginTransaction()
+                .replace(R.id.main_container, new BuildLibraryTaskFragment())
+                .commit();
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
        // if (!mDrawerLayout.isDrawerOpen()) {
@@ -229,7 +236,7 @@ public class MainActivity extends ActionBarActivity implements
             case R.id.action_sort:
                 break;
             case R.id.action_scan:
-                mDialog.show(getSupportFragmentManager(), null);
+                startScanFragment();
                 break;
             case R.id.action_sort_by_album:
                 MusicLibrary.get(getApplicationContext()).sortSongsByAlbum();
@@ -274,7 +281,7 @@ public class MainActivity extends ActionBarActivity implements
         // Display the library in a listview
         FragmentManager fragmentManager = getSupportFragmentManager();
         fragmentManager.beginTransaction()
-                .replace(R.id.main_container, new PageSlidingTabStripFragment())
+                .replace(R.id.main_container, new SlidingTabsFragment())
                 .commit();
 
     }

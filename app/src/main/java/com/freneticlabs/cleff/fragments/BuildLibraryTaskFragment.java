@@ -14,6 +14,7 @@ import android.util.Log;
 import com.freneticlabs.cleff.CleffApp;
 import com.freneticlabs.cleff.R;
 import com.freneticlabs.cleff.models.Album;
+import com.freneticlabs.cleff.models.Artist;
 import com.freneticlabs.cleff.models.MusicLibrary;
 import com.freneticlabs.cleff.models.Song;
 
@@ -125,6 +126,7 @@ public class BuildLibraryTaskFragment extends Fragment {
         protected Void doInBackground(Void... voids) {
             Cursor mediaStoreCursor = getSongsFromMediaStore();
             Cursor albumStoreCursor = getAlbumsFromMediaStore();
+            Cursor artistStoreCursor = getArtistsFromMediaStore();
 
             if (mediaStoreCursor!=null) {
                 buildSongList(mediaStoreCursor);
@@ -134,6 +136,11 @@ public class BuildLibraryTaskFragment extends Fragment {
             if(albumStoreCursor  != null) {
                 buildAlbumList(albumStoreCursor);
                 albumStoreCursor.close();
+            }
+
+            if(artistStoreCursor  != null) {
+                buildArtistList(artistStoreCursor);
+                artistStoreCursor.close();
             }
             return null;
         }
@@ -162,9 +169,8 @@ public class BuildLibraryTaskFragment extends Fragment {
             String mUnknownTitle = getActivity().getApplicationContext().getString(R.string.unknown_title_name);
 
 
-            if(mediaStoreCursor!=null && mediaStoreCursor.moveToFirst()){
-
-                /** These are the columns in the music cursor that we are interested in. */
+            if (mediaStoreCursor!=null && mediaStoreCursor.moveToFirst()) {
+                // These are the columns in the music cursor that we are interested in
                 int idColumn = mediaStoreCursor.getColumnIndex(MediaStore.Audio.Media._ID);
                 int artistColumn = mediaStoreCursor.getColumnIndexOrThrow(MediaStore.Audio.Media.ARTIST);
                 int albumColumn = mediaStoreCursor.getColumnIndexOrThrow(MediaStore.Audio.Media.ALBUM);
@@ -271,6 +277,30 @@ public class BuildLibraryTaskFragment extends Fragment {
             Timber.d(Integer.toString(MusicLibrary.get(mContext).getAlbums().size()));
         }
 
+        private void buildArtistList(Cursor cursor) {
+            String mUnknownArtist = getActivity().getApplicationContext().getString(R.string.unknown_artist_name);
+
+            if (cursor != null && cursor.moveToFirst()) {
+                int artistIdColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Artists._ID);
+                int artistNameColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Artists.ARTIST);
+
+                do {
+                    int artistId = cursor.getInt(artistIdColumn);
+                    String artistName = cursor.getString(artistNameColumn);
+                    boolean isUnknownArtist = artistName == null || artistName.equals(MediaStore.UNKNOWN_STRING);
+
+                    if (isUnknownArtist) artistName = mUnknownArtist;
+
+                    Artist artist = new Artist();
+                    artist.setId(artistId);
+                    artist.setArtistName(artistName);
+                    MusicLibrary.get(mContext).addArtist(artist);
+                } while (cursor.moveToNext());
+            }
+            if(cursor != null) cursor.close();
+            }
+
+
         /**
          * Retrives all songs from the MediaStore with no folder contraint
          */
@@ -331,6 +361,23 @@ public class BuildLibraryTaskFragment extends Fragment {
             Uri uri = MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI;
 
             cursor = mContentResolver.query(uri, projection, null, null, MediaStore.Audio.Albums.ALBUM);
+
+            return cursor;
+        }
+
+        /**
+         * Retrives all artists from the MediaStore with no folder contraint
+         */
+        private Cursor getArtistsFromMediaStore() {
+            Cursor cursor = null;
+            String projection[] = {
+                    MediaStore.Audio.Artists._ID,
+                    MediaStore.Audio.Artists.ARTIST,
+                    MediaStore.Audio.Artists.NUMBER_OF_ALBUMS
+            };
+            Uri uri = MediaStore.Audio.Artists.EXTERNAL_CONTENT_URI;
+
+            cursor = mContentResolver.query(uri, projection, null, null, MediaStore.Audio.Artists.ARTIST);
 
             return cursor;
         }
