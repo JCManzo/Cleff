@@ -3,11 +3,11 @@ package com.freneticlabs.cleff.activities;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.design.widget.AppBarLayout;
-import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.NavigationView;
+import android.support.design.widget.TabLayout;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.GravityCompat;
+import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
@@ -15,15 +15,12 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.LinearLayout;
-import android.widget.ProgressBar;
 
 import com.freneticlabs.cleff.CleffApp;
 import com.freneticlabs.cleff.R;
 import com.freneticlabs.cleff.fragments.BuildLibraryTaskFragment;
-import com.freneticlabs.cleff.fragments.SlidingTabsFragment;
 import com.freneticlabs.cleff.models.MusicLibrary;
+import com.freneticlabs.cleff.views.adapters.SlidingTabsAdapter;
 import com.nispok.snackbar.Snackbar;
 import com.nispok.snackbar.SnackbarManager;
 import com.nononsenseapps.filepicker.FilePickerFragment;
@@ -57,12 +54,10 @@ public class MainActivity extends ActionBarActivity implements
      * Injected Views
      */
     @InjectView(R.id.toolbar) Toolbar mToolbar;
-    @InjectView(R.id.build_lib_progressbar) ProgressBar mProgressBar;
-    @InjectView(R.id.build_lib_container) LinearLayout mLinearLayout;
     @InjectView(R.id.drawer_layout) DrawerLayout mDrawerLayout;
     @InjectView(R.id.navigation_view) NavigationView mNavigationView;
-    @InjectView(R.id.main_coordinator_layout) CoordinatorLayout mCoordinatorLayout;
-    @InjectView(R.id.main_appbar_layout) AppBarLayout mAppBarLayout;
+    @InjectView(R.id.tabs) TabLayout mTabLayout;
+    @InjectView(R.id.main_pager) ViewPager mViewPager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,7 +69,7 @@ public class MainActivity extends ActionBarActivity implements
 
         setUpToolbar();
         setUpNavigationView();
-
+        setUpPagerAndTabs();
 
         mDialog = new FilePickerFragment();
 
@@ -100,7 +95,7 @@ public class MainActivity extends ActionBarActivity implements
                     .commit();
 
            Timber.d("Building library.");
-           mLinearLayout.setVisibility(View.VISIBLE);
+          // mLinearLayout.setVisibility(View.VISIBLE);
 
            SharedPreferences.Editor editor = mSettings.edit();
            editor.putInt(CleffApp.LAST_SELECTED_ITEM, -1);
@@ -110,10 +105,10 @@ public class MainActivity extends ActionBarActivity implements
 
         } else if (!mFirstRun) {
             // Library has been built. Show main fragment.
-            mLinearLayout.setVisibility(View.GONE);
-            fm.beginTransaction()
+           // mLinearLayout.setVisibility(View.GONE);
+           /* fm.beginTransaction()
                     .replace(R.id.main_container, new SlidingTabsFragment())
-                    .commit();
+                    .commit();*/
            Timber.d("Showing mainview");
 
        }
@@ -193,6 +188,12 @@ public class MainActivity extends ActionBarActivity implements
         });
     }
 
+    public void setUpPagerAndTabs() {
+        SlidingTabsAdapter adapter = new SlidingTabsAdapter(getSupportFragmentManager());
+        mViewPager.setAdapter(adapter);
+        mTabLayout.setupWithViewPager(mViewPager);
+    }
+
     public void restoreActionBar() {
         ActionBar actionBar = getSupportActionBar();
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
@@ -201,10 +202,10 @@ public class MainActivity extends ActionBarActivity implements
     }
 
     private void startScanFragment() {
-        FragmentManager fm = getSupportFragmentManager();
+       /* FragmentManager fm = getSupportFragmentManager();
         fm.beginTransaction()
-                .replace(R.id.main_container, new BuildLibraryTaskFragment())
-                .commit();
+                .add(R.id.main_container, new BuildLibraryTaskFragment())
+                .commit();*/
     }
 
     @Override
@@ -259,7 +260,7 @@ public class MainActivity extends ActionBarActivity implements
 
     @Override
     public void onPreExecute() {
-        mLinearLayout.setVisibility(View.VISIBLE);
+       // mLinearLayout.setVisibility(View.VISIBLE);
         Log.i("TASK", "Main onPreExecute");
     }
 
@@ -271,7 +272,7 @@ public class MainActivity extends ActionBarActivity implements
     @Override
     public void onPostExecute() {
 
-        mLinearLayout.setVisibility(View.GONE);
+        //mLinearLayout.setVisibility(View.GONE);
 
         // Library has been created. No need to run this fragment again.
         mFirstRun = false;
@@ -279,10 +280,10 @@ public class MainActivity extends ActionBarActivity implements
         settings.edit().putBoolean(CleffApp.PREF_FIRST_RUN, false).apply();
 
         // Display the library in a listview
-        FragmentManager fragmentManager = getSupportFragmentManager();
+        /*FragmentManager fragmentManager = getSupportFragmentManager();
         fragmentManager.beginTransaction()
                 .replace(R.id.main_container, new SlidingTabsFragment())
-                .commit();
+                .commit();*/
 
     }
 

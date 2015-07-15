@@ -150,11 +150,10 @@ public class MusicLibrary {
         }
     }
 
-    /**
+  /**
      * Reads JSON file containing songs and creates an ArrayList
      * of Song POJO's
-     *
-     */
+   * */
     public void loadSongsFromJSONFile() throws IOException {
         try {
             //Open and read the file

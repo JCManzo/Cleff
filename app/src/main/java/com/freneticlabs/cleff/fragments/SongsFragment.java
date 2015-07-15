@@ -1,28 +1,22 @@
 package com.freneticlabs.cleff.fragments;
 
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AbsListView;
-import android.widget.AdapterView;
-import android.widget.ListView;
 
 import com.freneticlabs.cleff.CleffApp;
 import com.freneticlabs.cleff.R;
-import com.freneticlabs.cleff.activities.PlayerActivity;
 import com.freneticlabs.cleff.models.MusicLibrary;
 import com.freneticlabs.cleff.models.Song;
 import com.freneticlabs.cleff.models.events.MusicStateChangeEvent;
-import com.freneticlabs.cleff.models.events.SongSelectedEvent;
 import com.freneticlabs.cleff.views.adapters.SongsAdapter;
-import com.getbase.floatingactionbutton.FloatingActionButton;
-import com.getbase.floatingactionbutton.FloatingActionsMenu;
 import com.squareup.otto.Subscribe;
 
 import java.util.ArrayList;
@@ -34,16 +28,15 @@ import timber.log.Timber;
 
 public class SongsFragment extends Fragment {
 
-    @InjectView(R.id.list_view_songs)
-    ListView mListView;
-    @InjectView(R.id.action_play)
+    @InjectView(R.id.recycler_view_songs) RecyclerView mRecylerView;
+    /*@InjectView(R.id.action_play)
     FloatingActionButton mFloatingPlayButton;
     @InjectView(R.id.action_skip_next)
     FloatingActionButton mFloatingNextButton;
     @InjectView(R.id.action_skip_previous)
     FloatingActionButton mFloatingPreviousButton;
     @InjectView(R.id.floating_player_actions)
-    FloatingActionsMenu mFloatingActionsMenu;
+    FloatingActionsMenu mFloatingActionsMenu;*/
     private static final int URL_LOADER = 0;
 
     private SharedPreferences mSettings;
@@ -96,8 +89,9 @@ public class SongsFragment extends Fragment {
                 View rootView = inflater.inflate(R.layout.fragment_song_list, container, false);
                 ButterKnife.inject(this, rootView);
 
+                mRecylerView.setLayoutManager(new LinearLayoutManager(getActivity()));
                 mSongsAdapter = new SongsAdapter(mContext, mSongs);
-                mListView.setAdapter(mSongsAdapter);
+                mRecylerView.setAdapter(mSongsAdapter);
                 initListeners();
 
                 return rootView;
@@ -129,11 +123,11 @@ public class SongsFragment extends Fragment {
 
         } else if(mPlayerState.equals(CleffApp.MUSIC_PLAYING)) {
 
-            mFloatingPlayButton.setIcon(R.drawable.ic_orange_pause);
+           // mFloatingPlayButton.setIcon(R.drawable.ic_orange_pause);
 
         } else if(mPlayerState.equals(CleffApp.MUSIC_PAUSED)) {
 
-            mFloatingPlayButton.setIcon(R.drawable.ic_orange_play_arrow);
+            //mFloatingPlayButton.setIcon(R.drawable.ic_orange_play_arrow);
 
         }
     }
@@ -144,7 +138,7 @@ public class SongsFragment extends Fragment {
     private void initListeners() {
         // Listener for when a list item is clicked
 
-       mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+     /*  mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
            @Override
            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                Intent playerIntent = new Intent(getActivity(), PlayerActivity.class);
@@ -156,9 +150,9 @@ public class SongsFragment extends Fragment {
                playerIntent.putExtra(PlayerFragment.EXTRA_SONG_ID, song.getId());
                startActivityForResult(playerIntent, 0);
            }
-       });
+       });*/
 
-        mListView.setOnScrollListener(new AbsListView.OnScrollListener() {
+        /*mListView.setOnScrollListener(new AbsListView.OnScrollListener() {
             @Override
             public void onScrollStateChanged(AbsListView view, int scrollState) {
 
@@ -171,10 +165,10 @@ public class SongsFragment extends Fragment {
                 mPositionOffset = (childView == null) ? 0 : childView.getTop();
 
             }
-        });
+        });*/
 
         // Set up the floating player action listeners
-        mFloatingActionsMenu.setOnFloatingActionsMenuUpdateListener(new FloatingActionsMenu.OnFloatingActionsMenuUpdateListener() {
+       /* mFloatingActionsMenu.setOnFloatingActionsMenuUpdateListener(new FloatingActionsMenu.OnFloatingActionsMenuUpdateListener() {
             @Override
             public void onMenuExpanded() {
                 Timber.d("EXPANDED");
@@ -209,7 +203,7 @@ public class SongsFragment extends Fragment {
                 Timber.d("CLICKED PREVIOUS");
                 mCleffApp.getService().playPrevious();
             }
-        });
+        });*/
     }
 
     /**
@@ -234,7 +228,7 @@ public class SongsFragment extends Fragment {
         int position = mSettings.getInt(CleffApp.LAST_VIEWED_ITEM, 0);
         int offset = mSettings.getInt(CleffApp.LAST_VIEWED_OFFSET, 0);
 
-        mListView.setSelectionFromTop(position, offset);
+        //mListView.setSelectionFromTop(position, offset);
     }
 
     public void saveLastPlayedSong(int position) {

@@ -10,6 +10,9 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
 import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 
 import com.freneticlabs.cleff.CleffApp;
 import com.freneticlabs.cleff.R;
@@ -20,6 +23,7 @@ import com.freneticlabs.cleff.models.Song;
 
 import java.util.HashMap;
 
+import butterknife.ButterKnife;
 import timber.log.Timber;
 
 
@@ -98,6 +102,16 @@ public class BuildLibraryTaskFragment extends Fragment {
         mTask.execute();
     }
 
+    @Override
+        public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                Bundle savedInstanceState) {
+            super.onCreateView(inflater, container, savedInstanceState);
+            // Inflate the layout for this fragment
+            View rootView = inflater.inflate(R.layout.fragment_build_library, container, false);
+            ButterKnife.inject(this, rootView);
+
+            return rootView;
+    }
 
     @Override
     public void onDetach() {
@@ -162,12 +176,9 @@ public class BuildLibraryTaskFragment extends Fragment {
 
         public void buildSongList(Cursor mediaStoreCursor) {
             // Populates the ArrayList in MusicLibrary with Song objects.
-
-
             String mUnknownAlbum = getActivity().getApplicationContext().getString(R.string.unknown_album_name);
             String mUnknownArtist = getActivity().getApplicationContext().getString(R.string.unknown_artist_name);
             String mUnknownTitle = getActivity().getApplicationContext().getString(R.string.unknown_title_name);
-
 
             if (mediaStoreCursor!=null && mediaStoreCursor.moveToFirst()) {
                 // These are the columns in the music cursor that we are interested in

@@ -11,63 +11,36 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
+        <!-- Main content displayed here -->
+        <android.support.v4.view.ViewPager
+            android:id="@+id/main_pager"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
+
         <android.support.design.widget.AppBarLayout
             android:id="@+id/main_appbar_layout"
             android:layout_height="wrap_content"
             android:layout_width="match_parent">
 
-            <include layout="@layout/toolbar"/>
-
-            <!-- Main content displayed here -->
-            <FrameLayout
-                android:id="@+id/main_container"
+            <android.support.v7.widget.Toolbar
+                android:id="@+id/toolbar"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"/>
+                android:layout_height="?attr/actionBarSize"
+                android:background="?attr/colorPrimary"
+                app:layout_scrollFlags="scroll|enterAlways" />
+
+            <android.support.design.widget.TabLayout
+                android:id="@+id/tabs"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:tabSelectedTextColor="@color/accent"
+                app:tabTextColor="@color/white"/>
 
         </android.support.design.widget.AppBarLayout>
 
-        <!-- Progress layout to show while scanning for music files -->
-        <LinearLayout
-            android:id="@+id/build_lib_container"
-            android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="vertical">
-                <!-- As the main content view, the view below consumes the entire
-                 space available using match_parent in both dimensions. -->
-
-                <FrameLayout
-                    android:id="@+id/container"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:foreground="?android:windowContentOverlay">
-
-                    <LinearLayout
-                        android:orientation="vertical"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        >
-
-                        <ProgressBar
-                            android:id="@+id/build_lib_progressbar"
-                            style="?android:attr/progressBarStyleLarge"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center"/>
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/building_library"
-                            android:id="@+id/textView"
-                            android:layout_gravity="center"/>
-
-                    </LinearLayout>
 
 
-                </FrameLayout>
-
-            </LinearLayout>
 
     </android.support.design.widget.CoordinatorLayout>
 
