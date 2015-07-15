@@ -16,6 +16,7 @@ import com.freneticlabs.cleff.R;
 import com.freneticlabs.cleff.models.MusicLibrary;
 import com.freneticlabs.cleff.models.Song;
 import com.freneticlabs.cleff.models.events.MusicStateChangeEvent;
+import com.freneticlabs.cleff.views.DividerItemDecoration;
 import com.freneticlabs.cleff.views.adapters.SongsAdapter;
 import com.squareup.otto.Subscribe;
 
@@ -47,76 +48,78 @@ public class SongsFragment extends Fragment {
     private ArrayList<Song> mSongs;
     private int mLastPosition = 0;
     private int mPositionOffset = 0;
-    private int mCurrentSongPosition =0;
-    private static String             mPlayerState = CleffApp.MUSIC_IDLE;
-            public SongsFragment() {
-                // Required empty public constructor
-            }
+    private int mCurrentSongPosition = 0;
+    private static String mPlayerState = CleffApp.MUSIC_IDLE;
 
-            @Override
-            public void onCreate(Bundle savedInstanceState) {
-                super.onCreate(savedInstanceState);
-                setHasOptionsMenu(true);
-                mContext = getActivity().getApplicationContext();
-                mCleffApp = (CleffApp) getActivity().getApplication();
-                mSettings = mCleffApp.getAppPreferences();
-                mSongs = MusicLibrary.get(mContext).getSongs();
-            }
+    public SongsFragment() {
+        // Required empty public constructor
+    }
 
-            @Override
-            public void onSaveInstanceState(Bundle outState) {
-                super.onSaveInstanceState(outState);
-            }
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
+        mContext = getActivity().getApplicationContext();
+        mCleffApp = (CleffApp) getActivity().getApplication();
+        mSettings = mCleffApp.getAppPreferences();
+        mSongs = MusicLibrary.get(mContext).getSongs();
+    }
 
-            @Override
-            public void onResume() {
-                super.onResume();
-                CleffApp.getEventBus().register(this);
-            }
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+    }
 
-            @Override
-            public void onPause() {
-                super.onPause();
-                CleffApp.getEventBus().unregister(this);
-                saveListPosition();
+    @Override
+    public void onResume() {
+        super.onResume();
+        CleffApp.getEventBus().register(this);
+    }
 
-            }
+    @Override
+    public void onPause() {
+        super.onPause();
+        CleffApp.getEventBus().unregister(this);
+        saveListPosition();
 
-            @Override
-            public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                    Bundle savedInstanceState) {
+    }
 
-                View rootView = inflater.inflate(R.layout.fragment_song_list, container, false);
-                ButterKnife.inject(this, rootView);
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+            Bundle savedInstanceState) {
 
-                mRecylerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-                mSongsAdapter = new SongsAdapter(mContext, mSongs);
-                mRecylerView.setAdapter(mSongsAdapter);
-                initListeners();
+        View rootView = inflater.inflate(R.layout.fragment_song_list, container, false);
+        ButterKnife.inject(this, rootView);
 
-                return rootView;
-            }
+        mRecylerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        mSongsAdapter = new SongsAdapter(mContext, mSongs);
+        mRecylerView.setAdapter(mSongsAdapter);
+        mRecylerView.addItemDecoration(new DividerItemDecoration(getActivity(), DividerItemDecoration.VERTICAL_LIST));
+        initListeners();
 
-            @Override
-            public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
-                super.onViewCreated(view, savedInstanceState);
-                updateFloatingUi();
-                restoreListPosition();
+        return rootView;
+    }
 
-            }
+    @Override
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        updateFloatingUi();
+        restoreListPosition();
 
-            /**
-             * Called when the player global state has changed.
-             * @param event is the state of the MediaPlayer
-             */
-            @Subscribe
-            public void onMusicStateChange(MusicStateChangeEvent event) {
-                mPlayerState = event.musicState;
-                Timber.d(mPlayerState);
-                updateFloatingUi();
-            }
+    }
 
-        private void updateFloatingUi() {
+    /**
+     * Called when the player global state has changed.
+     * @param event is the state of the MediaPlayer
+     */
+    @Subscribe
+    public void onMusicStateChange(MusicStateChangeEvent event) {
+        mPlayerState = event.musicState;
+        Timber.d(mPlayerState);
+        updateFloatingUi();
+    }
+
+    private void updateFloatingUi() {
             Timber.d(mPlayerState);
 
             if(mPlayerState.equals(CleffApp.MUSIC_IDLE)) {

@@ -20,6 +20,8 @@ import java.util.ArrayList;
 public class SongsAdapter extends RecyclerView.Adapter<SongsAdapter.SongViewHolder> {
     private Context mContext;
     private ArrayList<Song> mSongs;
+    // Remember the last item shown on screen
+    private int lastPosition = -1;
 
     public SongsAdapter() {
 
@@ -35,21 +37,16 @@ public class SongsAdapter extends RecyclerView.Adapter<SongsAdapter.SongViewHold
             songArtist = (TextView)view.findViewById(R.id.recycler_view_song_artist);
         }
     }
-    // Remember the last item shown on screen
-    private int lastPosition = -1;
-
 
     public SongsAdapter(Context context, ArrayList<Song> songs) {
         mContext = context;
         mSongs = songs;
-
     }
 
     @Override
     public void onBindViewHolder(SongViewHolder songViewHolder, int position) {
         songViewHolder.songTitle.setText(mSongs.get(position).getTitle());
         songViewHolder.songArtist.setText(mSongs.get(position).getArtist());
-
     }
 
     @Override
