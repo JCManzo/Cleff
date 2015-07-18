@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.freneticlabs.cleff.R;
@@ -17,9 +18,14 @@ import java.util.ArrayList;
 /**
  * Created by jcmanzo on 12/14/14.
  */
-public class SongsAdapter extends RecyclerView.Adapter<SongsAdapter.SongViewHolder> {
+public class SongsAdapter extends RecyclerView.Adapter<SongsAdapter.SongViewHolder>  {
     private Context mContext;
     private ArrayList<Song> mSongs;
+
+    private static final int VIEW_TYPE_EMPTY_LIST_PLACEHOLDER = 0;
+    private static final int VIEW_TYPE_OBJECT_VIEW = 1;
+
+
     // Remember the last item shown on screen
     private int lastPosition = -1;
 
@@ -30,11 +36,13 @@ public class SongsAdapter extends RecyclerView.Adapter<SongsAdapter.SongViewHold
     public static class SongViewHolder extends RecyclerView.ViewHolder {
         TextView songTitle;
         TextView songArtist;
+        RelativeLayout relativeContainer;
 
-        SongViewHolder(View view) {
+        public SongViewHolder(View view) {
             super(view);
             songTitle = (TextView)view.findViewById(R.id.recyler_view_song_title);
             songArtist = (TextView)view.findViewById(R.id.recycler_view_song_artist);
+            relativeContainer = (RelativeLayout)view.findViewById(R.id.song_layout_container);
         }
     }
 
@@ -47,6 +55,8 @@ public class SongsAdapter extends RecyclerView.Adapter<SongsAdapter.SongViewHold
     public void onBindViewHolder(SongViewHolder songViewHolder, int position) {
         songViewHolder.songTitle.setText(mSongs.get(position).getTitle());
         songViewHolder.songArtist.setText(mSongs.get(position).getArtist());
+
+        setAnimation(songViewHolder.relativeContainer, position);
     }
 
     @Override
@@ -59,11 +69,20 @@ public class SongsAdapter extends RecyclerView.Adapter<SongsAdapter.SongViewHold
         View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.song_list_row_item, viewGroup, false);
         SongViewHolder songViewHolder = new SongViewHolder(view);
 
-        setAnimation(view, position);
-
         return songViewHolder;
     }
-/*
+
+    @Override
+    public int getItemViewType(int position) {
+        super.getItemViewType(position);
+        if(mSongs.isEmpty()) {
+            return VIEW_TYPE_EMPTY_LIST_PLACEHOLDER;
+        } else {
+            return VIEW_TYPE_OBJECT_VIEW;
+        }
+    }
+
+    /*
     @Override
     public void onAttachedToRecyclerView(RecyclerView recyclerView) {
         super.onAttachedToRecyclerView(recyclerView);

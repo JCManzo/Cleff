@@ -13,6 +13,7 @@
     <color name="gray_text">#666666</color>
     <color name="dark_electric_blue">#506576</color>
     <color name="accent">#FF9800</color>
+    <color name="accent_dark">#d88100</color>
     <color name="text_primary">#212121</color>
     <color name="text_secondary">#727272</color>
     <color name="divider">#E5E5E5</color>

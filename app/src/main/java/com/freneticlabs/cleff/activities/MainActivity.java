@@ -1,7 +1,6 @@
 package com.freneticlabs.cleff.activities;
 
 import android.content.SharedPreferences;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.TabLayout;
@@ -21,11 +20,7 @@ import com.freneticlabs.cleff.R;
 import com.freneticlabs.cleff.fragments.BuildLibraryTaskFragment;
 import com.freneticlabs.cleff.models.MusicLibrary;
 import com.freneticlabs.cleff.views.adapters.SlidingTabsAdapter;
-import com.nispok.snackbar.Snackbar;
-import com.nispok.snackbar.SnackbarManager;
-import com.nononsenseapps.filepicker.FilePickerFragment;
-
-import java.util.List;
+import com.getbase.floatingactionbutton.FloatingActionsMenu;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
@@ -33,14 +28,12 @@ import timber.log.Timber;
 
 
 public class MainActivity extends ActionBarActivity implements
-        BuildLibraryTaskFragment.BuildLibraryTaskCallbacks,
-        FilePickerFragment.OnFilePickedListener{
+        BuildLibraryTaskFragment.BuildLibraryTaskCallbacks {
 
     private static final String TAG_TASK_FRAGMENT = "build_library_task_fragment";
 
     private CleffApp mCleffApp;
     private SharedPreferences mSettings;
-    private FilePickerFragment mDialog;
     private boolean mFirstRun;
     /**
      * Fragment managing the behaviors, interactions and presentation of the navigation drawer.
@@ -58,6 +51,7 @@ public class MainActivity extends ActionBarActivity implements
     @InjectView(R.id.navigation_view) NavigationView mNavigationView;
     @InjectView(R.id.tabs) TabLayout mTabLayout;
     @InjectView(R.id.main_pager) ViewPager mViewPager;
+    @InjectView(R.id.floating_player_actions) FloatingActionsMenu mFloatingActionsMenu;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,13 +59,9 @@ public class MainActivity extends ActionBarActivity implements
         setContentView(R.layout.activity_main);
         ButterKnife.inject(this);
 
-        Timber.d("Activity Created");
-
         setUpToolbar();
         setUpNavigationView();
         setUpPagerAndTabs();
-
-        mDialog = new FilePickerFragment();
 
         mTitle = getTitle();
         mCleffApp = (CleffApp)getApplication();
@@ -284,18 +274,6 @@ public class MainActivity extends ActionBarActivity implements
         fragmentManager.beginTransaction()
                 .replace(R.id.main_container, new SlidingTabsFragment())
                 .commit();*/
-
-    }
-
-    @Override
-    public void onFilePicked(Uri file) {
-        SnackbarManager.show(Snackbar.with(this).text("SUCESS3"));
-
-    }
-
-    @Override
-    public void onFilesPicked(List<Uri> files) {
-        SnackbarManager.show(Snackbar.with(this).text("SUCESS"));
 
     }
 }

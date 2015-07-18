@@ -14,7 +14,7 @@ import android.widget.ImageView;
 import com.freneticlabs.cleff.R;
 import com.freneticlabs.cleff.models.MusicLibrary;
 import com.freneticlabs.cleff.models.Song;
-import com.freneticlabs.cleff.utils.MusicUtils;
+import com.freneticlabs.cleff.utils.Utils;
 
 import org.jaudiotagger.audio.AudioFile;
 import org.jaudiotagger.audio.AudioFileIO;
@@ -82,7 +82,7 @@ public class PlayerFragment extends Fragment {
                 byte[] art = artwork.getBinaryData();
 
                // Decode the covert art with 400x400 pixel resolution
-                bitmap = MusicUtils.decodeSampledBitmapFromResource(art, 500, 500);
+                bitmap = Utils.decodeSampledBitmapFromResource(art, 500, 500);
                 //bitmap = BitmapFactory.decodeByteArray(art, 0, art.length);
                 // Create a scaled up version of the bitmap
                 int origImgWidth = bitmap.getWidth();

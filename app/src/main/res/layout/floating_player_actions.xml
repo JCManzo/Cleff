@@ -2,14 +2,14 @@
     <com.getbase.floatingactionbutton.FloatingActionsMenu
         xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:fab="http://schemas.android.com/apk/res-auto"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
         android:id="@+id/floating_player_actions"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
-        android:layout_marginRight="16dp"
         fab:fab_expandDirection="left"
         fab:fab_addButtonColorNormal="@color/accent"
-        android:layout_gravity="right|bottom">
+        android:layout_gravity="end|bottom"
+        app:layout_behavior="com.freneticlabs.cleff.behaviors.HideOnScrollFABBehavior">
 
         <com.getbase.floatingactionbutton.FloatingActionButton
             android:id="@+id/action_skip_previous"

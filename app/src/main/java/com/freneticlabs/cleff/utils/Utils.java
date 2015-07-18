@@ -1,10 +1,13 @@
 package com.freneticlabs.cleff.utils;
 
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.util.DisplayMetrics;
 import android.view.WindowManager;
+
+import com.freneticlabs.cleff.R;
 
 import java.util.concurrent.TimeUnit;
 
@@ -13,7 +16,7 @@ import timber.log.Timber;
 /**
  * Created by jcmanzo on 12/27/14.
  */
-public class MusicUtils {
+public class Utils {
 
     public static int calculateInSampleSize(
             BitmapFactory.Options options, int reqWidth, int reqHeight) {
@@ -144,5 +147,18 @@ public class MusicUtils {
                 String test = String.format("%d",
                         TimeUnit.MINUTES.toMillis(current_time));
         return Integer.parseInt(test);
+    }
+
+    public static int getToolbarHeight(Context context) {
+        final TypedArray styledAttributes = context.getTheme().obtainStyledAttributes(
+                new int[]{R.attr.actionBarSize});
+        int toolbarHeight = (int) styledAttributes.getDimension(0, 0);
+        styledAttributes.recycle();
+
+        return toolbarHeight;
+    }
+
+    public static int getTabsHeight(Context context) {
+        return (int) context.getResources().getDimension(R.dimen.tabsHeight);
     }
 }

@@ -18,7 +18,7 @@ import com.freneticlabs.cleff.fragments.PlayerFragment;
 import com.freneticlabs.cleff.models.MusicLibrary;
 import com.freneticlabs.cleff.models.Song;
 import com.freneticlabs.cleff.models.events.SongSelectedEvent;
-import com.freneticlabs.cleff.utils.MusicUtils;
+import com.freneticlabs.cleff.utils.Utils;
 
 import org.adw.library.widgets.discreteseekbar.DiscreteSeekBar;
 
@@ -151,7 +151,7 @@ public class PlayerActivity extends ActionBarActivity {
                 // Displaying Total Duration time
                 //mSongTotalDuration.setText("" + MusicUtils.milliSecondsToTimer(totalDuration));
                 //int max_time = MusicUtils.millisecondsToTime(totalDuration);
-                int cur_time = MusicUtils.millisecondsToTime(currentDuration);
+                int cur_time = Utils.millisecondsToTime(currentDuration);
 
                 //Timber.d(MusicUtils.milliSecondsToTimer(totalDuration));
                // Timber.d(MusicUtils.milliSecondsToTimer(currentDuration));
@@ -160,7 +160,7 @@ public class PlayerActivity extends ActionBarActivity {
                // mSongCurrentDuration.setText("" + MusicUtils.milliSecondsToTimer(currentDuration));
 
                 // Updating progress bar
-                mSeekBarProgress = (int) (MusicUtils.getProgressPercentage(currentDuration, totalDuration));
+                mSeekBarProgress = (int) (Utils.getProgressPercentage(currentDuration, totalDuration));
                 mDiscreteSeekBar.setProgress(mSeekBarProgress);
                 //mDiscreteSeekBar.setIndicatorFormatter("%04d");
                // mDiscreteSeekBar.setMax(max_time);
@@ -189,7 +189,7 @@ public class PlayerActivity extends ActionBarActivity {
             public void onStopTrackingTouch(DiscreteSeekBar seekBar) {
                 mSeekBarHandler.removeCallbacks(mUpdateTimeTask);
                 int totalDuration = mCleffApp.getService().getDuration();
-                int currentPosition = MusicUtils.progressToTimer(seekBar.getProgress(), totalDuration);
+                int currentPosition = Utils.progressToTimer(seekBar.getProgress(), totalDuration);
 
                 // forward or backward to certain seconds
                 mCleffApp.getService().seek(currentPosition);
