@@ -19,35 +19,20 @@ import com.freneticlabs.cleff.activities.PlayerActivity;
 import com.freneticlabs.cleff.listeners.RecyclerItemClickListener;
 import com.freneticlabs.cleff.models.MusicLibrary;
 import com.freneticlabs.cleff.models.Song;
-import com.freneticlabs.cleff.models.events.MusicStateChangeEvent;
 import com.freneticlabs.cleff.models.events.SongSelectedEvent;
 import com.freneticlabs.cleff.views.DividerItemDecoration;
 import com.freneticlabs.cleff.views.adapters.SongsAdapter;
 import com.freneticlabs.cleff.views.widgets.EmptyRecyclerView;
-import com.squareup.otto.Subscribe;
 
 import java.util.ArrayList;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
-import timber.log.Timber;
 
 
 public class SongsFragment extends Fragment {
 
-    @InjectView(R.id.recycler_view_songs)
-    EmptyRecyclerView mRecyclerView;
-
-   /* @InjectView(R.id.action_play)
-    FloatingActionButton mFloatingPlayButton;
-
-    @InjectView(R.id.action_skip_next)
-    FloatingActionButton mFloatingNextButton;
-
-    @InjectView(R.id.action_skip_previous)
-    FloatingActionButton mFloatingPreviousButton;
-
-    */
+    @InjectView(R.id.recycler_view_songs) EmptyRecyclerView mRecyclerView;
 
     private SharedPreferences mSettings;
     private RecyclerView.LayoutManager mLayoutManager;
@@ -61,7 +46,6 @@ public class SongsFragment extends Fragment {
     private ArrayList<Song> mSongs;
     private int mCurrentSongPosition = 0;
 
-    private static String mPlayerState = CleffApp.MUSIC_IDLE;
 
     public SongsFragment() {
         // Required empty public constructor
@@ -111,7 +95,6 @@ public class SongsFragment extends Fragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        updateFloatingUi();
 
     }
 
@@ -131,32 +114,6 @@ public class SongsFragment extends Fragment {
         if(savedInstanceState != null) {
             mListState = savedInstanceState.getParcelable(LIST_STATE_KEY);
         }
-    }
-
-    /**
-     * Called when the player global state has changed.
-     * @param event is the state of the MediaPlayer
-     */
-    @Subscribe
-    public void onMusicStateChange(MusicStateChangeEvent event) {
-        mPlayerState = event.musicState;
-        Timber.d(mPlayerState);
-    }
-
-    private void updateFloatingUi() {
-            Timber.d(mPlayerState);
-/*
-            if(mPlayerState.equals(CleffApp.MUSIC_IDLE)) {
-
-        } else if(mPlayerState.equals(CleffApp.MUSIC_PLAYING)) {
-
-              mFloatingPlayButton.setIcon(R.drawable.ic_orange_pause);
-
-        } else if(mPlayerState.equals(CleffApp.MUSIC_PAUSED)) {
-
-             mFloatingPlayButton.setIcon(R.drawable.ic_orange_play_arrow);
-
-        }*/
     }
 
     private void setUpRecyclerView() {
@@ -197,45 +154,5 @@ public class SongsFragment extends Fragment {
             }
         }));
 
-       /* // Set up the floating player action listeners
-         mFloatingActionsMenu.setOnFloatingActionsMenuUpdateListener(new FloatingActionsMenu.OnFloatingActionsMenuUpdateListener() {
-             @Override
-             public void onMenuExpanded() {
-                 Timber.d("EXPANDED");
-             }
-
-             @Override
-             public void onMenuCollapsed() {
-                 Timber.d("COLLAPSED");
-
-             }
-         });*/
-
-        /*mFloatingPlayButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                mCleffApp.getService().togglePlayer();
-
-            }
-        });
-
-        mFloatingNextButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Timber.d("CLICKED NEXT");
-                mCleffApp.getService().playNext();
-            }
-        });
-
-        mFloatingPreviousButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Timber.d("CLICKED PREVIOUS");
-                mCleffApp.getService().playPrevious();
-            }
-        });*/
     }
-
-
-
 }

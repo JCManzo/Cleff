@@ -1,3 +1,2 @@
-include ":libraries:filepicker"
 include ":libraries:discrete_seekbar"
 include ":app"

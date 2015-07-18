@@ -13,12 +13,16 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 
 import com.freneticlabs.cleff.CleffApp;
 import com.freneticlabs.cleff.R;
 import com.freneticlabs.cleff.models.MusicLibrary;
+import com.freneticlabs.cleff.models.events.MusicStateChangeEvent;
 import com.freneticlabs.cleff.views.adapters.SlidingTabsAdapter;
+import com.getbase.floatingactionbutton.FloatingActionButton;
 import com.getbase.floatingactionbutton.FloatingActionsMenu;
+import com.squareup.otto.Subscribe;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
@@ -30,6 +34,7 @@ public class MainActivity extends AppCompatActivity {
 
     private CleffApp mCleffApp;
     private SharedPreferences mSettings;
+    private static String mPlayerState = CleffApp.MUSIC_IDLE;
 
     /**
      * Used to store the last screen title. For use in {@link #restoreActionBar()}.
@@ -44,6 +49,9 @@ public class MainActivity extends AppCompatActivity {
     @InjectView(R.id.tabs) TabLayout mTabLayout;
     @InjectView(R.id.main_pager) ViewPager mViewPager;
     @InjectView(R.id.floating_player_actions) FloatingActionsMenu mFloatingActionsMenu;
+    @InjectView(R.id.action_play) FloatingActionButton mFloatingPlayButton;
+    @InjectView(R.id.action_skip_next) FloatingActionButton mFloatingNextButton;
+    @InjectView(R.id.action_skip_previous) FloatingActionButton mFloatingPreviousButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,18 +63,20 @@ public class MainActivity extends AppCompatActivity {
         mSettings = mCleffApp.getAppPreferences();
 
         if (mCleffApp.isFirstRun()) {
-            Timber.i("App First RUN...");
             startLibraryScan();
         }
         setUpToolbar();
         setUpNavigationView();
         setUpPagerAndTabs();
-    }
+        setUpListeners();
+        updateFloatingUi();
 
+    }
 
     @Override
     public void onPause() {
         super.onPause();
+        CleffApp.getEventBus().unregister(this);
         CleffApp.activityPaused();
         MusicLibrary.get(this).saveLibrary();
     }
@@ -74,7 +84,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onResume() {
         super.onResume();
-
+        CleffApp.getEventBus().register(this);
         mCleffApp.getPlaybackManager().initPlayback();
         CleffApp.activityResumed();
         MusicLibrary.get(this).loadLibrary();
@@ -139,6 +149,71 @@ public class MainActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
+    private void setUpListeners() {
+        // Set up the floating player action listeners
+         mFloatingActionsMenu.setOnFloatingActionsMenuUpdateListener(new FloatingActionsMenu.OnFloatingActionsMenuUpdateListener() {
+             @Override
+             public void onMenuExpanded() {
+                 Timber.d("EXPANDED");
+             }
+
+             @Override
+             public void onMenuCollapsed() {
+                 Timber.d("COLLAPSED");
+
+             }
+         });
+
+        mFloatingPlayButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mCleffApp.getService().togglePlayer();
+
+            }
+        });
+
+        mFloatingNextButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Timber.d("CLICKED NEXT");
+                mCleffApp.getService().playNext();
+            }
+        });
+
+        mFloatingPreviousButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Timber.d("CLICKED PREVIOUS");
+                mCleffApp.getService().playPrevious();
+            }
+        });
+    }
+
+    private void updateFloatingUi() {
+        if(mPlayerState.equals(CleffApp.MUSIC_IDLE)) {
+
+        } else if(mPlayerState.equals(CleffApp.MUSIC_PLAYING)) {
+
+              mFloatingPlayButton.setIcon(R.drawable.ic_orange_pause);
+
+        } else if(mPlayerState.equals(CleffApp.MUSIC_PAUSED)) {
+
+             mFloatingPlayButton.setIcon(R.drawable.ic_orange_play_arrow);
+
+        }
+    }
+
+    /**
+     * Called when the player global state has changed.
+     * @param event is the state of the MediaPlayer
+     */
+    @Subscribe
+    public void onMusicStateChange(MusicStateChangeEvent event) {
+        mPlayerState = event.musicState;
+        updateFloatingUi();
+        Timber.d(mPlayerState);
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
        // if (!mDrawerLayout.isDrawerOpen()) {
@@ -189,4 +264,7 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
 
     }
+
+
+
 }
