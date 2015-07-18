@@ -3,7 +3,6 @@ package com.freneticlabs.cleff;
 import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
 
 import com.freneticlabs.cleff.utils.MusicServiceManager;
 import com.squareup.otto.Bus;
@@ -23,7 +22,7 @@ public class CleffApp extends Application {
     private static CleffApp sCleffApp;
     private static MusicService mService;
     private static MusicServiceManager mMusicServiceManager;
-    private static SharedPreferences mSharedPreferences;
+    private static SharedPreferences mPreferences;
 
     private static final Bus mEventBus = new Bus();
     private boolean mIsServiceRunning = false;
@@ -32,7 +31,8 @@ public class CleffApp extends Application {
     public static final String ART_WORK_PATH = "content://media/external/audio/albumart";
 
     //SharedPreferences keys.
-    public static final String PREF_FIRST_RUN = "app_first_run";
+    public static final String PREF_FIRST_RUN = "cleff_first_run";
+    public static final String PREFS_CLEF_FILE = "clef_app_prefs";
 
     public static final String REPEAT_MODE = "RepeatMode";
     public static final String SERVICE_RUNNING = "ServiceRunning";
@@ -48,6 +48,8 @@ public class CleffApp extends Application {
     public static final String LAST_SELECTED_ITEM = "SongListSelectedItem";
     public static final String LAST_VIEWED_ITEM = "LastViewedItem";
     public static final String LAST_VIEWED_OFFSET = "LastViewedOffset";
+
+    private boolean mFirstRun = true;
 
     public CleffApp() {
         sCleffApp = this;
@@ -85,12 +87,22 @@ public class CleffApp extends Application {
         mIsActivityVisible = false;
     }
 
+    public boolean isFirstRun() {
+        return mPreferences.getBoolean(PREF_FIRST_RUN, true);
+    }
+
+    public void setAsRunned() {
+        SharedPreferences.Editor editor = mPreferences.edit();
+        editor.putBoolean(PREF_FIRST_RUN, false);
+        editor.commit();
+    }
+
     public MusicServiceManager getPlaybackManager() {
         return mMusicServiceManager;
     }
 
     public SharedPreferences getAppPreferences() {
-        return mSharedPreferences;
+        return mPreferences;
     }
 
 
@@ -110,15 +122,9 @@ public class CleffApp extends Application {
 
 
         mContext = getApplicationContext();
-        mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(mContext);
+        mPreferences = mContext.getSharedPreferences(PREFS_CLEF_FILE, 0);
         mMusicServiceManager = new MusicServiceManager(mContext);
 
-        // Defines default font
-       /* CalligraphyConfig.initDefault(new CalligraphyConfig.Builder()
-                        .setDefaultFontPath("fonts/HelveticaNeue-Light.otf")
-                        .setFontAttrId(R.attr.fontPath)
-                        .build()
-        );*/
     }
 
     /** A tree which logs important information for crash reporting. */

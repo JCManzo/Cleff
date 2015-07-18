@@ -59,17 +59,7 @@ public class AlbumsFragment extends Fragment {
 
 
         mAlbumsAdapter = new AlbumsAdapter(mContext, mAlbums);
-        if(mGridView == null) {
-            Timber.d("GRIVIEW IS NULL");
-        } else {
-            Timber.d("GRIDVIEW IS NOT NULL");
-        }
 
-        if(mAlbumsAdapter == null) {
-            Timber.d("ALBUM ADAPTER IS NULL");
-        } else {
-            Timber.d("ALBUM ADAPTER IS NOT NULL");
-        }
         mGridView.setAdapter(mAlbumsAdapter);
         return rootView;
     }

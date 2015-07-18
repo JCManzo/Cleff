@@ -41,14 +41,6 @@ public class MusicLibrary {
         mArtists = new ArrayList<>();
 
         mCleffApp = (CleffApp.getCleffApp());
-        try {
-            loadAlbumsFromJSONFile();
-            loadSongsFromJSONFile();
-            loadArtistsFromJSONFile();
-        } catch (Exception e) {
-            mSongs = new ArrayList<Song>();
-            Timber.e("Error loading library: ", e);
-        }
 
     }
 
@@ -118,17 +110,6 @@ public class MusicLibrary {
         return 0;
     }
 
-    public void printLibSongs() {
-        for(Song song : mSongs) {
-            Timber.i(song.getTitle());
-        }
-    }
-
-    public void printLibAlbums()  {
-        for(Album album : mAlbums) {
-            Timber.i(album.getAlbumName());
-        }
-    }
 
     /**
      * Saves all music data to JSON files.
@@ -137,11 +118,10 @@ public class MusicLibrary {
      */
     public boolean saveLibrary() {
         try {
-           // mSongsJSONSerializer.saveSongs(mSongs);
-            saveAlbumsToJSONFile();
+            Timber.i("Saving Library..");
             saveSongsToJSONFile();
+            saveAlbumsToJSONFile();
             saveArtistsToJSONFile();
-            Timber.i("library saved");
 
             return true;
         } catch (Exception e) {
@@ -150,11 +130,37 @@ public class MusicLibrary {
         }
     }
 
+    public boolean loadLibrary() {
+        try {
+            loadSongsFromJSONFile();
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        }
+
+        try {
+            loadAlbumsFromJSONFile();
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+
+        }
+
+        try {
+            loadArtistsFromJSONFile();
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+
+        }
+
+        return true;
+    }
   /**
      * Reads JSON file containing songs and creates an ArrayList
      * of Song POJO's
    * */
-    public void loadSongsFromJSONFile() throws IOException {
+    private void loadSongsFromJSONFile() throws IOException {
         try {
             //Open and read the file
             InputStream inputStream = mContext.openFileInput(SONGS_FILE);
@@ -163,6 +169,7 @@ public class MusicLibrary {
             Timber.d("Songs loaded from file " + SONGS_FILE);
         } catch (FileNotFoundException ex) {
             // ignore. happens when app is first initialized
+            ex.printStackTrace();
         }
     }
 
@@ -171,7 +178,7 @@ public class MusicLibrary {
      * of Album POJO's
      *
      */
-    public void loadAlbumsFromJSONFile() throws IOException {
+    private void loadAlbumsFromJSONFile() throws IOException {
         try {
             //Open and read the file
             InputStream inputStream = mContext.openFileInput(ALBUMS_FILE);
@@ -188,7 +195,7 @@ public class MusicLibrary {
      * of Artist POJO's
      *
      */
-    public void loadArtistsFromJSONFile() throws IOException {
+    private void loadArtistsFromJSONFile() throws IOException {
         try {
             //Open and read the file
             InputStream inputStream = mContext.openFileInput(ARTISTS_FILE);
@@ -204,7 +211,7 @@ public class MusicLibrary {
     /**
      * Saves the current songs to a JSON File
      */
-    public void saveSongsToJSONFile() {
+    private void saveSongsToJSONFile() {
         Writer writer = null;
         OutputStream outputStream = null;
 
@@ -231,7 +238,7 @@ public class MusicLibrary {
     /**
      * Saves the current albums to a JSON File
      */
-    public void saveAlbumsToJSONFile() {
+    private void saveAlbumsToJSONFile() {
         Writer writer = null;
         OutputStream outputStream;
 
@@ -258,7 +265,7 @@ public class MusicLibrary {
     /**
      * Saves the current artists to a JSON File
      */
-    public void saveArtistsToJSONFile() {
+    private void saveArtistsToJSONFile() {
         Writer writer = null;
         OutputStream outputStream;
 

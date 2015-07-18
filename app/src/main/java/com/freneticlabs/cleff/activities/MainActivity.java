@@ -1,23 +1,21 @@
 package com.freneticlabs.cleff.activities;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.TabLayout;
-import android.support.v4.app.FragmentManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
 import com.freneticlabs.cleff.CleffApp;
 import com.freneticlabs.cleff.R;
-import com.freneticlabs.cleff.fragments.BuildLibraryTaskFragment;
 import com.freneticlabs.cleff.models.MusicLibrary;
 import com.freneticlabs.cleff.views.adapters.SlidingTabsAdapter;
 import com.getbase.floatingactionbutton.FloatingActionsMenu;
@@ -27,18 +25,12 @@ import butterknife.InjectView;
 import timber.log.Timber;
 
 
-public class MainActivity extends ActionBarActivity implements
-        BuildLibraryTaskFragment.BuildLibraryTaskCallbacks {
+public class MainActivity extends AppCompatActivity {
 
-    private static final String TAG_TASK_FRAGMENT = "build_library_task_fragment";
 
     private CleffApp mCleffApp;
     private SharedPreferences mSettings;
-    private boolean mFirstRun;
-    /**
-     * Fragment managing the behaviors, interactions and presentation of the navigation drawer.
-     */
-    private BuildLibraryTaskFragment mBuildLibraryTaskFragment;
+
     /**
      * Used to store the last screen title. For use in {@link #restoreActionBar()}.
      */
@@ -59,68 +51,24 @@ public class MainActivity extends ActionBarActivity implements
         setContentView(R.layout.activity_main);
         ButterKnife.inject(this);
 
-        setUpToolbar();
-        setUpNavigationView();
-        setUpPagerAndTabs();
-
-        mTitle = getTitle();
         mCleffApp = (CleffApp)getApplication();
         mSettings = mCleffApp.getAppPreferences();
 
-        FragmentManager fm = getSupportFragmentManager();
-        mBuildLibraryTaskFragment = (BuildLibraryTaskFragment) fm.findFragmentByTag(TAG_TASK_FRAGMENT);
-
-        // Checks to see if the music library must be built if this is the
-        // first time the user has run the app.
-        SharedPreferences settings = mCleffApp.getAppPreferences();
-        mFirstRun = settings.getBoolean(CleffApp.PREF_FIRST_RUN, true);
-
-        // If the Fragment is non-null, then it is currently being
-        // retained across a configuration change.
-       if (mBuildLibraryTaskFragment == null && mFirstRun) {
-            mBuildLibraryTaskFragment = new BuildLibraryTaskFragment();
-
-           fm.beginTransaction()
-                    .add(mBuildLibraryTaskFragment, TAG_TASK_FRAGMENT)
-                    .commit();
-
-           Timber.d("Building library.");
-          // mLinearLayout.setVisibility(View.VISIBLE);
-
-           SharedPreferences.Editor editor = mSettings.edit();
-           editor.putInt(CleffApp.LAST_SELECTED_ITEM, -1);
-
-           // Commit the edits!
-           editor.apply();
-
-        } else if (!mFirstRun) {
-            // Library has been built. Show main fragment.
-           // mLinearLayout.setVisibility(View.GONE);
-           /* fm.beginTransaction()
-                    .replace(R.id.main_container, new SlidingTabsFragment())
-                    .commit();*/
-           Timber.d("Showing mainview");
-
-       }
-
+        if (mCleffApp.isFirstRun()) {
+            Timber.i("App First RUN...");
+            startLibraryScan();
+        }
+        setUpToolbar();
+        setUpNavigationView();
+        setUpPagerAndTabs();
     }
 
-    @Override
-    public void onStart() {
-        super.onStart();
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-    }
 
     @Override
     public void onPause() {
         super.onPause();
         CleffApp.activityPaused();
         MusicLibrary.get(this).saveLibrary();
-        MusicLibrary.get(this).saveSongsToJSONFile();
     }
 
     @Override
@@ -129,13 +77,8 @@ public class MainActivity extends ActionBarActivity implements
 
         mCleffApp.getPlaybackManager().initPlayback();
         CleffApp.activityResumed();
+        MusicLibrary.get(this).loadLibrary();
 
-    }
-
-    @Override
-    protected void onDestroy() {
-        // Cancel all scheduled croutons
-        super.onDestroy();
 
     }
 
@@ -158,7 +101,7 @@ public class MainActivity extends ActionBarActivity implements
         if(mToolbar != null) {
             setSupportActionBar(mToolbar);
         }
-
+        setTitle(getString(R.string.nav_drawer_library_title));
         final ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
             actionBar.setHomeAsUpIndicator(R.drawable.ic_action_menu);
@@ -191,11 +134,9 @@ public class MainActivity extends ActionBarActivity implements
         actionBar.setTitle(mTitle);
     }
 
-    private void startScanFragment() {
-       /* FragmentManager fm = getSupportFragmentManager();
-        fm.beginTransaction()
-                .add(R.id.main_container, new BuildLibraryTaskFragment())
-                .commit();*/
+    private void startLibraryScan() {
+        Intent intent = new Intent(this, BuildingLibraryProgressActivity.class);
+        startActivity(intent);
     }
 
     @Override
@@ -227,7 +168,7 @@ public class MainActivity extends ActionBarActivity implements
             case R.id.action_sort:
                 break;
             case R.id.action_scan:
-                startScanFragment();
+                startLibraryScan();
                 break;
             case R.id.action_sort_by_album:
                 MusicLibrary.get(getApplicationContext()).sortSongsByAlbum();
@@ -246,34 +187,6 @@ public class MainActivity extends ActionBarActivity implements
 
         }
         return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    public void onPreExecute() {
-       // mLinearLayout.setVisibility(View.VISIBLE);
-        Log.i("TASK", "Main onPreExecute");
-    }
-
-    @Override
-    public void onCancelled() {
-
-    }
-
-    @Override
-    public void onPostExecute() {
-
-        //mLinearLayout.setVisibility(View.GONE);
-
-        // Library has been created. No need to run this fragment again.
-        mFirstRun = false;
-        SharedPreferences settings = mCleffApp.getAppPreferences();
-        settings.edit().putBoolean(CleffApp.PREF_FIRST_RUN, false).apply();
-
-        // Display the library in a listview
-        /*FragmentManager fragmentManager = getSupportFragmentManager();
-        fragmentManager.beginTransaction()
-                .replace(R.id.main_container, new SlidingTabsFragment())
-                .commit();*/
 
     }
 }

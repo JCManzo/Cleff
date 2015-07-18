@@ -9,7 +9,6 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -132,7 +131,6 @@ public class BuildLibraryTaskFragment extends Fragment {
             if(mBuildLibraryTaskCallbacks != null) {
                 mBuildLibraryTaskCallbacks.onPreExecute();
             }
-            Log.i("TASK", "Frag onPreExecute");
 
         }
 
@@ -229,7 +227,7 @@ public class BuildLibraryTaskFragment extends Fragment {
                         } while (genresCursor.moveToNext());
                     }
 
-                    Timber.d(songGenre);
+                  //  Timber.d(songGenre);
                     genresCursor.close();
                     boolean unknownArtist = songArtist == null || songArtist.equals(MediaStore.UNKNOWN_STRING);
                     boolean unknownAlbum = songAlbum == null || songAlbum.equals(MediaStore.UNKNOWN_STRING);
@@ -285,7 +283,6 @@ public class BuildLibraryTaskFragment extends Fragment {
                 } while (cursor.moveToNext());
             }
             if(cursor != null) cursor.close();
-            Timber.d(Integer.toString(MusicLibrary.get(mContext).getAlbums().size()));
         }
 
         private void buildArtistList(Cursor cursor) {

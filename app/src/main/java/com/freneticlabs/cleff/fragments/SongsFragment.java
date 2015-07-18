@@ -23,6 +23,7 @@ import com.freneticlabs.cleff.models.events.MusicStateChangeEvent;
 import com.freneticlabs.cleff.models.events.SongSelectedEvent;
 import com.freneticlabs.cleff.views.DividerItemDecoration;
 import com.freneticlabs.cleff.views.adapters.SongsAdapter;
+import com.freneticlabs.cleff.views.widgets.EmptyRecyclerView;
 import com.squareup.otto.Subscribe;
 
 import java.util.ArrayList;
@@ -35,7 +36,7 @@ import timber.log.Timber;
 public class SongsFragment extends Fragment {
 
     @InjectView(R.id.recycler_view_songs)
-    RecyclerView mRecyclerView;
+    EmptyRecyclerView mRecyclerView;
 
    /* @InjectView(R.id.action_play)
     FloatingActionButton mFloatingPlayButton;
@@ -58,8 +59,6 @@ public class SongsFragment extends Fragment {
     private Context mContext;
     private SongsAdapter mSongsAdapter;
     private ArrayList<Song> mSongs;
-    private int mLastPosition = 0;
-    private int mPositionOffset = 0;
     private int mCurrentSongPosition = 0;
 
     private static String mPlayerState = CleffApp.MUSIC_IDLE;
@@ -75,7 +74,6 @@ public class SongsFragment extends Fragment {
         mContext = getActivity().getApplicationContext();
         mCleffApp = (CleffApp) getActivity().getApplication();
         mSettings = mCleffApp.getAppPreferences();
-        mSongs = MusicLibrary.get(mContext).getSongs();
     }
 
 
@@ -103,6 +101,7 @@ public class SongsFragment extends Fragment {
 
         View rootView = inflater.inflate(R.layout.fragment_song_list, container, false);
         ButterKnife.inject(this, rootView);
+        mSongs = MusicLibrary.get(mContext).getSongs();
         setUpRecyclerView();
         setUpListeners();
 

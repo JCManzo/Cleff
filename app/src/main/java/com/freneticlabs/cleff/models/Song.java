@@ -17,7 +17,7 @@ public class Song extends Music implements Parcelable {
     private String mPath;
     private String mYear;
     private float mSongRating;
-    private boolean isFaved = false;
+
     public Song() {
         // Required empty constructor
     }
@@ -98,13 +98,6 @@ public class Song extends Music implements Parcelable {
         mYear = year;
     }
 
-    public boolean isFaved() {
-        return isFaved;
-    }
-
-    public void setIsFaved(boolean isFaved) {
-        this.isFaved = isFaved;
-    }
 
     @Override
     public String toString() {
@@ -126,7 +119,6 @@ public class Song extends Music implements Parcelable {
         dest.writeString(this.mAlbum);
         dest.writeString(this.mGenre);
         dest.writeFloat(this.mSongRating);
-        dest.writeByte((byte) (isFaved ? 1 : 0));
     }
 
     private Song(Parcel in) {
@@ -137,7 +129,6 @@ public class Song extends Music implements Parcelable {
         this.mAlbum = in.readString();
         this.mGenre = in.readString();
         this.mSongRating = in.readFloat();
-        this.isFaved = in.readByte() != 0;
     }
 
     public static final Creator<Song> CREATOR = new Creator<Song>() {
