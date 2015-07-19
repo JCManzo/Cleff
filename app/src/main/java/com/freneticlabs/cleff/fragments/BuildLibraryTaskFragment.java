@@ -13,7 +13,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.freneticlabs.cleff.CleffApp;
 import com.freneticlabs.cleff.R;
 import com.freneticlabs.cleff.models.Album;
 import com.freneticlabs.cleff.models.Artist;
@@ -23,7 +22,6 @@ import com.freneticlabs.cleff.models.Song;
 import java.util.HashMap;
 
 import butterknife.ButterKnife;
-import timber.log.Timber;
 
 
 /**
@@ -39,11 +37,12 @@ public class BuildLibraryTaskFragment extends Fragment {
     private static final Uri EXTERNAL_CONTENT = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
 
     private Context mContext;
-    private CleffApp mCleffApp;
-    private String mMediaStoreSelection = null;
     private HashMap<String, String> mGenresHashMap = new HashMap<String, String>();
     private HashMap<String, Integer> mGenresSongCountHashMap = new HashMap<String, Integer>();
     private ContentResolver mContentResolver;
+    String mUnknownAlbum;
+    String mUnknownArtist;
+    String mUnknownTitle;
 
     public BuildLibraryTaskFragment() {
         // Required empty public constructor
@@ -78,7 +77,9 @@ public class BuildLibraryTaskFragment extends Fragment {
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-
+        mUnknownAlbum = getString(R.string.unknown_album_name);
+        mUnknownArtist = getString(R.string.unknown_artist_name);
+        mUnknownTitle = getString(R.string.unknown_title_name);
         try {
             mBuildLibraryTaskCallbacks = (BuildLibraryTaskCallbacks) activity;
         } catch (ClassCastException e) {
@@ -90,7 +91,6 @@ public class BuildLibraryTaskFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mContext = getActivity();
-        mCleffApp = (CleffApp)mContext.getApplicationContext();
         mContentResolver = mContext.getContentResolver();
 
         // Retain this fragment across configuration changes.
@@ -119,7 +119,6 @@ public class BuildLibraryTaskFragment extends Fragment {
     }
 
     private class BuildLibraryTask extends AsyncTask <Void, Void, Void>{
-
         public BuildLibraryTask(Context context) {
             super();
 
@@ -174,9 +173,6 @@ public class BuildLibraryTaskFragment extends Fragment {
 
         public void buildSongList(Cursor mediaStoreCursor) {
             // Populates the ArrayList in MusicLibrary with Song objects.
-            String mUnknownAlbum = getActivity().getApplicationContext().getString(R.string.unknown_album_name);
-            String mUnknownArtist = getActivity().getApplicationContext().getString(R.string.unknown_artist_name);
-            String mUnknownTitle = getActivity().getApplicationContext().getString(R.string.unknown_title_name);
 
             if (mediaStoreCursor!=null && mediaStoreCursor.moveToFirst()) {
                 // These are the columns in the music cursor that we are interested in
@@ -256,8 +252,6 @@ public class BuildLibraryTaskFragment extends Fragment {
         }
 
         public void buildAlbumList(Cursor cursor) {
-            String mUnknownAlbum = getActivity().getApplicationContext().getString(R.string.unknown_album_name);
-
             if (cursor != null && cursor.moveToFirst()) {
                 int albumIdColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Albums._ID);
                 int albumNameColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Albums.ALBUM);
@@ -286,7 +280,6 @@ public class BuildLibraryTaskFragment extends Fragment {
         }
 
         private void buildArtistList(Cursor cursor) {
-            String mUnknownArtist = getActivity().getApplicationContext().getString(R.string.unknown_artist_name);
 
             if (cursor != null && cursor.moveToFirst()) {
                 int artistIdColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Artists._ID);

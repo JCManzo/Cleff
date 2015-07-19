@@ -45,7 +45,9 @@ public class MusicLibrary {
     }
 
     public void addSong(Song song) {
-        mSongs.add(song);
+        if(!mSongs.contains(song)) {
+            mSongs.add(song);
+        }
     }
 
     public void addAlbum(Album album) {

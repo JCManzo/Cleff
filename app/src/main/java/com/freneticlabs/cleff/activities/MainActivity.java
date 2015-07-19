@@ -61,6 +61,7 @@ public class MainActivity extends AppCompatActivity {
 
         mCleffApp = (CleffApp)getApplication();
         mSettings = mCleffApp.getAppPreferences();
+        mTitle = getTitle();
 
         if (mCleffApp.isFirstRun()) {
             startLibraryScan();
@@ -92,26 +93,11 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    public void onSectionAttached(int number) {
-        switch (number) {
-            case 1:
-                mTitle = getString(R.string.title_section1);
-                break;
-            case 2:
-                mTitle = getString(R.string.title_section2);
-                break;
-            case 3:
-                mTitle = getString(R.string.title_section3);
-                break;
-        }
-    }
-
     public void setUpToolbar() {
         // Set up the toolbar to act as ac action bar
         if(mToolbar != null) {
             setSupportActionBar(mToolbar);
         }
-        setTitle(getString(R.string.nav_drawer_library_title));
         final ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
             actionBar.setHomeAsUpIndicator(R.drawable.ic_action_menu);
@@ -126,6 +112,23 @@ public class MainActivity extends AppCompatActivity {
             public boolean onNavigationItemSelected(MenuItem menuItem) {
                 menuItem.setChecked(true);
                 mDrawerLayout.closeDrawers();
+
+                int id = menuItem.getItemId();
+
+                switch (id) {
+                    case R.id.nav_drawer_library:
+                        break;
+                    case R.id.nav_drawer_favorites:
+                        mTitle = getString(R.string.nav_drawer_favorite_title);
+                        setTitle(mTitle);
+                        Intent intent = new Intent(getApplicationContext(), FavoritesActivity.class);
+                        startActivity(intent);
+                        break;
+                    case R.id.nav_drawer_queue:
+                        break;
+                    case R.id.nav_drawer_recently_added:
+                        break;
+                }
                 return true;
             }
         });
@@ -145,6 +148,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void startLibraryScan() {
+        mCleffApp.setAsFirstInstall();
         Intent intent = new Intent(this, BuildingLibraryProgressActivity.class);
         startActivity(intent);
     }
@@ -264,7 +268,4 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
 
     }
-
-
-
 }

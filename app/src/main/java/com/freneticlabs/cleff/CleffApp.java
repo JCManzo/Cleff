@@ -97,6 +97,12 @@ public class CleffApp extends Application {
         editor.commit();
     }
 
+    public void setAsFirstInstall() {
+        SharedPreferences.Editor editor = mPreferences.edit();
+        editor.putBoolean(PREF_FIRST_RUN, true);
+        editor.commit();
+    }
+
     public MusicServiceManager getPlaybackManager() {
         return mMusicServiceManager;
     }

@@ -13,7 +13,7 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
 
-        <!-- MAIN ACTIVITY-->
+        <!-- MAIN ACTIVITY -->
         <activity
             android:name=".activities.MainActivity"
             android:configChanges="orientation|keyboardHidden"
@@ -26,17 +26,25 @@
             </intent-filter>
         </activity>
 
-        <!-- PLAYER ACTIVITY-->
-        <activity android:name=".activities.PlayerActivity"
-                  android:label="@string/app_name"
-                  android:theme="@style/AppTheme.Overlay" >
-
-            <meta-data android:name="android.support.PARENT_ACTIVITY"
-                       android:value=".activities.MainActivity" />
+        <!-- PLAYER ACTIVITY -->
+        <activity
+            android:name=".activities.PlayerActivity"
+            android:label="@string/app_name"
+            android:theme="@style/AppTheme.Overlay" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".activities.MainActivity" />
         </activity>
 
-        <!-- BUILDINGLIBRARYPROGRESS ACTIVITY-->
-        <activity android:name=".activities.BuildingLibraryProgressActivity" />
+        <!-- BUILDING LIBRARY PROGRESS ACTIVITY -->
+        <activity
+            android:name=".activities.BuildingLibraryProgressActivity" />
+
+        <!-- Favorites Activity-->
+        <activity
+            android:name=".activities.FavoritesActivity"
+            android:label="@string/title_activity_favorites" >
+        </activity>
 
         <receiver android:name=".utils.StopServiceBroadcastReceiver" >
             <intent-filter>
@@ -50,6 +58,7 @@
             android:exported="false"
             android:permission="com.freneticlabs.cleff.MY_SERVICE_PERMISSION" >
         </service>
+
 
     </application>
 

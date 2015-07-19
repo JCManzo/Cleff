@@ -51,6 +51,16 @@ public class Song extends Music implements Parcelable {
     }
 
     @Override
+    public boolean equals(Object o) {
+        boolean isEqual = false;
+
+        if(o != null && o instanceof Song ) {
+            isEqual = (mSongId) == ((Song) o).mSongId;
+        }
+        return isEqual;
+    }
+
+    @Override
     public int getId() {
         super.getId();
         return mSongId;

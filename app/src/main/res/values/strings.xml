@@ -53,5 +53,7 @@
         <item>Queue</item>
         <item>Recent</item>
     </array>
+    <string name="title_activity_favorites">FavoritesActivity</string>
+    <string name="hello_world">Hello world!</string>
 
 </resources>
