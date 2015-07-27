@@ -1,40 +1,34 @@
 package com.freneticlabs.cleff.activities;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
-import android.support.design.widget.TabLayout;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.view.GravityCompat;
-import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 
 import com.freneticlabs.cleff.CleffApp;
 import com.freneticlabs.cleff.R;
+import com.freneticlabs.cleff.fragments.BuildLibraryTaskFragment;
+import com.freneticlabs.cleff.fragments.LibrarySlidingTabsPagerFragment;
 import com.freneticlabs.cleff.models.MusicLibrary;
-import com.freneticlabs.cleff.models.events.MusicStateChangeEvent;
-import com.freneticlabs.cleff.views.adapters.SlidingTabsAdapter;
-import com.getbase.floatingactionbutton.FloatingActionButton;
-import com.getbase.floatingactionbutton.FloatingActionsMenu;
-import com.squareup.otto.Subscribe;
 
+import butterknife.Bind;
 import butterknife.ButterKnife;
-import butterknife.InjectView;
 import timber.log.Timber;
 
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements
+        BuildLibraryTaskFragment.BuildLibraryTaskCallbacks{
 
-
+    private static final String TAG_TASK_FRAGMENT = "build_library_task_fragment";
+    private static final String TAG_LIBRARY_FRAGMENT = "show_library_fragment";
     private CleffApp mCleffApp;
-    private SharedPreferences mSettings;
-    private static String mPlayerState = CleffApp.MUSIC_IDLE;
+    private BuildLibraryTaskFragment mBuildLibraryTaskFragment;
 
     /**
      * Used to store the last screen title. For use in {@link #restoreActionBar()}.
@@ -43,35 +37,27 @@ public class MainActivity extends AppCompatActivity {
     /**
      * Injected Views
      */
-    @InjectView(R.id.toolbar) Toolbar mToolbar;
-    @InjectView(R.id.drawer_layout) DrawerLayout mDrawerLayout;
-    @InjectView(R.id.navigation_view) NavigationView mNavigationView;
-    @InjectView(R.id.tabs) TabLayout mTabLayout;
-    @InjectView(R.id.main_pager) ViewPager mViewPager;
-    @InjectView(R.id.floating_player_actions) FloatingActionsMenu mFloatingActionsMenu;
-    @InjectView(R.id.action_play) FloatingActionButton mFloatingPlayButton;
-    @InjectView(R.id.action_skip_next) FloatingActionButton mFloatingNextButton;
-    @InjectView(R.id.action_skip_previous) FloatingActionButton mFloatingPreviousButton;
+   // @Bind(R.id.toolbar) Toolbar mToolbar;
+    @Bind(R.id.drawer_layout) DrawerLayout mDrawerLayout;
+    @Bind(R.id.navigation_view) NavigationView mNavigationView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        ButterKnife.inject(this);
+        ButterKnife.bind(this);
 
         mCleffApp = (CleffApp)getApplication();
-        mSettings = mCleffApp.getAppPreferences();
         mTitle = getTitle();
 
-        if (mCleffApp.isFirstRun()) {
-            startLibraryScan();
-        }
-        setUpToolbar();
+        setUpMainView();
         setUpNavigationView();
-        setUpPagerAndTabs();
-        setUpListeners();
-        updateFloatingUi();
+    }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        ButterKnife.unbind(this);
     }
 
     @Override
@@ -89,19 +75,13 @@ public class MainActivity extends AppCompatActivity {
         mCleffApp.getPlaybackManager().initPlayback();
         CleffApp.activityResumed();
         MusicLibrary.get(this).loadLibrary();
-
-
     }
 
-    public void setUpToolbar() {
-        // Set up the toolbar to act as ac action bar
-        if(mToolbar != null) {
-            setSupportActionBar(mToolbar);
-        }
-        final ActionBar actionBar = getSupportActionBar();
-        if (actionBar != null) {
-            actionBar.setHomeAsUpIndicator(R.drawable.ic_action_menu);
-            actionBar.setDisplayHomeAsUpEnabled(true);
+    public void setUpMainView() {
+        if(mCleffApp.isFirstRun()) {
+            startLibraryScan();
+        } else {
+            showLibraryFragment();
         }
     }
 
@@ -134,89 +114,43 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    public void setUpPagerAndTabs() {
-        SlidingTabsAdapter adapter = new SlidingTabsAdapter(getSupportFragmentManager());
-        mViewPager.setAdapter(adapter);
-        mTabLayout.setupWithViewPager(mViewPager);
-    }
-
-    public void restoreActionBar() {
+   /* public void restoreActionBar() {
         ActionBar actionBar = getSupportActionBar();
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
         actionBar.setDisplayShowTitleEnabled(true);
         actionBar.setTitle(mTitle);
-    }
+    }*/
 
+    /**
+     * Start up the fragment that builds the music library.
+     */
     private void startLibraryScan() {
         mCleffApp.setAsFirstInstall();
-        Intent intent = new Intent(this, BuildingLibraryProgressActivity.class);
-        startActivity(intent);
-    }
 
-    private void setUpListeners() {
-        // Set up the floating player action listeners
-         mFloatingActionsMenu.setOnFloatingActionsMenuUpdateListener(new FloatingActionsMenu.OnFloatingActionsMenuUpdateListener() {
-             @Override
-             public void onMenuExpanded() {
-                 Timber.d("EXPANDED");
-             }
+        mBuildLibraryTaskFragment = (BuildLibraryTaskFragment) getSupportFragmentManager().findFragmentByTag(TAG_TASK_FRAGMENT);
 
-             @Override
-             public void onMenuCollapsed() {
-                 Timber.d("COLLAPSED");
-
-             }
-         });
-
-        mFloatingPlayButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                mCleffApp.getService().togglePlayer();
-
-            }
-        });
-
-        mFloatingNextButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Timber.d("CLICKED NEXT");
-                mCleffApp.getService().playNext();
-            }
-        });
-
-        mFloatingPreviousButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Timber.d("CLICKED PREVIOUS");
-                mCleffApp.getService().playPrevious();
-            }
-        });
-    }
-
-    private void updateFloatingUi() {
-        if(mPlayerState.equals(CleffApp.MUSIC_IDLE)) {
-
-        } else if(mPlayerState.equals(CleffApp.MUSIC_PLAYING)) {
-
-              mFloatingPlayButton.setIcon(R.drawable.ic_orange_pause);
-
-        } else if(mPlayerState.equals(CleffApp.MUSIC_PAUSED)) {
-
-             mFloatingPlayButton.setIcon(R.drawable.ic_orange_play_arrow);
+        if (mBuildLibraryTaskFragment == null) {
+            mBuildLibraryTaskFragment = new BuildLibraryTaskFragment();
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.main_container, mBuildLibraryTaskFragment, TAG_TASK_FRAGMENT)
+                    .commit();
+            Timber.d("Building library.");
 
         }
+
+
     }
 
     /**
-     * Called when the player global state has changed.
-     * @param event is the state of the MediaPlayer
+     * Displays the main library view fragment
      */
-    @Subscribe
-    public void onMusicStateChange(MusicStateChangeEvent event) {
-        mPlayerState = event.musicState;
-        updateFloatingUi();
-        Timber.d(mPlayerState);
+    private void showLibraryFragment() {
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.main_container, new LibrarySlidingTabsPagerFragment())
+                .commit();
+        Timber.d("Showing mainview");
     }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -225,7 +159,7 @@ public class MainActivity extends AppCompatActivity {
             // if the drawer is not showing. Otherwise, let the drawer
             // decide what to show in the action bar.
             getMenuInflater().inflate(R.menu.main, menu);
-            restoreActionBar();
+           // restoreActionBar();
             return true;
         //}
        // return super.onCreateOptionsMenu(menu);
@@ -267,5 +201,25 @@ public class MainActivity extends AppCompatActivity {
         }
         return super.onOptionsItemSelected(item);
 
+    }
+
+    @Override
+    public void onPreExecute() {
+
+    }
+
+    @Override
+    public void onCancelled() {
+
+    }
+
+    @Override
+    public void onPostExecute() {
+        //TODO temporary fix for tabs not displaying after BuildLibrary Fragment completes
+        recreate();
+
+        mCleffApp.setAsRunned();
+
+        showLibraryFragment();
     }
 }

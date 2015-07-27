@@ -171,7 +171,6 @@ public class MusicLibrary {
             Timber.d("Songs loaded from file " + SONGS_FILE);
         } catch (FileNotFoundException ex) {
             // ignore. happens when app is first initialized
-            ex.printStackTrace();
         }
     }
 

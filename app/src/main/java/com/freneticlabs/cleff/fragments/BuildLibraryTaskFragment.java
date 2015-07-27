@@ -9,6 +9,9 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,6 +24,7 @@ import com.freneticlabs.cleff.models.Song;
 
 import java.util.HashMap;
 
+import butterknife.Bind;
 import butterknife.ButterKnife;
 
 
@@ -36,6 +40,7 @@ public class BuildLibraryTaskFragment extends Fragment {
     private static final String ALBUM_ART_PATH = "content://media/external/audio/albumart";
     private static final Uri EXTERNAL_CONTENT = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
 
+    @Bind(R.id.toolbar) Toolbar mToolbar;
     private Context mContext;
     private HashMap<String, String> mGenresHashMap = new HashMap<String, String>();
     private HashMap<String, Integer> mGenresSongCountHashMap = new HashMap<String, Integer>();
@@ -52,19 +57,13 @@ public class BuildLibraryTaskFragment extends Fragment {
      * Callback interface through which the fragment will report the
      * task's progress and results back to the Activity.
      */
-    public static interface BuildLibraryTaskCallbacks {
+    public interface BuildLibraryTaskCallbacks {
         void onPreExecute();
         void onCancelled();
         void onPostExecute();
     }
 
-    public interface BuildCursorListener {
-
-        public void onCursorReady(Cursor cursor, int currentSongIndex, boolean playAll);
-    }
-
     private BuildLibraryTaskCallbacks mBuildLibraryTaskCallbacks;
-    private BuildCursorListener mBuildCursorListener;
 
     private BuildLibraryTask mTask;
 
@@ -102,20 +101,41 @@ public class BuildLibraryTaskFragment extends Fragment {
     }
 
     @Override
-        public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                Bundle savedInstanceState) {
-            super.onCreateView(inflater, container, savedInstanceState);
-            // Inflate the layout for this fragment
-            View rootView = inflater.inflate(R.layout.fragment_build_library, container, false);
-            ButterKnife.inject(this, rootView);
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+            Bundle savedInstanceState) {
+        super.onCreateView(inflater, container, savedInstanceState);
+        // Inflate the layout for this fragment
+        View rootView = inflater.inflate(R.layout.fragment_build_library, container, false);
+        ButterKnife.bind(this, rootView);
+        setUpToolbar();
+        return rootView;
+    }
 
-            return rootView;
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        ButterKnife.unbind(this);
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
         mBuildLibraryTaskCallbacks = null;
+    }
+
+    public void setUpToolbar() {
+        // Set up the toolbar to act as ac action bar
+        if(mToolbar != null) {
+            ((AppCompatActivity) getActivity()).setSupportActionBar(mToolbar);
+        }
+        final ActionBar actionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setHomeAsUpIndicator(R.drawable.ic_action_menu);
+            actionBar.setDisplayHomeAsUpEnabled(true);
+        }
+    }
+
+    public void setUpTabs() {
     }
 
     private class BuildLibraryTask extends AsyncTask <Void, Void, Void>{

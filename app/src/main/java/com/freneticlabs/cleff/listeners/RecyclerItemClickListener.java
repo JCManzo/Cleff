@@ -12,13 +12,17 @@ import android.view.View;
 public class RecyclerItemClickListener implements RecyclerView.OnItemTouchListener {
     private OnItemClickListener mOnItemClickListener;
     GestureDetector mGestureDetector;
+    float positionX, positionY;
 
     public interface OnItemClickListener {
         public void onItemClick(View view, int position);
         public void onItemLongClick(View view, int position);
 
     }
-
+    OnClickItemListener onClickItemListener;
+    public interface OnClickItemListener {
+        void onClick(View view);
+    }
     /**
      * Implement a GestureDetector to listen for single and long clicks
      * @param context
@@ -30,6 +34,7 @@ public class RecyclerItemClickListener implements RecyclerView.OnItemTouchListen
         mGestureDetector = new GestureDetector(context, new GestureDetector.SimpleOnGestureListener() {
 
             @Override public boolean onSingleTapUp(MotionEvent e) {
+
                 return true;
             }
 
@@ -41,23 +46,33 @@ public class RecyclerItemClickListener implements RecyclerView.OnItemTouchListen
                     mOnItemClickListener.onItemLongClick(childView, recyclerView.getChildPosition(childView));
                 }
             }
+
         });
     }
 
-    @Override public boolean onInterceptTouchEvent(RecyclerView view, MotionEvent e) {
+    @Override
+    public boolean onInterceptTouchEvent(RecyclerView view, MotionEvent e) {
         View childView = view.findChildViewUnder(e.getX(), e.getY());
 
         if (childView != null && mOnItemClickListener != null && mGestureDetector.onTouchEvent(e)) {
             mOnItemClickListener.onItemClick(childView, view.getChildLayoutPosition(childView));
-            return true;
         }
         return false;
     }
 
-    @Override public void onTouchEvent(RecyclerView view, MotionEvent motionEvent) { }
+    @Override
+    public void onTouchEvent(RecyclerView view, MotionEvent ev) {
+
+    }
+    public void setOnClickItemListener(OnClickItemListener onClickItemListener) {
+        this.onClickItemListener = onClickItemListener;
+    }
+
 
     @Override
     public void onRequestDisallowInterceptTouchEvent(boolean disallowIntercept) {
 
     }
+
+
 }

@@ -24,8 +24,8 @@ import org.adw.library.widgets.discreteseekbar.DiscreteSeekBar;
 
 import java.util.ArrayList;
 
+import butterknife.Bind;
 import butterknife.ButterKnife;
-import butterknife.InjectView;
 import timber.log.Timber;
 
 public class PlayerActivity extends AppCompatActivity {
@@ -36,19 +36,19 @@ public class PlayerActivity extends AppCompatActivity {
     private int mSeekBarProgress = 0;
 
     private CleffApp mCleffApp;
-    @InjectView(R.id.toolbar) Toolbar mToolbar;
-    @InjectView(R.id.player_activity_pager) ViewPager mViewPager;
-    @InjectView(R.id.seekBar) DiscreteSeekBar mDiscreteSeekBar;
-    @InjectView(R.id.player_song_album) TextView mSongAlbum;
-    @InjectView(R.id.player_song_title) TextView mSongTitle;
-    @InjectView(R.id.player_song_artist) TextView mSongArtist;
+    @Bind(R.id.toolbar) Toolbar mToolbar;
+    @Bind(R.id.player_activity_pager) ViewPager mViewPager;
+    @Bind(R.id.seekBar) DiscreteSeekBar mDiscreteSeekBar;
+    @Bind(R.id.player_song_album) TextView mSongAlbum;
+    @Bind(R.id.player_song_title) TextView mSongTitle;
+    @Bind(R.id.player_song_artist) TextView mSongArtist;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_player);
 
-        ButterKnife.inject(this);
+        ButterKnife.bind(this);
         mCleffApp = (CleffApp)getApplication();
         // Set up the toolbar to act as an action bar
         if(mToolbar != null) {

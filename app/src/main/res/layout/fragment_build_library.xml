@@ -1,48 +1,62 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Progress layout to show while scanning for music files -->
-<LinearLayout
+<android.support.design.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/build_lib_container"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/progress_coordinator_layout"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:layout_height="match_parent">
 
-    <FrameLayout
+    <LinearLayout
+
+        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:foreground="?android:windowContentOverlay">
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        >
 
-        <LinearLayout
-            android:orientation="vertical"
+        <ProgressBar
+            android:id="@+id/build_lib_progressbar"
+            style="?android:attr/progressBarStyleLarge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/building_library_title"
+            android:layout_gravity="center"
+            android:textSize="22sp"
+            android:textColor="@color/text_primary"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/building_library_message"
+            android:layout_gravity="center"
+            android:paddingTop="10dp"
+            android:textColor="@color/text_secondary"/>
+    </LinearLayout>
+
+    <android.support.design.widget.AppBarLayout
+        android:id="@+id/progress_appbar_layout"
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent">
+
+        <include layout="@layout/toolbar"/>
+
+        <android.support.design.widget.TabLayout
+            android:id="@+id/main_tabs"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            >
-
-            <ProgressBar
-                android:id="@+id/build_lib_progressbar"
-                style="?android:attr/progressBarStyleLarge"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"/>
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/building_library_title"
-                android:layout_gravity="center"
-                android:textSize="22sp"
-                android:textColor="@color/text_primary"/>
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/building_library_message"
-                android:layout_gravity="center"
-                android:textColor="@color/text_secondary"/>
-        </LinearLayout>
+            app:tabMode="fixed"
+            app:tabGravity="fill"
+            app:tabIndicatorHeight="4dp"
+            app:tabSelectedTextColor="@color/accent"
+            app:tabIndicatorColor="@color/accent"
+            app:tabTextColor="@color/white"/>
+    </android.support.design.widget.AppBarLayout>
 
 
-    </FrameLayout>
-
-</LinearLayout>
+</android.support.design.widget.CoordinatorLayout>

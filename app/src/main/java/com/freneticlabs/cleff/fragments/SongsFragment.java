@@ -22,17 +22,16 @@ import com.freneticlabs.cleff.models.Song;
 import com.freneticlabs.cleff.models.events.SongSelectedEvent;
 import com.freneticlabs.cleff.views.DividerItemDecoration;
 import com.freneticlabs.cleff.views.adapters.SongsAdapter;
-import com.freneticlabs.cleff.views.widgets.EmptyRecyclerView;
 
 import java.util.ArrayList;
 
+import butterknife.Bind;
 import butterknife.ButterKnife;
-import butterknife.InjectView;
 
 
 public class SongsFragment extends Fragment {
 
-    @InjectView(R.id.recycler_view_songs) EmptyRecyclerView mRecyclerView;
+    @Bind(R.id.recycler_view_songs) RecyclerView mRecyclerView;
 
     private SharedPreferences mSettings;
     private RecyclerView.LayoutManager mLayoutManager;
@@ -82,14 +81,19 @@ public class SongsFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
-
-        View rootView = inflater.inflate(R.layout.fragment_song_list, container, false);
-        ButterKnife.inject(this, rootView);
+        View rootView = inflater.inflate(R.layout.fragment_song_recycler_view, container, false);
+        ButterKnife.bind(this, rootView);
         mSongs = MusicLibrary.get(mContext).getSongs();
         setUpRecyclerView();
         setUpListeners();
 
         return rootView;
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        ButterKnife.unbind(this);
     }
 
     @Override
@@ -122,7 +126,7 @@ public class SongsFragment extends Fragment {
         mLayoutManager = mRecyclerView.getLayoutManager();
 
         // Create and set the adapter
-        mSongsAdapter = new SongsAdapter(mContext, mSongs);
+        mSongsAdapter = new SongsAdapter(mContext, mRecyclerView, mSongs);
         mRecyclerView.setAdapter(mSongsAdapter);
 
         // Set the divider between song items
@@ -135,24 +139,23 @@ public class SongsFragment extends Fragment {
      */
     private void setUpListeners() {
         // Listener for when a recyclerview item is clicked
-        mRecyclerView.addOnItemTouchListener(new RecyclerItemClickListener(getActivity(), mRecyclerView, new RecyclerItemClickListener.OnItemClickListener() {
-            @Override
-            public void onItemClick(View view, int position) {
-                Intent playerIntent = new Intent(getActivity(), PlayerActivity.class);
-                mCurrentSongPosition = position;
-                Song song = mSongs.get(mCurrentSongPosition);
+           mRecyclerView.addOnItemTouchListener(new RecyclerItemClickListener(getActivity(), mRecyclerView, new RecyclerItemClickListener.OnItemClickListener() {
+               @Override
+               public void onItemClick(View view, int position) {
+                   Intent playerIntent = new Intent(getActivity(), PlayerActivity.class);
+                   mCurrentSongPosition = position;
+                   Song song = mSongs.get(mCurrentSongPosition);
 
-                CleffApp.getEventBus().post(new SongSelectedEvent(position));
+                   CleffApp.getEventBus().post(new SongSelectedEvent(position));
 
-                playerIntent.putExtra(PlayerFragment.EXTRA_SONG_ID, song.getId());
-                startActivityForResult(playerIntent, 0);
-            }
+                   playerIntent.putExtra(PlayerFragment.EXTRA_SONG_ID, song.getId());
+                   startActivityForResult(playerIntent, 0);
+               }
 
-            @Override
-            public void onItemLongClick(View view, int position) {
+               @Override
+               public void onItemLongClick(View view, int position) {
 
-            }
-        }));
-
+               }
+           }));
     }
 }

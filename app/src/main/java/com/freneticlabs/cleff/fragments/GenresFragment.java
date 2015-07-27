@@ -10,6 +10,8 @@ import android.widget.TextView;
 
 import com.freneticlabs.cleff.R;
 
+import butterknife.ButterKnife;
+
 /**
  * A simple {@link Fragment} subclass.
  */

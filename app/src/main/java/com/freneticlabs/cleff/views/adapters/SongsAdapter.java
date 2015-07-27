@@ -15,13 +15,16 @@ import com.freneticlabs.cleff.models.Song;
 
 import java.util.ArrayList;
 
+import butterknife.Bind;
+import butterknife.ButterKnife;
+
 /**
  * Created by jcmanzo on 12/14/14.
  */
-public class SongsAdapter extends RecyclerView.Adapter<SongsAdapter.SongViewHolder>  {
+public class SongsAdapter extends RecyclerView.Adapter<SongsAdapter.ViewHolder> {
     private Context mContext;
     private ArrayList<Song> mSongs;
-
+    private RecyclerView mRecyclerView;
     private static final int VIEW_TYPE_EMPTY_LIST_PLACEHOLDER = 0;
     private static final int VIEW_TYPE_OBJECT_VIEW = 1;
 
@@ -33,26 +36,26 @@ public class SongsAdapter extends RecyclerView.Adapter<SongsAdapter.SongViewHold
 
     }
 
-    public static class SongViewHolder extends RecyclerView.ViewHolder {
-        TextView songTitle;
-        TextView songArtist;
-        RelativeLayout relativeContainer;
-
-        public SongViewHolder(View view) {
-            super(view);
-            songTitle = (TextView)view.findViewById(R.id.recyler_view_song_title);
-            songArtist = (TextView)view.findViewById(R.id.recycler_view_song_artist);
-            relativeContainer = (RelativeLayout)view.findViewById(R.id.song_layout_container);
-        }
-    }
-
-    public SongsAdapter(Context context, ArrayList<Song> songs) {
+    public SongsAdapter(Context context, RecyclerView recyclerView, ArrayList<Song> songs) {
         mContext = context;
+        mRecyclerView = recyclerView;
         mSongs = songs;
     }
 
+    public static class ViewHolder extends RecyclerView.ViewHolder{
+        @Bind(R.id.recyler_view_song_title) TextView songTitle;
+        @Bind(R.id.recycler_view_song_artist) TextView songArtist;
+        @Bind(R.id.song_layout_container ) RelativeLayout relativeContainer;
+
+        public ViewHolder(View itemView) {
+            super(itemView);
+            ButterKnife.bind(this, itemView);
+        }
+
+    }
+
     @Override
-    public void onBindViewHolder(SongViewHolder songViewHolder, int position) {
+    public void onBindViewHolder(ViewHolder songViewHolder, final int position) {
         songViewHolder.songTitle.setText(mSongs.get(position).getTitle());
         songViewHolder.songArtist.setText(mSongs.get(position).getArtist());
 
@@ -65,14 +68,13 @@ public class SongsAdapter extends RecyclerView.Adapter<SongsAdapter.SongViewHold
     }
 
     @Override
-    public SongViewHolder onCreateViewHolder(ViewGroup viewGroup, int position) {
-        View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.song_list_row_item, viewGroup, false);
-        SongViewHolder songViewHolder = new SongViewHolder(view);
-
-        return songViewHolder;
+    public ViewHolder onCreateViewHolder(ViewGroup viewGroup, int position) {
+        View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.item_song_recycler_view, viewGroup, false);
+        return new ViewHolder(view);
     }
 
-    @Override
+
+    /*@Override
     public int getItemViewType(int position) {
         super.getItemViewType(position);
         if(mSongs.isEmpty()) {
@@ -80,7 +82,7 @@ public class SongsAdapter extends RecyclerView.Adapter<SongsAdapter.SongViewHold
         } else {
             return VIEW_TYPE_OBJECT_VIEW;
         }
-    }
+    }*/
 
     /*
     @Override

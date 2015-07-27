@@ -5,10 +5,11 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.GridView;
 
 import com.freneticlabs.cleff.CleffApp;
 import com.freneticlabs.cleff.R;
@@ -18,17 +19,16 @@ import com.freneticlabs.cleff.views.adapters.AlbumsAdapter;
 
 import java.util.ArrayList;
 
+import butterknife.Bind;
 import butterknife.ButterKnife;
-import butterknife.InjectView;
-import timber.log.Timber;
 
 /**
  * A simple {@link Fragment} subclass.
  */
 public class AlbumsFragment extends Fragment {
 
-    @InjectView(R.id.albums_grid_view)
-    GridView mGridView;
+    @Bind(R.id.albums_grid_view)
+    RecyclerView mRecyclerView;
     private AlbumsAdapter mAlbumsAdapter;
     private ArrayList<Album> mAlbums;
     private SharedPreferences mSettings;
@@ -55,12 +55,19 @@ public class AlbumsFragment extends Fragment {
         super.onCreateView(inflater, container, savedInstanceState);
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_albums_grid, container, false);
-        ButterKnife.inject(this, rootView);
+        ButterKnife.bind(this, rootView);
 
 
-        mAlbumsAdapter = new AlbumsAdapter(mContext, mAlbums);
+        mAlbumsAdapter = new AlbumsAdapter(mContext, mRecyclerView, mAlbums);
 
-        mGridView.setAdapter(mAlbumsAdapter);
+        mRecyclerView.setLayoutManager(new GridLayoutManager(getActivity(), 2));
+        mRecyclerView.setAdapter(mAlbumsAdapter);
         return rootView;
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        ButterKnife.unbind(this);
     }
 }

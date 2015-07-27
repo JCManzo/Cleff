@@ -1,8 +1,9 @@
 package com.freneticlabs.cleff.views.adapters;
 
+import android.content.Context;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.app.FragmentStatePagerAdapter;
 
 import com.freneticlabs.cleff.fragments.AlbumsFragment;
 import com.freneticlabs.cleff.fragments.ArtistsFragment;
@@ -12,37 +13,43 @@ import com.freneticlabs.cleff.fragments.SongsFragment;
 /**
  * Created by jcmanzo on 12/15/14.
  */
-public class SlidingTabsAdapter extends FragmentPagerAdapter {
+public class SlidingTabsAdapter extends FragmentStatePagerAdapter {
 
-    public SlidingTabsAdapter(FragmentManager fm) {
+    private Context mContext;
+    final int PAGE_COUNT = 4;
+    private String[] TITLES = new String[] {
+            "Songs",
+            "Albums",
+            "Artists",
+            "Genres"
+    };
+
+    public SlidingTabsAdapter(FragmentManager fm, Context context) {
         super(fm);
+        mContext = context;
     }
 
-    private final String[] TITLES = { "Songs", "Albums", "Artists",
-            "Genres" };
 
     @Override
-    public Fragment getItem(int index) {
-        Fragment fragment = null;
+    public Fragment getItem(int position) {
 
-        if(index == 0) {
-            fragment = new SongsFragment();
-        } else if(index == 1) {
-            fragment = new AlbumsFragment();
-
-        } else if(index == 2) {
-            fragment = new ArtistsFragment();
-
-        } else if(index == 3) {
-            fragment = new GenresFragment();
-
+        switch (position) {
+            case 0:
+                return new SongsFragment();
+            case 1:
+                return new AlbumsFragment();
+            case 2:
+                return new ArtistsFragment();
+            case 3:
+                return new GenresFragment();
+            default:
+                return new SongsFragment();
         }
-        return fragment;
     }
 
     @Override
     public int getCount() {
-        return TITLES.length;
+        return PAGE_COUNT;
     }
 
     @Override

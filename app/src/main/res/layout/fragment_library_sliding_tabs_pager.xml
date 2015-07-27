@@ -1,0 +1,36 @@
+<android.support.design.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/main_coordinator_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <android.support.v4.view.ViewPager
+        android:id="@+id/main_pager"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
+
+    <android.support.design.widget.AppBarLayout
+        android:id="@+id/main_appbar_layout"
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent">
+
+        <include layout="@layout/toolbar" />
+
+        <android.support.design.widget.TabLayout
+            android:id="@+id/main_tabs"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:tabMode="fixed"
+            app:tabGravity="fill"
+            app:tabIndicatorHeight="4dp"
+            app:tabSelectedTextColor="@color/accent"
+            app:tabIndicatorColor="@color/accent"
+            app:tabTextColor="@color/white"/>
+
+    </android.support.design.widget.AppBarLayout>
+
+    <include layout="@layout/floating_player_actions" />
+
+</android.support.design.widget.CoordinatorLayout>

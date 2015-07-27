@@ -13,8 +13,8 @@ import com.freneticlabs.cleff.models.Artist;
 
 import java.util.ArrayList;
 
+import butterknife.Bind;
 import butterknife.ButterKnife;
-import butterknife.InjectView;
 
 /**
  * Created by jcmanzo on 7/11/15.
@@ -35,11 +35,11 @@ public class ArtistAdapter extends ArrayAdapter<Artist> {
     }
 
     static class ViewHolder {
-        @InjectView(R.id.grid_artist_title)
+        @Bind(R.id.grid_artist_title)
         TextView title;
 
         public ViewHolder(View view) {
-            ButterKnife.inject(this, view);
+            ButterKnife.bind(this, view);
         }
     }
 

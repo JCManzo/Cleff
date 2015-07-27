@@ -1,0 +1,39 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <group
+        android:id="@+id/nav_drawer_group_1"
+        android:checkableBehavior="single">
+
+        <item
+            android:id="@+id/nav_drawer_library"
+            android:checked="true"
+            android:icon="@drawable/ic_nav_drawer_music_library"
+            android:title="@string/nav_drawer_library_title"/>
+
+        <item
+            android:id="@+id/nav_drawer_favorites"
+            android:icon="@drawable/ic_nav_drawer_favorites"
+            android:title="@string/nav_drawer_favorite_title"/>
+
+        <item
+            android:id="@+id/nav_drawer_queue"
+            android:icon="@drawable/ic_nav_drawer_music_queue"
+            android:title="@string/nav_drawer_queue_title"/>
+
+        <item
+            android:id="@+id/nav_drawer_recently_added"
+            android:icon="@drawable/ic_nav_drawer_recently_added"
+            android:title="@string/nav_drawer_recent_title"/>
+
+    </group>
+
+    <group
+        android:id="@+id/nav_drawer_group_2">
+        <item
+            android:id="@+id/nav_drawer_footer_settings"
+            android:title="@string/nav_drawer_settings" />
+        <item
+            android:id="@+id/nav_drawer_footer_about"
+            android:title="@string/nav_drawer_about" />
+    </group>
+</menu>

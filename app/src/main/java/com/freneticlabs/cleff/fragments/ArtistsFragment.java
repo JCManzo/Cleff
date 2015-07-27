@@ -18,8 +18,8 @@ import com.freneticlabs.cleff.views.adapters.ArtistAdapter;
 
 import java.util.ArrayList;
 
+import butterknife.Bind;
 import butterknife.ButterKnife;
-import butterknife.InjectView;
 import timber.log.Timber;
 
 /**
@@ -32,7 +32,7 @@ public class ArtistsFragment extends Fragment {
         // Required empty public constructor
     }
 
-    @InjectView(R.id.artists_grid_view)
+    @Bind(R.id.artists_grid_view)
     GridView mGridView;
     private ArtistAdapter mArtistsAdapter;
     private ArrayList<Artist> mArtists;
@@ -56,7 +56,7 @@ public class ArtistsFragment extends Fragment {
         super.onCreateView(inflater, container, savedInstanceState);
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_artist_list, container, false);
-        ButterKnife.inject(this, rootView);
+        ButterKnife.bind(this, rootView);
 
 
         mArtistsAdapter = new ArtistAdapter(mContext, mArtists);
@@ -75,4 +75,9 @@ public class ArtistsFragment extends Fragment {
         return rootView;
     }
 
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        ButterKnife.unbind(this);
+    }
 }

@@ -36,10 +36,6 @@
                 android:value=".activities.MainActivity" />
         </activity>
 
-        <!-- BUILDING LIBRARY PROGRESS ACTIVITY -->
-        <activity
-            android:name=".activities.BuildingLibraryProgressActivity" />
-
         <!-- Favorites Activity-->
         <activity
             android:name=".activities.FavoritesActivity"

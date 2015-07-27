@@ -16,6 +16,7 @@
     <color name="accent_dark">#d88100</color>
     <color name="text_primary">#212121</color>
     <color name="text_secondary">#727272</color>
+    <color name="text_tertiary">#666666</color>
     <color name="divider">#E5E5E5</color>
     <color name="item_pressed">#D8D8D8</color>
     <color name="oxford_blue">#263238</color>

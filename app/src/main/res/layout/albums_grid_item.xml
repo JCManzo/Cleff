@@ -1,50 +1,56 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:card_view="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:padding="16dp">
-
-    <android.support.v7.widget.CardView
-        android:id="@+id/card_view"
-        android:layout_gravity="center"
-        android:layout_width="match_parent"
+<android.support.v7.widget.CardView
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:card_view="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/albums_card_item"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        card_view:cardCornerRadius="1dp">
-
-   <ImageView
-        android:id="@+id/grid_album_image"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:adjustViewBounds="true"
-        android:scaleType="centerCrop"/>
+        android:layout_margin="4dp"
+        card_view:cardCornerRadius="2dp"
+        card_view:cardElevation="4dp">
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="16dp" >
+        android:layout_height="match_parent" >
 
-        <TextView
-            android:id="@+id/grid_album_title"
+       <ImageView
+            android:id="@+id/grid_album_image"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="bottom"
-            android:singleLine="true"
-            android:textSize="14sp"
-            android:ellipsize="marquee"
-            android:textColor="@color/text_primary"
-            />
+            android:layout_height="150dp"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:src="@drawable/adele"
+            android:scaleType="centerCrop"
+           />
 
-        <TextView
-            android:id="@+id/grid_album_num_songs"
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:visibility="visible"
-            android:gravity="bottom"
-            android:textColor="@color/text_primary"
-            android:textSize="12sp"
-            />
+            android:layout_below="@id/grid_album_image"
+            android:padding="10dp"
+            >
+            <TextView
+                android:id="@+id/grid_album_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="bottom"
+                android:singleLine="true"
+                android:textSize="14sp"
+                android:ellipsize="marquee"
+                android:textColor="@color/text_primary"
+                />
+
+            <TextView
+                android:id="@+id/grid_album_num_songs"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:visibility="visible"
+                android:gravity="bottom"
+                android:textColor="@color/text_primary"
+                android:textSize="12sp"
+                android:layout_below="@id/grid_album_title"
+                />
         </RelativeLayout>
-    </android.support.v7.widget.CardView>
-</LinearLayout>
+    </RelativeLayout>
+</android.support.v7.widget.CardView>

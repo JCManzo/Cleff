@@ -23,8 +23,8 @@ import org.jaudiotagger.tag.datatype.Artwork;
 
 import java.io.File;
 
+import butterknife.Bind;
 import butterknife.ButterKnife;
-import butterknife.InjectView;
 import timber.log.Timber;
 
 /**
@@ -33,7 +33,7 @@ import timber.log.Timber;
 public class PlayerFragment extends Fragment {
     public static final String EXTRA_SONG_ID = "com.freneticlabs.cleff.song_id";
     //@InjectView(R.id.player_song_name) TextView mSongName;
-    @InjectView(R.id.player_song_art) ImageView mSongArt;
+    @Bind(R.id.player_song_art) ImageView mSongArt;
 
 
     private Song mSong;
@@ -66,7 +66,7 @@ public class PlayerFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_player, container, false);
-        ButterKnife.inject(this, view);
+        ButterKnife.bind(this, view);
         Bitmap bitmap = null;
         final BitmapFactory.Options options = new BitmapFactory.Options();
 
@@ -123,6 +123,8 @@ public class PlayerFragment extends Fragment {
     public void onDestroyView() {
         mSongArt.setImageDrawable(null);
         super.onDestroyView();
+        ButterKnife.unbind(this);
+
     }
 
 
