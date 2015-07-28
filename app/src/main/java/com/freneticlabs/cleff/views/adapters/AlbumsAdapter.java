@@ -28,7 +28,6 @@ public class AlbumsAdapter extends RecyclerView.Adapter<AlbumsAdapter.ViewHolder
     private ArrayList<Album> mAlbumList;
     private final Context mContext;
     private RecyclerView mRecyclerView;
-    private String mSongCount;
 
     public AlbumsAdapter(Context context, RecyclerView recyclerView, ArrayList<Album> albums) {
         mContext = context;
@@ -37,13 +36,9 @@ public class AlbumsAdapter extends RecyclerView.Adapter<AlbumsAdapter.ViewHolder
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder{
-        @Bind(R.id.grid_album_title)
-        TextView album_title;
-        @Bind(R.id.grid_album_num_songs)
-        TextView songCount;
-        @Bind(R.id.grid_album_image)
-        ImageView artwork;
-
+        @Bind(R.id.grid_album_title) TextView album_title;
+        @Bind(R.id.grid_album_artist) TextView album_artist;
+        @Bind(R.id.grid_album_image) ImageView artwork;
 
         public ViewHolder(View itemView) {
             super(itemView);
@@ -66,7 +61,7 @@ public class AlbumsAdapter extends RecyclerView.Adapter<AlbumsAdapter.ViewHolder
 
         //get title and artist strings
         holder.album_title.setText(mAlbumList.get(position).getAlbumName());
-        holder.songCount.setText(mSongCount + Integer.toString(album.getNumOfSongs()));
+        holder.album_artist.setText(mAlbumList.get(position).getAlbumArtist());
 
         Uri uri = ContentUris.withAppendedId(Uri.parse(CleffApp.ART_WORK_PATH), album.getId());
         Picasso.with(mContext)

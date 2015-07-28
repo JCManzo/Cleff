@@ -76,11 +76,12 @@ public class BuildLibraryTaskFragment extends Fragment {
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-        mUnknownAlbum = getString(R.string.unknown_album_name);
-        mUnknownArtist = getString(R.string.unknown_artist_name);
-        mUnknownTitle = getString(R.string.unknown_title_name);
+
         try {
             mBuildLibraryTaskCallbacks = (BuildLibraryTaskCallbacks) activity;
+            mUnknownAlbum = getString(R.string.unknown_album_name);
+            mUnknownArtist = getString(R.string.unknown_artist_name);
+            mUnknownTitle = getString(R.string.unknown_title_name);
         } catch (ClassCastException e) {
             throw new ClassCastException("Activity must implement BuildLibraryTaskCallbacks.");
         }
@@ -135,13 +136,10 @@ public class BuildLibraryTaskFragment extends Fragment {
         }
     }
 
-    public void setUpTabs() {
-    }
-
     private class BuildLibraryTask extends AsyncTask <Void, Void, Void>{
+
         public BuildLibraryTask(Context context) {
             super();
-
         }
 
         @Override
@@ -216,10 +214,9 @@ public class BuildLibraryTaskFragment extends Fragment {
                 };
 
                 do {
-
                     int songId = mediaStoreCursor.getInt(idColumn);
-
                     int songAlbumId = mediaStoreCursor.getInt(albumIdColumn);
+
                     String songYear = mediaStoreCursor.getString(yearColumn);
                     String songTitle = mediaStoreCursor.getString(titleColumn);
                     String songArtist = mediaStoreCursor.getString(artistColumn);
