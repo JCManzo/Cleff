@@ -290,33 +290,4 @@ public class MusicLibrary {
 
     }
 
-
-    public void sortSongsByTitle() {
-        Collections.sort(mSongs, new Comparator<Song>() {
-            public int compare(Song song1, Song song2) {
-                return song1.getTitle().compareTo(song2.getTitle());
-            }
-        });
-    }
-    public void sortSongsByAlbum() {
-        Collections.sort(mSongs, new Comparator<Song>() {
-            public int compare(Song song1, Song song2) {
-                return song1.getAlbum().compareTo(song2.getAlbum());
-            }
-        });
-    }
-    public void sortSongsByArtist() {
-        Collections.sort(mSongs, new Comparator<Song>() {
-            public int compare(Song song1, Song song2) {
-                return song1.getArtist().compareTo(song2.getArtist());
-            }
-        });
-    }
-    public void sortSongsByGenre() {
-        Collections.sort(mSongs, new Comparator<Song>() {
-            public int compare(Song song1, Song song2) {
-                return song1.getGenre().compareTo(song2.getGenre());
-            }
-        });
-    }
 }

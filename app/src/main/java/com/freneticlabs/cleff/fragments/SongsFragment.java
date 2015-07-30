@@ -10,6 +10,7 @@ import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -24,6 +25,7 @@ import com.freneticlabs.cleff.views.DividerItemDecoration;
 import com.freneticlabs.cleff.views.adapters.SongsAdapter;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -100,6 +102,47 @@ public class SongsFragment extends Fragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_sort_by_album:
+                mSongsAdapter.sort(new Comparator<Song>() {
+                    @Override
+                    public int compare(Song song1, Song song2) {
+                        return song1.getAlbum().compareTo(song2.getAlbum());
+                    }
+                });
+                break;
+            case R.id.action_sort_by_artist:
+                mSongsAdapter.sort(new Comparator<Song>() {
+                    @Override
+                    public int compare(Song song1, Song song2) {
+                        return song1.getArtist().compareTo(song2.getArtist());
+                    }
+                });
+                break;
+            case R.id.action_sort_by_genre:
+                mSongsAdapter.sort(new Comparator<Song>() {
+                    @Override
+                    public int compare(Song song1, Song song2) {
+                        return song1.getGenre().compareTo(song2.getAlbum());
+                    }
+                });
+                break;
+            case R.id.action_sort_by_name:
+                mSongsAdapter.sort(new Comparator<Song>() {
+                    @Override
+                    public int compare(Song song1, Song song2) {
+                        return song1.getTitle().compareTo(song2.getTitle());
+
+                    }
+                });
+                break;
+
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override

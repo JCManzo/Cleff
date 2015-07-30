@@ -14,9 +14,12 @@ import com.freneticlabs.cleff.R;
 import com.freneticlabs.cleff.models.Song;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import timber.log.Timber;
 
 /**
  * Created by jcmanzo on 12/14/14.
@@ -73,6 +76,11 @@ public class SongsAdapter extends RecyclerView.Adapter<SongsAdapter.ViewHolder> 
         return new ViewHolder(view);
     }
 
+    public void sort(Comparator<? super Song> comparator) {
+        Timber.d("Sorting..");
+        Collections.sort(mSongs, comparator);
+        notifyItemRangeChanged(0, getItemCount());
+    }
 
     /*@Override
     public int getItemViewType(int position) {

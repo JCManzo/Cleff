@@ -183,18 +183,6 @@ public class MainActivity extends AppCompatActivity implements
             case R.id.action_scan:
                 startLibraryScan();
                 break;
-            case R.id.action_sort_by_album:
-                MusicLibrary.get(getApplicationContext()).sortSongsByAlbum();
-                break;
-            case R.id.action_sort_by_artist:
-                MusicLibrary.get(getApplicationContext()).sortSongsByArtist();
-                break;
-            case R.id.action_sort_by_name:
-                MusicLibrary.get(getApplicationContext()).sortSongsByTitle();
-                break;
-            case R.id.action_sort_by_genre:
-                MusicLibrary.get(getApplicationContext()).sortSongsByGenre();
-                break;
             default:
                 break;
 
