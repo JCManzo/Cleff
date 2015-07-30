@@ -6,6 +6,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
@@ -39,7 +40,6 @@ public class PlayerActivity extends AppCompatActivity {
     @Bind(R.id.toolbar) Toolbar mToolbar;
     @Bind(R.id.player_activity_pager) ViewPager mViewPager;
     @Bind(R.id.seekBar) DiscreteSeekBar mDiscreteSeekBar;
-    @Bind(R.id.player_song_album) TextView mSongAlbum;
     @Bind(R.id.player_song_title) TextView mSongTitle;
     @Bind(R.id.player_song_artist) TextView mSongArtist;
 
@@ -50,13 +50,8 @@ public class PlayerActivity extends AppCompatActivity {
 
         ButterKnife.bind(this);
         mCleffApp = (CleffApp)getApplication();
-        // Set up the toolbar to act as an action bar
-        if(mToolbar != null) {
-            setSupportActionBar(mToolbar);
-            mToolbar.setNavigationIcon(R.drawable.ic_action_arrow_back);
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            mToolbar.getBackground().setAlpha(0);
-        }
+
+        setUpToolbar();
         mSongs = MusicLibrary.get(this).getSongs();
 
         FragmentManager fm = getSupportFragmentManager();
@@ -112,7 +107,6 @@ public class PlayerActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-
     @Override
     protected void onResume() {
         CleffApp.getEventBus().register(this);
@@ -126,12 +120,21 @@ public class PlayerActivity extends AppCompatActivity {
     }
 
     private void updateSongDisplayInfo(Song song) {
-        mSongAlbum.setText(song.getAlbum());
-        mSongArtist.setText(BY + song.getArtist());
+        mSongArtist.setText(song.getArtist());
         mSongTitle.setText(song.getTitle());
     }
 
-
+    public void setUpToolbar() {
+        // Set up the toolbar to act as ac action bar
+        if(mToolbar != null) {
+            setSupportActionBar(mToolbar);
+        }
+        final ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setHomeAsUpIndicator(R.drawable.ic_action_menu);
+            actionBar.setDisplayHomeAsUpEnabled(true);
+        }
+    }
     /**
      * Updates the seekbar every 100 milliseconds
      */

@@ -28,9 +28,7 @@
 
         <!-- PLAYER ACTIVITY -->
         <activity
-            android:name=".activities.PlayerActivity"
-            android:label="@string/app_name"
-            android:theme="@style/AppTheme.Overlay" >
+            android:name=".activities.PlayerActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".activities.MainActivity" />

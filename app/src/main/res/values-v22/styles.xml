@@ -17,6 +17,8 @@
 
     </style>
 
+
+    <!-- Transparent Toolbar -->
     <style name="AppTheme.Overlay" parent="AppTheme">
         <item name="android:windowActionBarOverlay">true</item>
         <item name="android:fitsSystemWindows">true</item>

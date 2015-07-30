@@ -2,6 +2,7 @@
 <resources>
     <!-- My Colors -->
     <color name="red">#C2185B</color>
+    <color name="hot_red">#E61B58</color>
     <color name="yellow">#FFC600</color>
     <color name="offWhite">#cccc</color>
     <color name="grey">#9e9e9e</color>
@@ -20,6 +21,7 @@
     <color name="divider">#E5E5E5</color>
     <color name="item_pressed">#D8D8D8</color>
     <color name="oxford_blue">#263238</color>
+
     <!-- Material Colors -->
     <color name="black">#000000</color>
     <color name="white">#FFFFFF</color>

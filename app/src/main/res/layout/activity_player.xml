@@ -1,116 +1,154 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context="com.freneticlabs.cleff.activities.PlayerActivity" >
 
-    <LinearLayout
-        android:background="?attr/colorPrimary"
+    <android.support.design.widget.AppBarLayout
+        android:id="@+id/appbar_layout"
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent" >
+
+        <include layout="@layout/toolbar" />
+
+    </android.support.design.widget.AppBarLayout>
+
+    <android.support.design.widget.CoordinatorLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/fragment_container"
-        android:orientation="vertical">
+        android:layout_height="match_parent" >
 
-        <!-- ViewPager Fragment-->
-        <RelativeLayout
-            android:id="@+id/player_pager_container"
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="0.64"
-            >
+            android:layout_height="match_parent"
+            android:layout_margin="20dp"
+            android:layout_marginTop="40dp"
+            android:background="@drawable/rec_shadow"
+            android:orientation="vertical"  >
 
-            <android.support.v4.view.ViewPager
-                android:id="@+id/player_activity_pager"
+            <!-- Viewpager Album Art Container -->
+            <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                tools:context=".PlayerActivity"
-                android:background="@color/red"
-                />
+                android:layout_height="0dp"
+                android:clipChildren="false"
+                android:layout_weight="1" >
 
-            <include
-                android:id="@+id/toolbar"
-                android:layout_height="?attr/actionBarSize"
-                android:layout_width="match_parent"
-                layout="@layout/toolbar"
-                android:theme="@style/AppTheme.Overlay"
-                android:background="@android:color/transparent"/>
+                <!-- ViewPager Fragment-->
+                <android.support.v4.view.ViewPager
+                    tools:context=".PlayerActivity"
+                    android:id="@+id/player_activity_pager"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@color/red" />
 
+            </RelativeLayout>
 
-
-        </RelativeLayout>
-
-        <!-- Player Controls-->
-
-        <RelativeLayout
-            android:id="@+id/player_controls_container"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="0.36"
-            android:layout_gravity="center"
-            android:background="@color/white"
-            >
-
-            <LinearLayout
+            <!-- Player Controls Container-->
+            <RelativeLayout
                 android:id="@+id/layout_login"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="0dp"
                 android:orientation="vertical"
-                android:layout_gravity="center"
-                android:gravity="center" >
+                android:layout_weight=".5"
+                android:layout_gravity="center|top"
+                android:padding="20dp"
+                android:gravity="top">
+
+                <!-- Song Info -->
+                <RelativeLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/player_song_info_layout"
+                    android:paddingTop="10dp">
+
+                    <TextView
+                        android:id="@+id/player_song_title"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/placeholder_text"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        android:ellipsize="marquee"
+                        android:singleLine="true"
+                        android:textColor="@color/black"
+                        android:layout_gravity="center_horizontal"
+                        android:gravity="center_horizontal" />
+
+                    <TextView
+                        android:id="@+id/player_song_artist"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/placeholder_text"
+                        android:textStyle="normal"
+                        android:textSize="16sp"
+                        android:ellipsize="marquee"
+                        android:singleLine="true"
+                        android:layout_below="@id/player_song_title"
+                        android:textColor="@color/black"
+                        android:gravity="center_horizontal"/>
+                </RelativeLayout>
 
                 <org.adw.library.widgets.discreteseekbar.DiscreteSeekBar
-                    android:layout_width="match_parent"
+                    xmlns:app="http://schemas.android.com/apk/res-auto"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:id="@+id/seekBar"
+                    android:layout_below="@id/player_song_info_layout"
                     app:dsb_indicatorFormatter="%04d"
                     app:dsb_indicatorColor="@color/accent"
                     app:dsb_progressColor="@color/accent"
                     android:padding="0dp"/>
 
-                <TextView
-                    android:id="@+id/player_song_title"
-                    android:layout_width="wrap_content"
+                <!-- Player Buttons -->
+                <LinearLayout
+                    android:layout_below="@id/seekBar"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="@string/placeholder_text"
-                    android:textSize="18sp"
-                    android:textStyle="bold"
-                    android:ellipsize="marquee"
-                    android:singleLine="true"
-                    android:textColor="@color/black"
-                    />
+                    android:gravity="center_horizontal">
 
-                <TextView
-                    android:id="@+id/player_song_artist"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/placeholder_text"
-                    android:textStyle="normal"
-                    android:textSize="16sp"
-                    android:ellipsize="marquee"
-                    android:singleLine="true"
-                    android:textColor="@color/black"
+                    <ImageView
+                        android:id="@+id/player_skip_prev_button"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:src="@drawable/ic_player_skip_previous"/>
 
-                    />
+                    <ImageView
+                        android:id="@+id/player_toggle_button"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:src="@drawable/ic_player_orange_play_circle_outline"/>
 
-                <TextView
-                    android:id="@+id/player_song_album"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/placeholder_text"
-                    android:textStyle="normal"
-                    android:textSize="16sp"
-                    android:ellipsize="marquee"
-                    android:singleLine="true"
-                    android:textColor="@color/black"
+                    <ImageView
+                        android:id="@+id/player_skip_next_button"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:src="@drawable/ic_player_skip_next"/>
 
-                    />
 
-            </LinearLayout>
+                </LinearLayout>
 
-        </RelativeLayout>
+            </RelativeLayout>
 
-    </LinearLayout>
+        </LinearLayout>
 
-</FrameLayout>
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/fab"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_player_favorite_outline"
+            android:layout_margin="26dp"
+            app:backgroundTint="@color/hot_red"
+            app:elevation="4dp"
+            app:pressedTranslationZ="10dp"
+            app:fabSize="mini"
+            app:layout_anchor="@id/player_activity_pager"
+            app:layout_anchorGravity="bottom|right|end" />
+
+    </android.support.design.widget.CoordinatorLayout>
+</LinearLayout>

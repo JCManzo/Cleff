@@ -32,9 +32,8 @@ import timber.log.Timber;
  */
 public class PlayerFragment extends Fragment {
     public static final String EXTRA_SONG_ID = "com.freneticlabs.cleff.song_id";
-    //@InjectView(R.id.player_song_name) TextView mSongName;
-    @Bind(R.id.player_song_art) ImageView mSongArt;
 
+    @Bind(R.id.player_song_art) ImageView mSongArt;
 
     private Song mSong;
 
