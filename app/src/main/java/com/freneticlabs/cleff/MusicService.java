@@ -230,7 +230,7 @@ public class MusicService extends Service implements
             mMediaPlayer.prepareAsync();
             mPlayerSate = PlayerState.PLAYING;
 
-            CleffApp.getEventBus().post(new MusicStateChangeEvent(CleffApp.MUSIC_PLAYING));
+            CleffApp.getEventBus().post(new MusicStateChangeEvent(CleffApp.MUSIC_PLAYING, mCurrentSongPosition));
 
             // Saves the position of the previously played song to a file.
             SharedPreferences.Editor editor = mSettings.edit();
@@ -253,7 +253,7 @@ public class MusicService extends Service implements
         if(mPlayerSate.equals(PlayerState.PLAYING)) {
             mMediaPlayer.pause();
             mPlayerSate = PlayerState.PAUSED;
-            CleffApp.getEventBus().post(new MusicStateChangeEvent(CleffApp.MUSIC_PAUSED));
+            CleffApp.getEventBus().post(new MusicStateChangeEvent(CleffApp.MUSIC_PAUSED, mCurrentSongPosition));
 
         }
     }
@@ -268,7 +268,7 @@ public class MusicService extends Service implements
         if (mPlayerSate.equals(PlayerState.PLAYING) || mPlayerSate.equals(PlayerState.PAUSED)) {
             //mIsPlaying = false;
             mPlayerSate = PlayerState.IDLE;
-            CleffApp.getEventBus().post(new MusicStateChangeEvent(CleffApp.MUSIC_IDLE));
+            CleffApp.getEventBus().post(new MusicStateChangeEvent(CleffApp.MUSIC_IDLE, mCurrentSongPosition));
 
             if (mMediaPlayer != null) {
                 Timber.d("Stopping player.");
@@ -337,13 +337,14 @@ public class MusicService extends Service implements
         Timber.d("Resume Called");
         mMediaPlayer.start();
         mPlayerSate = PlayerState.PLAYING;
-        CleffApp.getEventBus().post(new MusicStateChangeEvent(CleffApp.MUSIC_PLAYING));
+        CleffApp.getEventBus().post(new MusicStateChangeEvent(CleffApp.MUSIC_PLAYING, mCurrentSongPosition));
 
     }
 
     public int getCurrentPosition(){
         return (mMediaPlayer != null) ? mMediaPlayer.getCurrentPosition() : -1;
     }
+
 
     public int getDuration(){
         return (mMediaPlayer != null ) ? mMediaPlayer.getDuration() : -1;

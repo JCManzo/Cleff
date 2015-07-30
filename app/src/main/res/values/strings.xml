@@ -32,8 +32,9 @@
     <string name="sort_songs_genre">Genre</string>
     <string name="sort_songs_time">Time</string>
 
+    <!-- Player -->
     <string name="title_activity_player">PlayerActivity</string>
-
+    <string name="player_added_to_faves">Song added to favorites</string>
     <!-- Song actions -->
     <string name="song_faved">Song added to favorites</string>
 

@@ -121,7 +121,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:src="@drawable/ic_player_orange_play_circle_outline"/>
+                        android:src="@drawable/ic_player_pause_circle_outline"/>
 
                     <ImageView
                         android:id="@+id/player_skip_next_button"
@@ -138,10 +138,10 @@
         </LinearLayout>
 
         <android.support.design.widget.FloatingActionButton
-            android:id="@+id/fab"
+            android:id="@+id/player_fav_fab"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/ic_player_favorite_outline"
+            android:src="@drawable/ic_player_favorite"
             android:layout_margin="26dp"
             app:backgroundTint="@color/hot_red"
             app:elevation="4dp"
