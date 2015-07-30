@@ -32,7 +32,6 @@ import timber.log.Timber;
  */
 public class PlayerFragment extends Fragment {
     public static final String EXTRA_SONG_ID = "com.freneticlabs.cleff.song_id";
-    public static final String EXTRA_SONG_POS = "com.freneticlabs.cleff.song_position";
     @Bind(R.id.player_song_art) ImageView mSongArt;
 
     private Song mSong;

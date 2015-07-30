@@ -38,7 +38,6 @@ import butterknife.OnClick;
 import timber.log.Timber;
 
 public class PlayerActivity extends AppCompatActivity {
-    private static final String BY = "by ";
     private ArrayList<Song> mSongs;
     private Song mSong;
     private Handler mSeekBarHandler = new Handler();
@@ -56,7 +55,7 @@ public class PlayerActivity extends AppCompatActivity {
     @Bind(R.id.player_skip_prev_button) ImageView mSkipPrevButton;
     @Bind(R.id.player_skip_next_button) ImageView mSkipNextButton;
     @Bind(R.id.player_fav_fab) FloatingActionButton mFloatingActionFavButton;
-    private int mSongPosition = 0;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -86,8 +85,6 @@ public class PlayerActivity extends AppCompatActivity {
         updateProgressBar();
 
         int songId = (int)getIntent().getSerializableExtra(PlayerFragment.EXTRA_SONG_ID);
-        mSongPosition = (int)getIntent().getSerializableExtra(PlayerFragment.EXTRA_SONG_POS);
-        Timber.d("SongPOs: " + Integer.toString(mSongPosition));
 
         for (int i = 0; i < mSongs.size(); i++) {
             mSong = mSongs.get(i);
@@ -164,7 +161,7 @@ public class PlayerActivity extends AppCompatActivity {
         public void run() {
             if(mCleffApp.getService() != null && mCleffApp.getService().isPlaying()) {
                 int totalDuration = mCleffApp.getService().getDuration();
-                int currentDuration = mCleffApp.getService().getCurrentPosition();
+                int currentDuration = mCleffApp.getService().getMPCurrentPosition();
                 // Displaying Total Duration time
                 //mSongTotalDuration.setText("" + MusicUtils.milliSecondsToTimer(totalDuration));
                 //int max_time = MusicUtils.millisecondsToTime(totalDuration);
@@ -190,7 +187,6 @@ public class PlayerActivity extends AppCompatActivity {
     @OnClick(R.id.player_toggle_button)
         public void playerToggle() {
             mCleffApp.getService().togglePlayer();
-
         }
 
     @Subscribe
@@ -212,6 +208,7 @@ public class PlayerActivity extends AppCompatActivity {
 
         }
     }
+
     private void initListeners() {
 
         // Seekbar
@@ -250,7 +247,6 @@ public class PlayerActivity extends AppCompatActivity {
             @Override
             public void onPageSelected(int position) {
                 Song song = mSongs.get(position);
-                mSongPosition = position;
                 updateSongDisplayInfo(song);
                 if (song.getTitle() != null) {
                     // setTitle(song.getTitle());
@@ -276,11 +272,10 @@ public class PlayerActivity extends AppCompatActivity {
         mSkipNextButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                //Timber.d("BEFORE SONG POST: " + Integer.toString(mCleffApp.getService().getCurrentSongPosition()));
                 mCleffApp.getService().playNext();
-                Timber.d("Position Before: " + Integer.toString(mSongPosition));
-                mSongPosition =  ((mSongPosition + 1) >= mSongs.size()) ? 0 : ++mSongPosition;
-                Timber.d("Position After: " + Integer.toString(mSongPosition));
-                mViewPager.setCurrentItem(mSongPosition);
+                //Timber.d("AFTER SONG POST: " + Integer.toString(mCleffApp.getService().getCurrentSongPosition()));
+                mViewPager.setCurrentItem(mCleffApp.getService().getCurrentSongPosition());
                 updateUi();
             }
         });
@@ -288,12 +283,10 @@ public class PlayerActivity extends AppCompatActivity {
         mSkipPrevButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Timber.d("Position Before: " + Integer.toString(mSongPosition));
-                mSongPosition =  ((mSongPosition - 1) < 0) ? (mSongs.size()) : --mSongPosition;
-                Timber.d("Position After: " + Integer.toString(mSongPosition));
-
+                Timber.d("BEFORE SONG POST: " + Integer.toString(mCleffApp.getService().getCurrentSongPosition()));
                 mCleffApp.getService().playPrevious();
-                mViewPager.setCurrentItem(mSongPosition);
+                Timber.d("AFTER SONG POST: " + Integer.toString(mCleffApp.getService().getCurrentSongPosition()));
+                mViewPager.setCurrentItem(mCleffApp.getService().getCurrentSongPosition());
                 updateUi();
             }
         });

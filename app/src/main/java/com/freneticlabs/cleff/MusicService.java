@@ -313,6 +313,9 @@ public class MusicService extends Service implements
         play();
     }
 
+    public int getCurrentSongPosition() {
+        return mCurrentSongPosition;
+    }
     /**
      * Play and pause button is one entity. Toggle back and forth
      * depending on the player state.
@@ -330,6 +333,8 @@ public class MusicService extends Service implements
         }
     }
 
+
+    //=============== BEGIN MEDIA PLAYER FUNCTIONS==================
     /**
      * Resumes the player if it was previously paused.
      */
@@ -341,10 +346,9 @@ public class MusicService extends Service implements
 
     }
 
-    public int getCurrentPosition(){
+    public int getMPCurrentPosition(){
         return (mMediaPlayer != null) ? mMediaPlayer.getCurrentPosition() : -1;
     }
-
 
     public int getDuration(){
         return (mMediaPlayer != null ) ? mMediaPlayer.getDuration() : -1;
@@ -353,6 +357,8 @@ public class MusicService extends Service implements
     public void seek(int songPosition){
         mMediaPlayer.seekTo(songPosition);
     }
+
+    //=============== END MEDIA PLAYER FUNCTIONS==================
 
     /**
      * Builds and updates the notification.
