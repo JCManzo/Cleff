@@ -1,6 +1,7 @@
 package com.freneticlabs.cleff.fragments;
 
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
@@ -9,15 +10,18 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.freneticlabs.cleff.CleffApp;
 import com.freneticlabs.cleff.R;
+import com.freneticlabs.cleff.activities.SearchActivity;
 import com.freneticlabs.cleff.models.events.MusicStateChangeEvent;
 import com.freneticlabs.cleff.views.adapters.SlidingTabsAdapter;
 import com.getbase.floatingactionbutton.FloatingActionButton;
 import com.getbase.floatingactionbutton.FloatingActionsMenu;
+import com.quinny898.library.persistentsearch.SearchBox;
 import com.squareup.otto.Subscribe;
 
 import butterknife.Bind;
@@ -50,6 +54,8 @@ public class LibrarySlidingTabsPagerFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_library_sliding_tabs_pager, container, false);
         ButterKnife.bind(this, view);
+
+
         mCleffApp = (CleffApp)getActivity().getApplication();
 
         setUpToolbar();
@@ -70,10 +76,19 @@ public class LibrarySlidingTabsPagerFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-
+        setHasOptionsMenu(true);
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_search:
+                Intent intent = new Intent(getActivity(), SearchActivity.class);
+                startActivity(intent);
+                break;
+        }
+        return super.onOptionsItemSelected(item);
+    }
 
     public void setUpToolbar() {
        // Set up the toolbar to act as ac action bar
@@ -141,7 +156,8 @@ public class LibrarySlidingTabsPagerFragment extends Fragment {
         }
     }
 
-    /**
+
+     /**
      * Called when the player global state has changed.
      * @param event is the state of the MediaPlayer
      */

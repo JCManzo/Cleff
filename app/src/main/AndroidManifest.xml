@@ -27,14 +27,13 @@
         </activity>
 
         <!-- PLAYER ACTIVITY -->
-        <activity
-            android:name=".activities.PlayerActivity">
+        <activity android:name=".activities.PlayerActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".activities.MainActivity" />
         </activity>
 
-        <!-- Favorites Activity-->
+        <!-- Favorites Activity -->
         <activity
             android:name=".activities.FavoritesActivity"
             android:label="@string/title_activity_favorites" >
@@ -53,7 +52,10 @@
             android:permission="com.freneticlabs.cleff.MY_SERVICE_PERMISSION" >
         </service>
 
-
+        <activity
+            android:name=".activities.SearchActivity"
+            android:label="@string/title_activity_search" >
+        </activity>
     </application>
 
 </manifest>
