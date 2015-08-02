@@ -3,17 +3,15 @@ package com.freneticlabs.cleff.activities;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
-import android.support.v4.app.FragmentManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 
 import com.freneticlabs.cleff.CleffApp;
 import com.freneticlabs.cleff.R;
-import com.freneticlabs.cleff.fragments.AlbumInfoFragment;
+import com.freneticlabs.cleff.fragments.AlbumDetailFragment;
 import com.freneticlabs.cleff.fragments.BuildLibraryTaskFragment;
 import com.freneticlabs.cleff.fragments.LibrarySlidingTabsPagerFragment;
 import com.freneticlabs.cleff.models.MusicLibrary;
@@ -212,17 +210,10 @@ public class MainActivity extends AppCompatActivity implements
     @Subscribe
     public void onAlbumInfoSelected(AlbumInfoSelectedEvent album) {
         Timber.d("Album Clicked");
-        AlbumInfoFragment albumInfoFragment = new AlbumInfoFragment();
-        Bundle bundle = new Bundle();
-        bundle.putInt(CleffApp.ALBUM_INFO_ID, album.album_id);
+        Intent intent = new Intent(this, AlbumDetailActivity.class);
+        intent.putExtra(AlbumDetailFragment.ALBUM_INFO_ID, album.album_id);
+        intent.putExtra(AlbumDetailFragment.ALBUM_INFO_NAME, album.album_name);
 
-        albumInfoFragment.setArguments(bundle);
-
-        getSupportFragmentManager()
-                .beginTransaction()
-                .add(R.id.main_container, albumInfoFragment)
-                .addToBackStack(null)
-                .commit();
-
+        startActivity(intent);
     }
 }

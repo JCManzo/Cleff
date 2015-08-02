@@ -50,7 +50,6 @@ public class CleffApp extends Application {
     public static final String LAST_VIEWED_OFFSET = "LastViewedOffset";
 
     //Keys used in AlbumInfoFragment
-    public static final String ALBUM_INFO_ID = "AlbumInfoId";
 
     private boolean mFirstRun = true;
 

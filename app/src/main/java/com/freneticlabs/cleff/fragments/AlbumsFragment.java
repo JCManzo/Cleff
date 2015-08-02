@@ -83,7 +83,7 @@ public class AlbumsFragment extends Fragment {
             public void onItemClick(View view, int position) {
                 Album album = mAlbums.get(position);
 
-                CleffApp.getEventBus().post(new AlbumInfoSelectedEvent(album.getId()));
+                CleffApp.getEventBus().post(new AlbumInfoSelectedEvent(album));
 
 
             }

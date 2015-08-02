@@ -52,9 +52,19 @@
             android:permission="com.freneticlabs.cleff.MY_SERVICE_PERMISSION" >
         </service>
 
+        <!-- Search Activity -->
         <activity
             android:name=".activities.SearchActivity"
             android:label="@string/title_activity_search" >
+        </activity>
+
+        <!-- Album Detail Activity -->
+        <activity
+            android:name=".activities.AlbumDetailActivity"
+            android:label="@string/title_activity_album_detail" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.freneticlabs.cleff.activities.MainActivity" />
         </activity>
     </application>
 

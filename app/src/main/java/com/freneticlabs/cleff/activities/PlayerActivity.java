@@ -283,9 +283,7 @@ public class PlayerActivity extends AppCompatActivity {
         mSkipPrevButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Timber.d("BEFORE SONG POST: " + Integer.toString(mCleffApp.getService().getCurrentSongPosition()));
                 mCleffApp.getService().playPrevious();
-                Timber.d("AFTER SONG POST: " + Integer.toString(mCleffApp.getService().getCurrentSongPosition()));
                 mViewPager.setCurrentItem(mCleffApp.getService().getCurrentSongPosition());
                 updateUi();
             }
@@ -297,7 +295,6 @@ public class PlayerActivity extends AppCompatActivity {
                 Snackbar
                         .make(view, R.string.player_added_to_faves, Snackbar.LENGTH_LONG)
                         .show();
-
                 mFloatingActionFavButton.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.white)));
                 mFloatingActionFavButton.setImageResource(R.drawable.ic_player_favorite_full);
             }
