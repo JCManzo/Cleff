@@ -8,12 +8,10 @@
     android:layout_height="match_parent">
 
     <LinearLayout
-
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        >
+        android:layout_gravity="center" >
 
         <ProgressBar
             android:id="@+id/build_lib_progressbar"
@@ -30,13 +28,6 @@
             android:textSize="22sp"
             android:textColor="@color/text_primary"/>
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/building_library_message"
-            android:layout_gravity="center"
-            android:paddingTop="10dp"
-            android:textColor="@color/text_secondary"/>
     </LinearLayout>
 
     <android.support.design.widget.AppBarLayout

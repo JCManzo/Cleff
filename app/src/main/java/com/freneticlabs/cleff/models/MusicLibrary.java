@@ -13,8 +13,6 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 
 import timber.log.Timber;
 
@@ -82,6 +80,17 @@ public class MusicLibrary {
         return mArtists;
     }
 
+    public ArrayList<Song> getAllAlbumSongs(int albumId) {
+        ArrayList<Song> albumSongs = new ArrayList<>();
+        for (Song song : mSongs) {
+            if(song.getAlbumID() == albumId) {
+                albumSongs.add(song);
+            }
+        }
+
+        return albumSongs;
+    }
+
     public Song getSong(long id) {
         for(Song song : mSongs) {
             if(song.getId() == id) {
@@ -111,7 +120,6 @@ public class MusicLibrary {
         }
         return 0;
     }
-
 
     /**
      * Saves all music data to JSON files.

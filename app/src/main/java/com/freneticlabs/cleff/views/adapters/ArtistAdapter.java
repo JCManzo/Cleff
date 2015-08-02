@@ -63,7 +63,7 @@ public class ArtistAdapter extends ArrayAdapter<Artist> {
         ViewHolder holder;
         if(view == null) {
             //map to song layout
-            view = mArtistsInflater.inflate(R.layout.artists_grid_item, parent, false);
+            view = mArtistsInflater.inflate(R.layout.item_artists_grid, parent, false);
 
             // Set up up the ViewHolder
             holder = new ViewHolder(view);

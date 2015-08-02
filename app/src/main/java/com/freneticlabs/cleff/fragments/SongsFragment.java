@@ -175,6 +175,25 @@ public class SongsFragment extends Fragment {
         // Set the divider between song items
         mRecyclerView.addItemDecoration(new DividerItemDecoration(getActivity(), DividerItemDecoration.VERTICAL_LIST));
 
+        mRecyclerView.addOnItemTouchListener(new RecyclerItemClickListener(getActivity(), mRecyclerView, new RecyclerItemClickListener.OnItemClickListener() {
+            @Override
+            public void onItemClick(View view, int position) {
+                Intent playerIntent = new Intent(getActivity(), PlayerActivity.class);
+                mCurrentSongPosition = position;
+                Song song = mSongs.get(mCurrentSongPosition);
+
+                CleffApp.getEventBus().post(new SongSelectedEvent(position));
+
+                playerIntent.putExtra(PlayerFragment.EXTRA_SONG_ID, song.getId());
+
+                startActivityForResult(playerIntent, 0);
+            }
+
+            @Override
+            public void onItemLongClick(View view, int position) {
+
+            }
+        }));
     }
 
     /**
@@ -182,24 +201,6 @@ public class SongsFragment extends Fragment {
      */
     private void setUpListeners() {
         // Listener for when a recyclerview item is clicked
-           mRecyclerView.addOnItemTouchListener(new RecyclerItemClickListener(getActivity(), mRecyclerView, new RecyclerItemClickListener.OnItemClickListener() {
-               @Override
-               public void onItemClick(View view, int position) {
-                   Intent playerIntent = new Intent(getActivity(), PlayerActivity.class);
-                   mCurrentSongPosition = position;
-                   Song song = mSongs.get(mCurrentSongPosition);
 
-                   CleffApp.getEventBus().post(new SongSelectedEvent(position));
-
-                   playerIntent.putExtra(PlayerFragment.EXTRA_SONG_ID, song.getId());
-
-                   startActivityForResult(playerIntent, 0);
-               }
-
-               @Override
-               public void onItemLongClick(View view, int position) {
-
-               }
-           }));
     }
 }

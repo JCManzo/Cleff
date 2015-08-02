@@ -21,8 +21,7 @@
     <string name="unknown_genre_name">Unknown genre</string>
 
     <!-- Library Scanner -->
-    <string name="building_library_title">Building Library…</string>
-    <string name="building_library_message">Please wait while Cleff scans your device for music.</string>
+    <string name="building_library_title">Building your music library</string>
 
     <string name="search_box_library_title">Search library</string>
     <!-- Sort menu -->

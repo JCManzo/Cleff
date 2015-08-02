@@ -7,6 +7,7 @@ import android.view.MenuItem;
 
 import com.freneticlabs.cleff.R;
 import com.quinny898.library.persistentsearch.SearchBox;
+import com.quinny898.library.persistentsearch.SearchResult;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -57,6 +58,9 @@ public class SearchActivity extends AppCompatActivity {
 
         mSearchBox.enableVoiceRecognition(this);
         mSearchBox.setLogoText(getString(R.string.search_box_library_title));
+        for (int x = 0; x < 10; x++) {
+
+        }
         mSearchBox.toggleSearch();
         mSearchBox.setSearchListener(new SearchBox.SearchListener() {
             @Override
@@ -77,12 +81,14 @@ public class SearchActivity extends AppCompatActivity {
 
             @Override
             public void onSearchTermChanged() {
-
             }
 
             @Override
             public void onSearch(String s) {
-
+                Timber.d(s);
+                SearchResult option = new SearchResult(s, getResources().getDrawable(
+                        R.drawable.ic_action_heart));
+                mSearchBox.addSearchable(option);
             }
         });
 

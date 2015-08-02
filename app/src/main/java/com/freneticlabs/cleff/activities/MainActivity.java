@@ -13,9 +13,12 @@ import android.view.MenuItem;
 
 import com.freneticlabs.cleff.CleffApp;
 import com.freneticlabs.cleff.R;
+import com.freneticlabs.cleff.fragments.AlbumInfoFragment;
 import com.freneticlabs.cleff.fragments.BuildLibraryTaskFragment;
 import com.freneticlabs.cleff.fragments.LibrarySlidingTabsPagerFragment;
 import com.freneticlabs.cleff.models.MusicLibrary;
+import com.freneticlabs.cleff.models.events.AlbumInfoSelectedEvent;
+import com.squareup.otto.Subscribe;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -23,7 +26,7 @@ import timber.log.Timber;
 
 
 public class MainActivity extends AppCompatActivity implements
-        BuildLibraryTaskFragment.BuildLibraryTaskCallbacks{
+        BuildLibraryTaskFragment.BuildLibraryTaskCallbacks {
 
     private static final String TAG_TASK_FRAGMENT = "build_library_task_fragment";
     private static final String TAG_LIBRARY_FRAGMENT = "show_library_fragment";
@@ -37,9 +40,11 @@ public class MainActivity extends AppCompatActivity implements
     /**
      * Injected Views
      */
-   // @Bind(R.id.toolbar) Toolbar mToolbar;
-    @Bind(R.id.drawer_layout) DrawerLayout mDrawerLayout;
-    @Bind(R.id.navigation_view) NavigationView mNavigationView;
+    // @Bind(R.id.toolbar) Toolbar mToolbar;
+    @Bind(R.id.drawer_layout)
+    DrawerLayout mDrawerLayout;
+    @Bind(R.id.navigation_view)
+    NavigationView mNavigationView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,7 +52,7 @@ public class MainActivity extends AppCompatActivity implements
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
 
-        mCleffApp = (CleffApp)getApplication();
+        mCleffApp = (CleffApp) getApplication();
         mTitle = getTitle();
 
         setUpMainView();
@@ -78,7 +83,7 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     public void setUpMainView() {
-        if(mCleffApp.isFirstRun()) {
+        if (mCleffApp.isFirstRun()) {
             startLibraryScan();
         } else {
             showLibraryFragment();
@@ -114,13 +119,6 @@ public class MainActivity extends AppCompatActivity implements
         });
     }
 
-   /* public void restoreActionBar() {
-        ActionBar actionBar = getSupportActionBar();
-        actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
-        actionBar.setDisplayShowTitleEnabled(true);
-        actionBar.setTitle(mTitle);
-    }*/
-
     /**
      * Start up the fragment that builds the music library.
      */
@@ -154,15 +152,15 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-       // if (!mDrawerLayout.isDrawerOpen()) {
-            // Only show items in the action bar relevant to this screen
-            // if the drawer is not showing. Otherwise, let the drawer
-            // decide what to show in the action bar.
-            getMenuInflater().inflate(R.menu.main, menu);
-           // restoreActionBar();
-            return true;
+        // if (!mDrawerLayout.isDrawerOpen()) {
+        // Only show items in the action bar relevant to this screen
+        // if the drawer is not showing. Otherwise, let the drawer
+        // decide what to show in the action bar.
+        getMenuInflater().inflate(R.menu.main, menu);
+        // restoreActionBar();
+        return true;
         //}
-       // return super.onCreateOptionsMenu(menu);
+        // return super.onCreateOptionsMenu(menu);
     }
 
     @Override
@@ -209,5 +207,22 @@ public class MainActivity extends AppCompatActivity implements
         mCleffApp.setAsRunned();
 
         showLibraryFragment();
+    }
+
+    @Subscribe
+    public void onAlbumInfoSelected(AlbumInfoSelectedEvent album) {
+        Timber.d("Album Clicked");
+        AlbumInfoFragment albumInfoFragment = new AlbumInfoFragment();
+        Bundle bundle = new Bundle();
+        bundle.putInt(CleffApp.ALBUM_INFO_ID, album.album_id);
+
+        albumInfoFragment.setArguments(bundle);
+
+        getSupportFragmentManager()
+                .beginTransaction()
+                .add(R.id.main_container, albumInfoFragment)
+                .addToBackStack(null)
+                .commit();
+
     }
 }

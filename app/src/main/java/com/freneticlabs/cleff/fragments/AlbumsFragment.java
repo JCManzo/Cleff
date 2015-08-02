@@ -13,8 +13,10 @@ import android.view.ViewGroup;
 
 import com.freneticlabs.cleff.CleffApp;
 import com.freneticlabs.cleff.R;
+import com.freneticlabs.cleff.listeners.RecyclerItemClickListener;
 import com.freneticlabs.cleff.models.Album;
 import com.freneticlabs.cleff.models.MusicLibrary;
+import com.freneticlabs.cleff.models.events.AlbumInfoSelectedEvent;
 import com.freneticlabs.cleff.views.adapters.AlbumsAdapter;
 
 import java.util.ArrayList;
@@ -27,9 +29,7 @@ import butterknife.ButterKnife;
  */
 public class AlbumsFragment extends Fragment {
 
-    @Bind(R.id.albums_grid_view)
-    RecyclerView mRecyclerView;
-    private AlbumsAdapter mAlbumsAdapter;
+    @Bind(R.id.albums_grid_view) RecyclerView mRecyclerView;
     private ArrayList<Album> mAlbums;
     private SharedPreferences mSettings;
     private Context mContext;
@@ -37,6 +37,10 @@ public class AlbumsFragment extends Fragment {
 
     public AlbumsFragment() {
         // Required empty public constructor
+    }
+
+    public interface OnAlbumSelectedListener {
+
     }
 
     @Override
@@ -57,11 +61,8 @@ public class AlbumsFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_albums_grid, container, false);
         ButterKnife.bind(this, rootView);
 
+        setUpRecyclerViewAndAdapter();
 
-        mAlbumsAdapter = new AlbumsAdapter(mContext, mRecyclerView, mAlbums);
-
-        mRecyclerView.setLayoutManager(new GridLayoutManager(getActivity(), 2));
-        mRecyclerView.setAdapter(mAlbumsAdapter);
         return rootView;
     }
 
@@ -69,5 +70,28 @@ public class AlbumsFragment extends Fragment {
     public void onDestroyView() {
         super.onDestroyView();
         ButterKnife.unbind(this);
+    }
+
+    private void setUpRecyclerViewAndAdapter() {
+        AlbumsAdapter albumsAdapter = new AlbumsAdapter(mContext, mRecyclerView, mAlbums);
+
+        mRecyclerView.setLayoutManager(new GridLayoutManager(getActivity(), 2));
+        mRecyclerView.setAdapter(albumsAdapter);
+
+        mRecyclerView.addOnItemTouchListener(new RecyclerItemClickListener(getActivity(), mRecyclerView, new RecyclerItemClickListener.OnItemClickListener() {
+            @Override
+            public void onItemClick(View view, int position) {
+                Album album = mAlbums.get(position);
+
+                CleffApp.getEventBus().post(new AlbumInfoSelectedEvent(album.getId()));
+
+
+            }
+
+            @Override
+            public void onItemLongClick(View view, int position) {
+
+            }
+        }));
     }
 }

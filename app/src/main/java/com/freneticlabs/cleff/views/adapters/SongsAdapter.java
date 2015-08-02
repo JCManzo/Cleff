@@ -7,6 +7,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.Filter;
+import android.widget.Filterable;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -16,6 +18,7 @@ import com.freneticlabs.cleff.models.Song;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -24,10 +27,11 @@ import timber.log.Timber;
 /**
  * Created by jcmanzo on 12/14/14.
  */
-public class SongsAdapter extends RecyclerView.Adapter<SongsAdapter.ViewHolder> {
+public class SongsAdapter extends RecyclerView.Adapter<SongsAdapter.ViewHolder> implements
+        Filterable {
     private Context mContext;
     private ArrayList<Song> mSongs;
-    private RecyclerView mRecyclerView;
+    private List<Song> mOrigSongs;
     private static final int VIEW_TYPE_EMPTY_LIST_PLACEHOLDER = 0;
     private static final int VIEW_TYPE_OBJECT_VIEW = 1;
 
@@ -41,7 +45,6 @@ public class SongsAdapter extends RecyclerView.Adapter<SongsAdapter.ViewHolder> 
 
     public SongsAdapter(Context context, RecyclerView recyclerView, ArrayList<Song> songs) {
         mContext = context;
-        mRecyclerView = recyclerView;
         mSongs = songs;
     }
 
@@ -108,5 +111,32 @@ public class SongsAdapter extends RecyclerView.Adapter<SongsAdapter.ViewHolder> 
             viewToAnimate.startAnimation(animation);
             lastPosition = position;
         }
+    }
+
+    @Override
+    public Filter getFilter() {
+        return new Filter() {
+            @Override
+            protected FilterResults performFiltering(CharSequence charSequence) {
+                final FilterResults oReturn = new FilterResults();
+                final List<Song> results = new ArrayList<Song>();
+                if (mSongs == null)
+                    mOrigSongs  = mSongs;
+                if (charSequence != null){
+                    if(mOrigSongs !=null & mOrigSongs.size()>0 ){
+                        for ( final Song g : mOrigSongs) {
+                            if (g.getTitle().toLowerCase().contains(charSequence.toString()))results.add(g);
+                        }
+                    }
+                    oReturn.values = results;
+                }
+                return oReturn;            }
+
+            @Override
+            protected void publishResults(CharSequence charSequence, FilterResults filterResults) {
+                mSongs = (ArrayList<Song>)filterResults.values;
+                notifyDataSetChanged();
+            }
+        };
     }
 }
