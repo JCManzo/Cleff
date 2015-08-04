@@ -10,10 +10,12 @@ import com.freneticlabs.cleff.fragments.ArtistsFragment;
 import com.freneticlabs.cleff.fragments.GenresFragment;
 import com.freneticlabs.cleff.fragments.SongsFragment;
 
+import timber.log.Timber;
+
 /**
  * Created by jcmanzo on 12/15/14.
  */
-public class SlidingTabsAdapter extends FragmentStatePagerAdapter {
+public class LibraryTabs extends FragmentStatePagerAdapter {
 
     private Context mContext;
     final int PAGE_COUNT = 4;
@@ -24,7 +26,7 @@ public class SlidingTabsAdapter extends FragmentStatePagerAdapter {
             "Genres"
     };
 
-    public SlidingTabsAdapter(FragmentManager fm, Context context) {
+    public LibraryTabs(FragmentManager fm, Context context) {
         super(fm);
         mContext = context;
     }

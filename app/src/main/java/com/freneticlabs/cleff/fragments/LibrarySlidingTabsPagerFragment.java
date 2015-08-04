@@ -18,10 +18,9 @@ import com.freneticlabs.cleff.CleffApp;
 import com.freneticlabs.cleff.R;
 import com.freneticlabs.cleff.activities.SearchActivity;
 import com.freneticlabs.cleff.models.events.MusicStateChangeEvent;
-import com.freneticlabs.cleff.views.adapters.SlidingTabsAdapter;
+import com.freneticlabs.cleff.views.adapters.LibraryTabs;
 import com.getbase.floatingactionbutton.FloatingActionButton;
 import com.getbase.floatingactionbutton.FloatingActionsMenu;
-import com.quinny898.library.persistentsearch.SearchBox;
 import com.squareup.otto.Subscribe;
 
 import butterknife.Bind;
@@ -52,7 +51,7 @@ public class LibrarySlidingTabsPagerFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_library_sliding_tabs_pager, container, false);
+        View view = inflater.inflate(R.layout.fragment_library_home, container, false);
         ButterKnife.bind(this, view);
 
 
@@ -61,7 +60,7 @@ public class LibrarySlidingTabsPagerFragment extends Fragment {
         setUpToolbar();
 
         ViewPager mViewPager = (ViewPager)view.findViewById(R.id.main_pager);
-        mViewPager.setAdapter(new SlidingTabsAdapter(getChildFragmentManager(), getActivity().getApplication().getApplicationContext()));
+        mViewPager.setAdapter(new LibraryTabs(getChildFragmentManager(), getActivity().getApplication().getApplicationContext()));
 
         TabLayout mTabs = (TabLayout)view.findViewById(R.id.main_tabs);
 

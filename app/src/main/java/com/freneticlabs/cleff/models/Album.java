@@ -25,6 +25,13 @@ public class Album extends Music{
     }
 
     @Override
+    public int hashCode() {
+        int result = 17;
+        result = 31 * result + mAlbumId;
+        result = 31 * result + mNumOfSongs;
+        return result;
+    }
+    @Override
     public int getId() {
         super.getId();
         return mAlbumId;

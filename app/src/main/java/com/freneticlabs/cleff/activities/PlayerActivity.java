@@ -23,6 +23,7 @@ import com.freneticlabs.cleff.R;
 import com.freneticlabs.cleff.fragments.PlayerFragment;
 import com.freneticlabs.cleff.models.MusicLibrary;
 import com.freneticlabs.cleff.models.Song;
+import com.freneticlabs.cleff.models.events.MusicDataChangedEvent;
 import com.freneticlabs.cleff.models.events.MusicStateChangeEvent;
 import com.freneticlabs.cleff.models.events.SongSelectedEvent;
 import com.freneticlabs.cleff.utils.Utils;
@@ -38,6 +39,8 @@ import butterknife.OnClick;
 import timber.log.Timber;
 
 public class PlayerActivity extends AppCompatActivity {
+    public static final String EXTRA_SONG_DATA ="com.freneticlabs.cleff.song_data";
+
     private ArrayList<Song> mSongs;
     private Song mSong;
     private Handler mSeekBarHandler = new Handler();
@@ -63,7 +66,7 @@ public class PlayerActivity extends AppCompatActivity {
 
         ButterKnife.bind(this);
         mCleffApp = (CleffApp)getApplication();
-        mSongs = MusicLibrary.get(this).getSongs();
+        mSongs = getIntent().getParcelableArrayListExtra(EXTRA_SONG_DATA);
 
         setUpToolbar();
 
@@ -96,6 +99,12 @@ public class PlayerActivity extends AppCompatActivity {
         }
 
         initListeners();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        CleffApp.getEventBus().post(new MusicDataChangedEvent(MusicLibrary.get(this).getSongs()));
     }
 
     @Override
@@ -195,6 +204,8 @@ public class PlayerActivity extends AppCompatActivity {
         updateUi();
     }
 
+
+
     private void updateUi() {
         if(mPlayerState.equals(CleffApp.MUSIC_IDLE)) {
 
@@ -252,7 +263,7 @@ public class PlayerActivity extends AppCompatActivity {
                     // setTitle(song.getTitle());
 
                 }
-                CleffApp.getEventBus().post(new SongSelectedEvent(position));
+                CleffApp.getEventBus().post(new SongSelectedEvent(song, position));
             }
 
             @Override

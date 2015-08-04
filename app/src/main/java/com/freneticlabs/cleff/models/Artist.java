@@ -26,6 +26,14 @@ public class Artist extends Music{
     }
 
     @Override
+    public int hashCode() {
+        int result = 17;
+        result = 31 * result + mArtistId;
+        result = 31 * result + mNumOfSongs;
+        return result;
+    }
+
+    @Override
     public int getId() {
         super.getId();
         return mArtistId;

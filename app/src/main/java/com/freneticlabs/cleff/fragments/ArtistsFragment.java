@@ -20,7 +20,6 @@ import java.util.ArrayList;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
-import timber.log.Timber;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -47,7 +46,7 @@ public class ArtistsFragment extends Fragment {
         mContext = getActivity().getApplicationContext();
         mCleffApp = (CleffApp)getActivity().getApplication();
         mSettings = mCleffApp.getAppPreferences();
-        mArtists = MusicLibrary.get(mContext).getArtists();
+        mArtists = new ArrayList<Artist>(MusicLibrary.get(mContext).getArtists());
     }
 
     @Override
@@ -58,19 +57,8 @@ public class ArtistsFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_artist_list, container, false);
         ButterKnife.bind(this, rootView);
 
-
         mArtistsAdapter = new ArtistAdapter(mContext, mArtists);
-        if(mGridView == null) {
-            Timber.d("GRIVIEW IS NULL");
-        } else {
-            Timber.d("GRIDVIEW IS NOT NULL");
-        }
 
-        if(mArtistsAdapter == null) {
-            Timber.d("ARTIST ADAPTER IS NULL");
-        } else {
-            Timber.d("ARTIST ADAPTER IS NOT NULL");
-        }
         mGridView.setAdapter(mArtistsAdapter);
         return rootView;
     }

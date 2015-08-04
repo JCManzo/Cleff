@@ -19,6 +19,8 @@ import android.widget.RemoteViews;
 import com.freneticlabs.cleff.activities.MainActivity;
 import com.freneticlabs.cleff.models.MusicLibrary;
 import com.freneticlabs.cleff.models.Song;
+import com.freneticlabs.cleff.models.events.AlbumInfoSelectedEvent;
+import com.freneticlabs.cleff.models.events.MusicDataChangedEvent;
 import com.freneticlabs.cleff.models.events.MusicStateChangeEvent;
 import com.freneticlabs.cleff.models.events.SongSelectedEvent;
 import com.squareup.otto.Subscribe;
@@ -46,8 +48,6 @@ public class MusicService extends Service implements
 
     public static final String STOP_SERVICE = "com.freneticlabs.cleff.STOP_SERVICE";
 
-    private static int NOTIFICATION_ID = 579; // just a number
-
     private NotificationCompat.Builder mNotificationBuilder;
 
     public enum PlayerState {
@@ -66,8 +66,7 @@ public class MusicService extends Service implements
 
     // Keep track of the current song position in the Array
     private int mCurrentSongPosition = 0;
-    private int mLastSongPosition = -1;
-    private int mPreviousSongPosition;
+    private int mLastSongPlayedPosition = -1;
 
     /**
      * Starts playing the current song in the playing queue.
@@ -109,7 +108,8 @@ public class MusicService extends Service implements
         mContext = getApplicationContext();
         mCleffApp = (CleffApp) getApplicationContext();
         mSettings = mCleffApp.getAppPreferences();
-        mSongs = MusicLibrary.get(mContext).getSongs();
+
+        mSongs = new ArrayList<>(MusicLibrary.get(mContext).getSongs());
 
         mCleffApp.setService(this);
         initMediaPlayer();
@@ -188,9 +188,18 @@ public class MusicService extends Service implements
     }
 
     @Subscribe
+    public void onMusicDataSetChanged(MusicDataChangedEvent event) {
+        mSongs = event.songs;
+        Timber.d("Music Data Changed");
+    }
+
+    @Subscribe
     public void onSongSelected(SongSelectedEvent event) {
+        // Change our data back to include ALL songs
+
         mCurrentSongPosition = event.songPosition;
-        int lastPlayedSong = mSettings.getInt(CleffApp.LAST_PLAYED_SONG, mLastSongPosition);
+        //mCurrentSong = event.song;
+        int lastPlayedSong = mSettings.getInt(CleffApp.LAST_PLAYED_SONG, mLastSongPlayedPosition);
 
         if (getPlayerSate().equals(PlayerState.IDLE)) {
             play();
@@ -210,13 +219,20 @@ public class MusicService extends Service implements
 
     }
 
+    @Subscribe
+    public void onAlbumInfoSelected(AlbumInfoSelectedEvent albumEvent) {
+        // Change data set to only the album's songs
+        Timber.d("Data set changed to album songs only");
+        mSongs = MusicLibrary.get(mContext).getAllAlbumSongs(albumEvent.album_id);
+
+    }
+
     /**
      * Plays the current song in mCurrentSongPosition
      **/
     public void play() {
-        Timber.d("Play Called");
-        if (mMediaPlayer == null) initMediaPlayer();
 
+        if (mMediaPlayer == null) initMediaPlayer();
         Song currentSong = mSongs.get(mCurrentSongPosition);
 
         Uri trackUri = ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, currentSong.getId());
@@ -234,7 +250,7 @@ public class MusicService extends Service implements
 
             // Saves the position of the previously played song to a file.
             SharedPreferences.Editor editor = mSettings.edit();
-            editor.putInt(CleffApp.LAST_PLAYED_SONG, mLastSongPosition);
+            editor.putInt(CleffApp.LAST_PLAYED_SONG, mLastSongPlayedPosition);
 
             editor.apply();
 
@@ -441,6 +457,7 @@ public class MusicService extends Service implements
     public void onPrepared(MediaPlayer mediaPlayer) {
         mediaPlayer.start();
         Notification notification = updateNotification();
+        int NOTIFICATION_ID = 579;
         startForeground(NOTIFICATION_ID, notification);
     }
 

@@ -7,47 +7,24 @@ import android.os.Parcelable;
  * Created by jcmanzo on 8/7/14.
  */
 public class Song extends Music implements Parcelable {
-    private int mSongId;
-    private int mAlbumID;
 
-    private String mTitle;
-    private String mArtist;
+    //================================================================================
+    // Properties
+    //================================================================================
+
+    private boolean mFavorited = false;
+
+    private int mAlbumId;
+    private int mSongId;
+
     private String mAlbum;
+    private String mArtist;
     private String mGenre;
     private String mPath;
-    private String mYear;
-    private float mSongRating;
+    private String mTitle;
 
     public Song() {
         // Required empty constructor
-    }
-
-    public float getSongRating() {
-        return mSongRating;
-    }
-
-    public String getGenre() {
-        return mGenre;
-    }
-
-    public void setGenre(String genre) {
-        mGenre = genre;
-    }
-
-    public void setSongRating(float songRating) {
-        mSongRating = songRating;
-    }
-
-
-    public String getAlbum() {
-        return mAlbum;
-    }
-
-    public void setAlbum(String album) {
-        mAlbum = album;
-    }
-    public int getAlbumID() {
-        return mAlbumID;
     }
 
     @Override
@@ -61,6 +38,23 @@ public class Song extends Music implements Parcelable {
     }
 
     @Override
+    public int hashCode() {
+        int result = 17;
+        result = 31 * result + mSongId;
+        result = 31 * result + mAlbumId;
+        return result;
+    }
+
+    @Override
+    public String toString() {
+        return getTitle();
+    }
+
+    //================================================================================
+    // Accessors
+    //================================================================================
+
+    @Override
     public int getId() {
         super.getId();
         return mSongId;
@@ -72,48 +66,80 @@ public class Song extends Music implements Parcelable {
         mSongId = id;
     }
 
-    public String getTitle() {
-        return this.mTitle;
+    public int getAlbumId() {
+        return mAlbumId;
     }
 
-    public void setTitle(String title) {
-        mTitle = title;
+    public void setAlbumId(int albumId) {
+        mAlbumId = albumId;
+    }
+
+    public boolean getFavorited() {
+        return mFavorited;
+    }
+
+    public void setFavorited(boolean favorited) {
+        mFavorited = favorited;
+    }
+
+    public int getSongId() {
+        return mSongId;
+    }
+
+    public void setSongId(int songId) {
+        mSongId = songId;
+    }
+
+    public String getAlbum() {
+        return mAlbum;
+    }
+
+    public void setAlbum(String album) {
+        mAlbum = album;
     }
 
     public String getArtist() {
-        return this.mArtist;
+        return mArtist;
     }
 
     public void setArtist(String artist) {
         mArtist = artist;
     }
 
-    public void setPath(String path) {
-        mPath = path;
+    public String getGenre() {
+        return mGenre;
+    }
+
+    public void setGenre(String genre) {
+        mGenre = genre;
     }
 
     public String getPath() {
         return mPath;
     }
 
-    public void setAlbumID(int albumID) {
-        mAlbumID = albumID;
+    public void setPath(String path) {
+        mPath = path;
     }
 
-    public String getYear() {
-        return mYear;
+    public String getTitle() {
+        return mTitle;
     }
 
-    public void setYear(String year) {
-        mYear = year;
+    public void setTitle(String title) {
+        mTitle = title;
     }
 
-
-    @Override
-    public String toString() {
-     return getTitle();
+    protected Song(Parcel in) {
+        mFavorited = in.readByte() != 0x00;
+        mAlbumId = in.readInt();
+        mSongId = in.readInt();
+        mAlbum = in.readString();
+        mArtist = in.readString();
+        mGenre = in.readString();
+        mPath = in.readString();
+        mTitle = in.readString();
     }
-
 
     @Override
     public int describeContents() {
@@ -122,30 +148,24 @@ public class Song extends Music implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeLong(this.mSongId);
-        dest.writeInt(this.mAlbumID);
-        dest.writeString(this.mTitle);
-        dest.writeString(this.mArtist);
-        dest.writeString(this.mAlbum);
-        dest.writeString(this.mGenre);
-        dest.writeFloat(this.mSongRating);
+        dest.writeByte((byte) (mFavorited ? 0x01 : 0x00));
+        dest.writeInt(mAlbumId);
+        dest.writeInt(mSongId);
+        dest.writeString(mAlbum);
+        dest.writeString(mArtist);
+        dest.writeString(mGenre);
+        dest.writeString(mPath);
+        dest.writeString(mTitle);
     }
 
-    private Song(Parcel in) {
-        this.mSongId = in.readInt();
-        this.mAlbumID = in.readInt();
-        this.mTitle = in.readString();
-        this.mArtist = in.readString();
-        this.mAlbum = in.readString();
-        this.mGenre = in.readString();
-        this.mSongRating = in.readFloat();
-    }
-
-    public static final Creator<Song> CREATOR = new Creator<Song>() {
-        public Song createFromParcel(Parcel source) {
-            return new Song(source);
+    @SuppressWarnings("unused")
+    public static final Parcelable.Creator<Song> CREATOR = new Parcelable.Creator<Song>() {
+        @Override
+        public Song createFromParcel(Parcel in) {
+            return new Song(in);
         }
 
+        @Override
         public Song[] newArray(int size) {
             return new Song[size];
         }

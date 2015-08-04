@@ -20,9 +20,11 @@ import com.freneticlabs.cleff.activities.PlayerActivity;
 import com.freneticlabs.cleff.listeners.RecyclerItemClickListener;
 import com.freneticlabs.cleff.models.MusicLibrary;
 import com.freneticlabs.cleff.models.Song;
+import com.freneticlabs.cleff.models.events.MusicDataChangedEvent;
 import com.freneticlabs.cleff.models.events.SongSelectedEvent;
 import com.freneticlabs.cleff.views.DividerItemDecoration;
 import com.freneticlabs.cleff.views.adapters.SongsAdapter;
+import com.squareup.otto.Subscribe;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -85,7 +87,7 @@ public class SongsFragment extends Fragment {
             Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_songs, container, false);
         ButterKnife.bind(this, rootView);
-        mSongs = MusicLibrary.get(mContext).getSongs();
+        mSongs = new ArrayList<>(MusicLibrary.get(mContext).getSongs());
         setUpRecyclerView();
         setUpListeners();
 
@@ -108,7 +110,7 @@ public class SongsFragment extends Fragment {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_sort_by_album:
-                mSongsAdapter.sort(new Comparator<Song>() {
+                mSongsAdapter.sortLibrary(new Comparator<Song>() {
                     @Override
                     public int compare(Song song1, Song song2) {
                         return song1.getAlbum().compareTo(song2.getAlbum());
@@ -116,7 +118,7 @@ public class SongsFragment extends Fragment {
                 });
                 break;
             case R.id.action_sort_by_artist:
-                mSongsAdapter.sort(new Comparator<Song>() {
+                mSongsAdapter.sortLibrary(new Comparator<Song>() {
                     @Override
                     public int compare(Song song1, Song song2) {
                         return song1.getArtist().compareTo(song2.getArtist());
@@ -124,7 +126,7 @@ public class SongsFragment extends Fragment {
                 });
                 break;
             case R.id.action_sort_by_genre:
-                mSongsAdapter.sort(new Comparator<Song>() {
+                mSongsAdapter.sortLibrary(new Comparator<Song>() {
                     @Override
                     public int compare(Song song1, Song song2) {
                         return song1.getGenre().compareTo(song2.getAlbum());
@@ -132,7 +134,7 @@ public class SongsFragment extends Fragment {
                 });
                 break;
             case R.id.action_sort_by_name:
-                mSongsAdapter.sort(new Comparator<Song>() {
+                mSongsAdapter.sortLibrary(new Comparator<Song>() {
                     @Override
                     public int compare(Song song1, Song song2) {
                         return song1.getTitle().compareTo(song2.getTitle());
@@ -169,12 +171,28 @@ public class SongsFragment extends Fragment {
         mLayoutManager = mRecyclerView.getLayoutManager();
 
         // Create and set the adapter
-        mSongsAdapter = new SongsAdapter(mContext, mRecyclerView, mSongs);
+        mSongsAdapter = new SongsAdapter(mContext, mRecyclerView, new ArrayList<Song>(mSongs));
         mRecyclerView.setAdapter(mSongsAdapter);
 
         // Set the divider between song items
         mRecyclerView.addItemDecoration(new DividerItemDecoration(getActivity(), DividerItemDecoration.VERTICAL_LIST));
 
+
+    }
+
+    /**
+     * Listens to when the songs data set is changed
+      * @param event
+     */
+    @Subscribe
+    public void onMusicDataSetChanged(MusicDataChangedEvent event) {
+        mSongs = event.songs;
+    }
+    /**
+     * Sets up listerners
+     */
+    private void setUpListeners() {
+        // Listener for when a recyclerview item is clicked
         mRecyclerView.addOnItemTouchListener(new RecyclerItemClickListener(getActivity(), mRecyclerView, new RecyclerItemClickListener.OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
@@ -182,10 +200,11 @@ public class SongsFragment extends Fragment {
                 mCurrentSongPosition = position;
                 Song song = mSongs.get(mCurrentSongPosition);
 
-                CleffApp.getEventBus().post(new SongSelectedEvent(position));
+                CleffApp.getEventBus().post(new SongSelectedEvent(song, position));
 
+                // Pass all songs to the player viewpager activity
                 playerIntent.putExtra(PlayerFragment.EXTRA_SONG_ID, song.getId());
-
+                playerIntent.putParcelableArrayListExtra(PlayerActivity.EXTRA_SONG_DATA, mSongs);
                 startActivityForResult(playerIntent, 0);
             }
 
@@ -194,13 +213,5 @@ public class SongsFragment extends Fragment {
 
             }
         }));
-    }
-
-    /**
-     * Sets up listerners
-     */
-    private void setUpListeners() {
-        // Listener for when a recyclerview item is clicked
-
     }
 }

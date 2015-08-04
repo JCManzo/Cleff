@@ -67,7 +67,7 @@ public class AlbumsAdapter extends RecyclerView.Adapter<AlbumsAdapter.ViewHolder
         Picasso.with(mContext)
                 .load(uri)
                 .resize(300,300)
-                .placeholder(R.drawable.adele)
+                .placeholder(R.drawable.no_album_art)
                 .into(holder.artwork);
     }
 

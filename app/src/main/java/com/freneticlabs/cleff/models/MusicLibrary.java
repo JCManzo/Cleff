@@ -4,6 +4,7 @@ import android.content.Context;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.freneticlabs.cleff.CleffApp;
+import com.freneticlabs.cleff.models.events.MusicDataChangedEvent;
 import com.freneticlabs.cleff.utils.PojoMapper;
 
 import java.io.FileNotFoundException;
@@ -13,6 +14,8 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 
 import timber.log.Timber;
 
@@ -43,22 +46,15 @@ public class MusicLibrary {
     }
 
     public void addSong(Song song) {
-        if(!mSongs.contains(song)) {
             mSongs.add(song);
-        }
     }
 
     public void addAlbum(Album album) {
-        if(!mAlbums.contains(album)) {
             mAlbums.add(album);
-        }
     }
 
     public void addArtist(Artist artist) {
-        //TODO find more efficient method. Consider using a LinkedHashSet
-        if(!mArtists.contains(artist)) {
             mArtists.add(artist);
-        }
     }
 
     public static MusicLibrary get(Context context) {
@@ -80,10 +76,18 @@ public class MusicLibrary {
         return mArtists;
     }
 
+    public ArrayList<Song> sortSongsBy(Comparator<? super Song> comparator) {
+        Timber.d("Sorting..");
+        Collections.sort(mSongs, comparator);
+
+        CleffApp.getEventBus().post(new MusicDataChangedEvent(mSongs));
+        return mSongs;
+    }
+
     public ArrayList<Song> getAllAlbumSongs(int albumId) {
         ArrayList<Song> albumSongs = new ArrayList<>();
         for (Song song : mSongs) {
-            if(song.getAlbumID() == albumId) {
+            if(song.getAlbumId() == albumId) {
                 albumSongs.add(song);
             }
         }
@@ -100,7 +104,8 @@ public class MusicLibrary {
         return null;
     }
 
-    public void updateRating(long songID, float rating) {
+
+   /* public void updateRating(long songID, float rating) {
 
         for(Song song : mSongs) {
             if(song.getId() == songID) {
@@ -110,16 +115,16 @@ public class MusicLibrary {
                 mSongs.set(index, song);
             }
         }
-    }
+    }*/
 
-    public float getRating(long songId) {
+   /* public float getRating(long songId) {
         for(Song song : mSongs) {
             if(song.getId() == songId) {
                 return song.getSongRating();
             }
         }
         return 0;
-    }
+    }*/
 
     /**
      * Saves all music data to JSON files.

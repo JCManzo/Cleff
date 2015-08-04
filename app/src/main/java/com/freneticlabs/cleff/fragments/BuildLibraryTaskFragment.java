@@ -253,13 +253,13 @@ public class BuildLibraryTaskFragment extends Fragment {
 
                     Song song = new Song();
                     song.setId(songId);
-                    song.setYear(songYear);
-                    song.setTitle(songTitle);
+                    song.setFavorited(false);
+                    song.setAlbumId(songAlbumId);
                     song.setArtist(songArtist);
                     song.setAlbum(songAlbum);
-                    song.setPath(songFilePath);
-                    song.setAlbumID(songAlbumId);
                     song.setGenre(songGenre);
+                    song.setPath(songFilePath);
+                    song.setTitle(songTitle);
 
                     MusicLibrary.get(mContext).addSong(song);
                 }

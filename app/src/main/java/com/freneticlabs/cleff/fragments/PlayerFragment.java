@@ -32,6 +32,7 @@ import timber.log.Timber;
  */
 public class PlayerFragment extends Fragment {
     public static final String EXTRA_SONG_ID = "com.freneticlabs.cleff.song_id";
+
     @Bind(R.id.player_song_art) ImageView mSongArt;
 
     private Song mSong;
@@ -40,7 +41,7 @@ public class PlayerFragment extends Fragment {
         // Required empty public constructor
     }
 
-    public static PlayerFragment newInstance(long songId) {
+    public static PlayerFragment newInstance(int songId) {
         Bundle args = new Bundle();
         args.putSerializable(EXTRA_SONG_ID, songId);
 
@@ -55,7 +56,7 @@ public class PlayerFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
-        long songId = (long)getArguments().getSerializable(EXTRA_SONG_ID);
+        int songId = (int)getArguments().getSerializable(EXTRA_SONG_ID);
         mSong = MusicLibrary.get(getActivity()).getSong(songId);
     }
 
@@ -90,14 +91,18 @@ public class PlayerFragment extends Fragment {
                 float scaleFactor = (float) newWidth / (float) origImgWidth;
                 int newHeight = (int) (origImgHeight * scaleFactor);
 
-                Bitmap scaledPicture = Bitmap.createScaledBitmap(bitmap, newWidth, newHeight, true);
+                Bitmap scaledPicture;
+                try {
+                   scaledPicture = Bitmap.createScaledBitmap(bitmap, newWidth, newHeight, true);
+                    mSongArt.setImageBitmap(scaledPicture);
+
+                } catch (IllegalArgumentException ex) {
+                    ex.printStackTrace();
+                }
 
                 if(!bitmap.isRecycled()) {
                     bitmap.recycle();
                 }
-                mSongArt.setImageBitmap(scaledPicture);
-
-
             }
         } catch (Exception e) {
             e.printStackTrace();
