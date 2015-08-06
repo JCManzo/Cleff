@@ -13,7 +13,7 @@ import com.freneticlabs.cleff.CleffApp;
 import com.freneticlabs.cleff.R;
 import com.freneticlabs.cleff.fragments.AlbumDetailFragment;
 import com.freneticlabs.cleff.fragments.BuildLibraryTaskFragment;
-import com.freneticlabs.cleff.fragments.LibrarySlidingTabsPagerFragment;
+import com.freneticlabs.cleff.fragments.LibraryPagerFragment;
 import com.freneticlabs.cleff.models.MusicLibrary;
 import com.freneticlabs.cleff.models.events.AlbumInfoSelectedEvent;
 import com.squareup.otto.Subscribe;
@@ -142,7 +142,7 @@ public class MainActivity extends AppCompatActivity implements
      */
     private void showLibraryFragment() {
         getSupportFragmentManager().beginTransaction()
-                .replace(R.id.main_container, new LibrarySlidingTabsPagerFragment())
+                .replace(R.id.main_container, new LibraryPagerFragment())
                 .commit();
         Timber.d("Showing mainview");
     }
@@ -199,11 +199,7 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public void onPostExecute() {
-        //TODO temporary fix for tabs not displaying after BuildLibrary Fragment completes
-        recreate();
-
         mCleffApp.setAsRunned();
-
         showLibraryFragment();
     }
 

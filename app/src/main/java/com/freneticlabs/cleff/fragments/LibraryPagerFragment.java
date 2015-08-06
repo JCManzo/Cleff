@@ -30,7 +30,7 @@ import timber.log.Timber;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class LibrarySlidingTabsPagerFragment extends Fragment {
+public class LibraryPagerFragment extends Fragment {
 
     @Bind(R.id.toolbar) Toolbar mToolbar;
     @Bind(R.id.floating_player_actions) FloatingActionsMenu mFloatingActionsMenu;
@@ -41,7 +41,7 @@ public class LibrarySlidingTabsPagerFragment extends Fragment {
     private CleffApp mCleffApp;
     private static String mPlayerState = CleffApp.MUSIC_IDLE;
 
-    public LibrarySlidingTabsPagerFragment() {
+    public LibraryPagerFragment() {
         // Required empty public constructor
     }
 
@@ -59,12 +59,18 @@ public class LibrarySlidingTabsPagerFragment extends Fragment {
 
         setUpToolbar();
 
-        ViewPager mViewPager = (ViewPager)view.findViewById(R.id.main_pager);
+        final ViewPager mViewPager = (ViewPager)view.findViewById(R.id.main_pager);
         mViewPager.setAdapter(new LibraryTabs(getChildFragmentManager(), getActivity().getApplication().getApplicationContext()));
 
-        TabLayout mTabs = (TabLayout)view.findViewById(R.id.main_tabs);
+        final TabLayout mTabs = (TabLayout)view.findViewById(R.id.main_tabs);
 
-        mTabs.setupWithViewPager(mViewPager);
+        // Fix so tabs display when a fragment is replaced with this
+        mTabs.post(new Runnable() {
+            @Override
+            public void run() {
+                mTabs.setupWithViewPager(mViewPager);
+            }
+        });
 
         setUpListeners();
         updateFloatingUi();
