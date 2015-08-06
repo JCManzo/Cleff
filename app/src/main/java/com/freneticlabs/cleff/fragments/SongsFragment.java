@@ -87,7 +87,7 @@ public class SongsFragment extends Fragment {
             Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_songs, container, false);
         ButterKnife.bind(this, rootView);
-        mSongs = new ArrayList<>(MusicLibrary.get(mContext).getSongs());
+        mSongs = new ArrayList<>(MusicLibrary.get(mContext).getAllSongs());
         setUpRecyclerView();
         setUpListeners();
 
@@ -110,6 +110,8 @@ public class SongsFragment extends Fragment {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_sort_by_album:
+                MusicLibrary.get(mContext).printLibrary();
+
                 mSongsAdapter.sortLibrary(new Comparator<Song>() {
                     @Override
                     public int compare(Song song1, Song song2) {
@@ -199,6 +201,7 @@ public class SongsFragment extends Fragment {
                 Intent playerIntent = new Intent(getActivity(), PlayerActivity.class);
                 mCurrentSongPosition = position;
                 Song song = mSongs.get(mCurrentSongPosition);
+                CleffApp.getEventBus().post(new MusicDataChangedEvent(MusicLibrary.get(getActivity()).getAllSongs()));
 
                 CleffApp.getEventBus().post(new SongSelectedEvent(song, position));
 

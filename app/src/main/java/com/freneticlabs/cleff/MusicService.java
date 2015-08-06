@@ -109,7 +109,6 @@ public class MusicService extends Service implements
         mCleffApp = (CleffApp) getApplicationContext();
         mSettings = mCleffApp.getAppPreferences();
 
-        mSongs = new ArrayList<>(MusicLibrary.get(mContext).getSongs());
 
         mCleffApp.setService(this);
         initMediaPlayer();

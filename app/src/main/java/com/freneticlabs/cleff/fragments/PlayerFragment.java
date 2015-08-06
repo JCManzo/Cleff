@@ -84,25 +84,22 @@ public class PlayerFragment extends Fragment {
                 bitmap = Utils.decodeSampledBitmapFromResource(art, 500, 500);
                 //bitmap = BitmapFactory.decodeByteArray(art, 0, art.length);
                 // Create a scaled up version of the bitmap
-                int origImgWidth = bitmap.getWidth();
+               /* int origImgWidth = bitmap.getWidth();
                 int origImgHeight = bitmap.getHeight();
 
                 int newWidth = getScreenWidth();
                 float scaleFactor = (float) newWidth / (float) origImgWidth;
                 int newHeight = (int) (origImgHeight * scaleFactor);
 
-                Bitmap scaledPicture;
-                try {
-                   scaledPicture = Bitmap.createScaledBitmap(bitmap, newWidth, newHeight, true);
-                    mSongArt.setImageBitmap(scaledPicture);
-
-                } catch (IllegalArgumentException ex) {
-                    ex.printStackTrace();
-                }
+                Bitmap scaledPicture = Bitmap.createScaledBitmap(bitmap, newWidth, newHeight, true);
 
                 if(!bitmap.isRecycled()) {
                     bitmap.recycle();
                 }
+                mSongArt.setImageBitmap(scaledPicture);
+*/
+
+
             }
         } catch (Exception e) {
             e.printStackTrace();

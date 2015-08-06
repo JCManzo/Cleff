@@ -4,7 +4,6 @@ import android.content.res.ColorStateList;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -42,12 +41,13 @@ public class PlayerActivity extends AppCompatActivity {
     public static final String EXTRA_SONG_DATA ="com.freneticlabs.cleff.song_data";
 
     private ArrayList<Song> mSongs;
-    private Song mSong;
     private Handler mSeekBarHandler = new Handler();
-    private int mSeekBarProgress = 0;
     private static String mPlayerState = CleffApp.MUSIC_IDLE;
 
     private CleffApp mCleffApp;
+
+    private int mCurrentSongId = 0;
+
     @Bind(R.id.toolbar) Toolbar mToolbar;
     @Bind(R.id.player_activity_pager) ViewPager mViewPager;
     @Bind(R.id.seekBar) DiscreteSeekBar mDiscreteSeekBar;
@@ -87,24 +87,20 @@ public class PlayerActivity extends AppCompatActivity {
         });
         updateProgressBar();
 
-        int songId = (int)getIntent().getSerializableExtra(PlayerFragment.EXTRA_SONG_ID);
+        mCurrentSongId = (int)getIntent().getSerializableExtra(PlayerFragment.EXTRA_SONG_ID);
 
         for (int i = 0; i < mSongs.size(); i++) {
-            mSong = mSongs.get(i);
-            if(mSong.getId() == songId) {
+            Song song = mSongs.get(i);
+            if(song.getId() == mCurrentSongId) {
                 mViewPager.setCurrentItem(i);
-                updateSongDisplayInfo(mSong);
+                updateSongDisplayInfo(song);
                 break;
             }
         }
 
         initListeners();
-    }
+        updateUi();
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        CleffApp.getEventBus().post(new MusicDataChangedEvent(MusicLibrary.get(this).getSongs()));
     }
 
     @Override
@@ -136,6 +132,7 @@ public class PlayerActivity extends AppCompatActivity {
 
     @Override
     protected void onPause() {
+        CleffApp.getEventBus().post(new MusicDataChangedEvent(MusicLibrary.get(this).getAllSongs()));
         CleffApp.getEventBus().unregister(this);
         super.onPause();
     }
@@ -166,8 +163,10 @@ public class PlayerActivity extends AppCompatActivity {
      * Runnable that converts duration of song to mm:ss format.
      */
     private Runnable mUpdateTimeTask = new Runnable() {
+
         @Override
         public void run() {
+
             if(mCleffApp.getService() != null && mCleffApp.getService().isPlaying()) {
                 int totalDuration = mCleffApp.getService().getDuration();
                 int currentDuration = mCleffApp.getService().getMPCurrentPosition();
@@ -183,8 +182,8 @@ public class PlayerActivity extends AppCompatActivity {
                // mSongCurrentDuration.setText("" + MusicUtils.milliSecondsToTimer(currentDuration));
 
                 // Updating progress bar
-                mSeekBarProgress = (int) (Utils.getProgressPercentage(currentDuration, totalDuration));
-                mDiscreteSeekBar.setProgress(mSeekBarProgress);
+                int seekBarProgress = (int) (Utils.getProgressPercentage(currentDuration, totalDuration));
+                mDiscreteSeekBar.setProgress(seekBarProgress);
                 //mDiscreteSeekBar.setIndicatorFormatter("%04d");
                // mDiscreteSeekBar.setMax(max_time);
                 // Running this thread after 100 milliseconds
@@ -204,9 +203,12 @@ public class PlayerActivity extends AppCompatActivity {
         updateUi();
     }
 
-
-
     private void updateUi() {
+        updateMusicControls();
+        updateFavoriteButton();
+    }
+
+    private void updateMusicControls() {
         if(mPlayerState.equals(CleffApp.MUSIC_IDLE)) {
 
         } else if(mPlayerState.equals(CleffApp.MUSIC_PLAYING)) {
@@ -218,6 +220,24 @@ public class PlayerActivity extends AppCompatActivity {
             mToggleButton.setImageResource(R.drawable.ic_player_orange_play_circle_outline);
 
         }
+    }
+
+    private void updateFavoriteButton() {
+        if (MusicLibrary.get(getApplicationContext()).isSongFavorited(mCurrentSongId)) {
+            mFloatingActionFavButton.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.white)));
+            mFloatingActionFavButton.setImageResource(R.drawable.ic_player_favorite_full);
+            Timber.d("Song with ID: " + Integer.toString(mCurrentSongId) + " Favorited");
+        } else {
+            mFloatingActionFavButton.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.hot_red)));
+            mFloatingActionFavButton.setImageResource(R.drawable.ic_player_favorite);
+
+            Timber.d("Song with ID: " + Integer.toString(mCurrentSongId) + " Unfavorited");
+        }
+    }
+
+    @Subscribe
+    public void onMusicDataSetChanged(MusicDataChangedEvent event) {
+        mSongs = event.songs;
     }
 
     private void initListeners() {
@@ -249,7 +269,7 @@ public class PlayerActivity extends AppCompatActivity {
             }
         });
 
-        // ViewPager
+        // ViewPager listener
         mViewPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
@@ -261,9 +281,13 @@ public class PlayerActivity extends AppCompatActivity {
                 updateSongDisplayInfo(song);
                 if (song.getTitle() != null) {
                     // setTitle(song.getTitle());
+                    Timber.d(Integer.toString(song.getId()));
+                    mCurrentSongId = song.getId();
 
                 }
                 CleffApp.getEventBus().post(new SongSelectedEvent(song, position));
+                updateUi();
+
             }
 
             @Override
@@ -283,9 +307,7 @@ public class PlayerActivity extends AppCompatActivity {
         mSkipNextButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //Timber.d("BEFORE SONG POST: " + Integer.toString(mCleffApp.getService().getCurrentSongPosition()));
                 mCleffApp.getService().playNext();
-                //Timber.d("AFTER SONG POST: " + Integer.toString(mCleffApp.getService().getCurrentSongPosition()));
                 mViewPager.setCurrentItem(mCleffApp.getService().getCurrentSongPosition());
                 updateUi();
             }
@@ -303,12 +325,12 @@ public class PlayerActivity extends AppCompatActivity {
         mFloatingActionFavButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar
-                        .make(view, R.string.player_added_to_faves, Snackbar.LENGTH_LONG)
-                        .show();
-                mFloatingActionFavButton.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.white)));
-                mFloatingActionFavButton.setImageResource(R.drawable.ic_player_favorite_full);
+                MusicLibrary.get(getApplicationContext()).toggleFavorite(mCurrentSongId);
+                MusicLibrary.get(getApplicationContext()).printLibrary();
+                updateUi();
+
             }
         });
+
     }
 }

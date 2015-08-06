@@ -64,15 +64,15 @@ public class MusicLibrary {
         return sMusicLibrary;
     }
 
-    public ArrayList<Song> getSongs() {
+    public ArrayList<Song> getAllSongs() {
         return mSongs;
     }
 
-    public ArrayList<Album> getAlbums() {
+    public ArrayList<Album> getAllAlbums() {
         return mAlbums;
     }
 
-    public ArrayList<Artist> getArtists() {
+    public ArrayList<Artist> getAllArtists() {
         return mArtists;
     }
 
@@ -95,7 +95,7 @@ public class MusicLibrary {
         return albumSongs;
     }
 
-    public Song getSong(long id) {
+    public Song getSong(int id) {
         for(Song song : mSongs) {
             if(song.getId() == id) {
                 return song;
@@ -104,28 +104,42 @@ public class MusicLibrary {
         return null;
     }
 
-
-   /* public void updateRating(long songID, float rating) {
-
+    public void toggleFavorite(int songId) {
         for(Song song : mSongs) {
-            if(song.getId() == songID) {
+            if (song.getId() == songId) {
                 int index = mSongs.indexOf(song);
-                song.setSongRating(rating);
+
+                if (song.getFavorited()) {
+                    song.setFavorited(false);
+                } else {
+                    song.setFavorited(true);
+
+                }
 
                 mSongs.set(index, song);
+                CleffApp.getEventBus().post(new MusicDataChangedEvent(mSongs));
+
+                Timber.d("Updating song with: " + song.getFavorited());
             }
         }
-    }*/
+    }
 
-   /* public float getRating(long songId) {
-        for(Song song : mSongs) {
-            if(song.getId() == songId) {
-                return song.getSongRating();
+    public boolean isSongFavorited(int songId) {
+        for (Song song : mSongs) {
+            if (song.getId() == songId) {
+                return song.getFavorited();
             }
         }
-        return 0;
-    }*/
+        return false;
+    }
 
+    public void printLibrary() {
+        StringBuilder str = new StringBuilder();
+
+        for (Song song : mSongs) {
+            Timber.d(song.toString());
+        }
+    }
     /**
      * Saves all music data to JSON files.
      *
