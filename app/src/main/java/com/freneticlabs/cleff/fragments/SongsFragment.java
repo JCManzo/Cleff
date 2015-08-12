@@ -203,8 +203,8 @@ public class SongsFragment extends Fragment {
     public void onMusicDataSetChanged(MusicDataChangedEvent event) {
         Timber.d("Music Dataset changed in SongsFragment");
 
-       // mSongs = event.songs;
-       // mSongsAdapter.notifyDataChange();
+       mSongs = event.songs;
+       mSongsAdapter.notifyDataChange();
     }
 
     /**
