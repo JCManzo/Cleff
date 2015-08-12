@@ -8,14 +8,9 @@
              tools:context="com.jcmanzo.cleff.fragments.AlbumsFragment"
              android:padding="2dp" >
 
-    <GridView
-        android:id="@+id/artists_grid_view"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:numColumns="auto_fit"
-        android:drawSelectorOnTop="true"
-        android:stretchMode="columnWidth"
-        android:horizontalSpacing="2dp"
-        android:verticalSpacing="2dp"/>
+  <android.support.v7.widget.RecyclerView
+      android:id="@+id/artists_view"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      />
 </FrameLayout>
