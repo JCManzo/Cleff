@@ -118,7 +118,6 @@ public class LibraryPagerFragment extends Fragment {
             @Override
             public void onMenuCollapsed() {
                 Timber.d("COLLAPSED");
-
             }
         });
 
@@ -126,7 +125,6 @@ public class LibraryPagerFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 mCleffApp.getService().togglePlayer();
-
             }
         });
 

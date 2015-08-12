@@ -64,7 +64,7 @@ public class AlbumDetailFragment extends Fragment {
 
         mAlbumId = getArguments().getInt(ALBUM_INFO_ID);
         mAlbumName = getArguments().getString(ALBUM_INFO_NAME);
-        mAlbumSongs = MusicLibrary.get(getActivity()).getAllAlbumSongs(mAlbumId);
+        mAlbumSongs = MusicLibrary.getInstance(getActivity()).getAllAlbumSongs(mAlbumId);
         setUpToolbar();
         setUpRecyclerView();
 

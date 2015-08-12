@@ -119,7 +119,7 @@ public class MusicService extends Service implements
                 AudioManager.AUDIOFOCUS_GAIN);
 
         if (result != AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
-            Timber.e("Could not get audio focus");
+            Timber.d("Could not get audio focus");
             mService.stopSelf();
         }
 
@@ -190,6 +190,7 @@ public class MusicService extends Service implements
     public void onMusicDataSetChanged(MusicDataChangedEvent event) {
         mSongs = event.songs;
         Timber.d("Music Data Changed");
+       // MusicLibrary.getInstance(mContext).printLibrary();
     }
 
     @Subscribe
@@ -222,7 +223,7 @@ public class MusicService extends Service implements
     public void onAlbumInfoSelected(AlbumInfoSelectedEvent albumEvent) {
         // Change data set to only the album's songs
         Timber.d("Data set changed to album songs only");
-        mSongs = MusicLibrary.get(mContext).getAllAlbumSongs(albumEvent.album_id);
+        mSongs = MusicLibrary.getInstance(mContext).getAllAlbumSongs(albumEvent.album_id);
 
     }
 

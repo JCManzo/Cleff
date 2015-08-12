@@ -12,7 +12,7 @@ public class Song extends Music implements Parcelable {
     // Properties
     //================================================================================
 
-    private boolean mFavorited = false;
+    private boolean mFavorited;
 
     private int mAlbumId;
     private int mSongId;
@@ -47,7 +47,7 @@ public class Song extends Music implements Parcelable {
 
     @Override
     public String toString() {
-        return getTitle();
+        return "Id: " + getId() + "\n" + "Title: " + getTitle() + "\n" + getArtist() + "\n" + "IsFave: " + getFavorited();
     }
 
     //================================================================================
@@ -131,7 +131,7 @@ public class Song extends Music implements Parcelable {
     }
 
     protected Song(Parcel in) {
-        mFavorited = in.readByte() != 0x00;
+        mFavorited = in.readByte() != 0;
         mAlbumId = in.readInt();
         mSongId = in.readInt();
         mAlbum = in.readString();
@@ -148,7 +148,7 @@ public class Song extends Music implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeByte((byte) (mFavorited ? 0x01 : 0x00));
+        dest.writeByte((byte) (mFavorited ? 1 : 0));
         dest.writeInt(mAlbumId);
         dest.writeInt(mSongId);
         dest.writeString(mAlbum);

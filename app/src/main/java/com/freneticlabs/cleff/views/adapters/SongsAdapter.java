@@ -69,6 +69,7 @@ public class SongsAdapter extends RecyclerView.Adapter<SongsAdapter.ViewHolder> 
         return mSongs.size();
     }
 
+
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup viewGroup, int position) {
         View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.item_song_recycler_view, viewGroup, false);
@@ -76,11 +77,13 @@ public class SongsAdapter extends RecyclerView.Adapter<SongsAdapter.ViewHolder> 
     }
 
     public void sortLibrary(Comparator<? super Song> comparator) {
-        mSongs = MusicLibrary.get(mContext).sortSongsBy(comparator);
-        notifyItemRangeChanged(0, getItemCount());
+        mSongs = MusicLibrary.getInstance(mContext).sortSongsBy(comparator);
+        notifyDataChange();
     }
 
-
+    public void notifyDataChange() {
+        notifyItemRangeChanged(0, getItemCount());
+    }
     /*@Override
     public int getItemViewType(int position) {
         super.getItemViewType(position);

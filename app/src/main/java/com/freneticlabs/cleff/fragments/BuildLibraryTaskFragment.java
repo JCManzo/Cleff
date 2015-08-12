@@ -261,7 +261,7 @@ public class BuildLibraryTaskFragment extends Fragment {
                     song.setPath(songFilePath);
                     song.setTitle(songTitle);
 
-                    MusicLibrary.get(mContext).addSong(song);
+                    MusicLibrary.getInstance(mContext).addSong(song);
                 }
                 while (mediaStoreCursor.moveToNext());
             }
@@ -290,7 +290,7 @@ public class BuildLibraryTaskFragment extends Fragment {
                     album.setAlbumName(albumName);
                     album.setAlbumArtist(albumArtist);
                     album.setNumOfSongs(albumSongCount);
-                    MusicLibrary.get(mContext).addAlbum(album);
+                    MusicLibrary.getInstance(mContext).addAlbum(album);
                 } while (cursor.moveToNext());
             }
             if(cursor != null) cursor.close();
@@ -312,7 +312,7 @@ public class BuildLibraryTaskFragment extends Fragment {
                     Artist artist = new Artist();
                     artist.setId(artistId);
                     artist.setArtistName(artistName);
-                    MusicLibrary.get(mContext).addArtist(artist);
+                    MusicLibrary.getInstance(mContext).addArtist(artist);
                 } while (cursor.moveToNext());
             }
             if(cursor != null) cursor.close();

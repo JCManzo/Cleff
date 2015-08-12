@@ -3,6 +3,7 @@ package com.freneticlabs.cleff;
 import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.util.Log;
 
 import com.freneticlabs.cleff.utils.MusicServiceManager;
 import com.squareup.otto.Bus;
@@ -30,6 +31,8 @@ public class CleffApp extends Application {
 
     public static final String ART_WORK_PATH = "content://media/external/audio/albumart";
 
+    //Request codes
+    public static final int ACTIVITY_RESULT_CODE_SONGS_FRAGMENT = 4242;
     //SharedPreferences keys.
     public static final String PREF_FIRST_RUN = "cleff_first_run";
     public static final String PREFS_CLEF_FILE = "clef_app_prefs";
@@ -136,23 +139,13 @@ public class CleffApp extends Application {
     }
 
     /** A tree which logs important information for crash reporting. */
-    private static class CrashReportingTree extends Timber.HollowTree {
-        @Override public void i(String message, Object... args) {
-            // TODO e.g., Crashlytics.log(String.format(message, args));
+    private static class CrashReportingTree extends Timber.Tree {
+        @Override protected void log(int priority, String tag, String message, Throwable t) {
+            if (priority == Log.VERBOSE || priority == Log.DEBUG) {
+                return;
+            }
         }
 
-        @Override public void i(Throwable t, String message, Object... args) {
-            i(message, args); // Just add to the log.
-        }
 
-        @Override public void e(String message, Object... args) {
-            i("ERROR: " + message, args); // Just add to the log.
-        }
-
-        @Override public void e(Throwable t, String message, Object... args) {
-            e(message, args);
-
-            // TODO e.g., Crashlytics.logException(t);
-        }
     }
 }

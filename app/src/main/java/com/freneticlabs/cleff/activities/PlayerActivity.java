@@ -1,5 +1,7 @@
 package com.freneticlabs.cleff.activities;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.os.Bundle;
 import android.os.Handler;
@@ -38,7 +40,9 @@ import butterknife.OnClick;
 import timber.log.Timber;
 
 public class PlayerActivity extends AppCompatActivity {
+
     public static final String EXTRA_SONG_DATA ="com.freneticlabs.cleff.song_data";
+    public static final String EXTRA_PLAYER_RESULT = "com.freneticlabs.cleff.player_result";
 
     private ArrayList<Song> mSongs;
     private Handler mSeekBarHandler = new Handler();
@@ -126,20 +130,27 @@ public class PlayerActivity extends AppCompatActivity {
 
     @Override
     protected void onResume() {
-        CleffApp.getEventBus().register(this);
         super.onResume();
+        MusicLibrary.getInstance(this).loadLibrary();
+        CleffApp.getEventBus().register(this);
     }
 
     @Override
     protected void onPause() {
-        CleffApp.getEventBus().post(new MusicDataChangedEvent(MusicLibrary.get(this).getAllSongs()));
+        MusicLibrary.getInstance(this).saveLibrary();
         CleffApp.getEventBus().unregister(this);
         super.onPause();
     }
 
-    private void updateSongDisplayInfo(Song song) {
-        mSongArtist.setText(song.getArtist());
-        mSongTitle.setText(song.getTitle());
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        Intent resultIntent = new Intent();
+        resultIntent.putExtra(EXTRA_PLAYER_RESULT, 53533);
+        resultIntent.putParcelableArrayListExtra(PlayerActivity.EXTRA_SONG_DATA, mSongs);
+
+        setResult(Activity.RESULT_OK, resultIntent);
+        finish();
     }
 
     public void setUpToolbar() {
@@ -152,96 +163,8 @@ public class PlayerActivity extends AppCompatActivity {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
     }
-    /**
-     * Updates the seekbar every 100 milliseconds
-     */
-    public void updateProgressBar() {
-        mSeekBarHandler.postDelayed(mUpdateTimeTask, 100);
-    }
-
-    /**
-     * Runnable that converts duration of song to mm:ss format.
-     */
-    private Runnable mUpdateTimeTask = new Runnable() {
-
-        @Override
-        public void run() {
-
-            if(mCleffApp.getService() != null && mCleffApp.getService().isPlaying()) {
-                int totalDuration = mCleffApp.getService().getDuration();
-                int currentDuration = mCleffApp.getService().getMPCurrentPosition();
-                // Displaying Total Duration time
-                //mSongTotalDuration.setText("" + MusicUtils.milliSecondsToTimer(totalDuration));
-                //int max_time = MusicUtils.millisecondsToTime(totalDuration);
-                int cur_time = Utils.millisecondsToTime(currentDuration);
-
-                //Timber.d(MusicUtils.milliSecondsToTimer(totalDuration));
-               // Timber.d(MusicUtils.milliSecondsToTimer(currentDuration));
-               // Timber.d(Integer.toString(cur_time));
-                // Displaying time completed playing
-               // mSongCurrentDuration.setText("" + MusicUtils.milliSecondsToTimer(currentDuration));
-
-                // Updating progress bar
-                int seekBarProgress = (int) (Utils.getProgressPercentage(currentDuration, totalDuration));
-                mDiscreteSeekBar.setProgress(seekBarProgress);
-                //mDiscreteSeekBar.setIndicatorFormatter("%04d");
-               // mDiscreteSeekBar.setMax(max_time);
-                // Running this thread after 100 milliseconds
-                mSeekBarHandler.postDelayed(this, 100);
-            }
-        }
-    };
-
-    @OnClick(R.id.player_toggle_button)
-        public void playerToggle() {
-            mCleffApp.getService().togglePlayer();
-        }
-
-    @Subscribe
-    public void onMusicStateChange(MusicStateChangeEvent event) {
-        mPlayerState = event.musicState;
-        updateUi();
-    }
-
-    private void updateUi() {
-        updateMusicControls();
-        updateFavoriteButton();
-    }
-
-    private void updateMusicControls() {
-        if(mPlayerState.equals(CleffApp.MUSIC_IDLE)) {
-
-        } else if(mPlayerState.equals(CleffApp.MUSIC_PLAYING)) {
-
-            mToggleButton.setImageResource(R.drawable.ic_player_pause_circle_outline);
-
-        } else if(mPlayerState.equals(CleffApp.MUSIC_PAUSED)) {
-
-            mToggleButton.setImageResource(R.drawable.ic_player_orange_play_circle_outline);
-
-        }
-    }
-
-    private void updateFavoriteButton() {
-        if (MusicLibrary.get(getApplicationContext()).isSongFavorited(mCurrentSongId)) {
-            mFloatingActionFavButton.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.white)));
-            mFloatingActionFavButton.setImageResource(R.drawable.ic_player_favorite_full);
-            Timber.d("Song with ID: " + Integer.toString(mCurrentSongId) + " Favorited");
-        } else {
-            mFloatingActionFavButton.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.hot_red)));
-            mFloatingActionFavButton.setImageResource(R.drawable.ic_player_favorite);
-
-            Timber.d("Song with ID: " + Integer.toString(mCurrentSongId) + " Unfavorited");
-        }
-    }
-
-    @Subscribe
-    public void onMusicDataSetChanged(MusicDataChangedEvent event) {
-        mSongs = event.songs;
-    }
 
     private void initListeners() {
-
         // Seekbar
         mDiscreteSeekBar.setOnProgressChangeListener(new DiscreteSeekBar.OnProgressChangeListener() {
             @Override
@@ -251,8 +174,8 @@ public class PlayerActivity extends AppCompatActivity {
 
             @Override
             public void onStartTrackingTouch(DiscreteSeekBar seekBar) {
-                    // remove message Handler from updating progress bar
-                    mSeekBarHandler.removeCallbacks(mUpdateTimeTask);
+                // remove message Handler from updating progress bar
+                mSeekBarHandler.removeCallbacks(mUpdateTimeTask);
             }
 
             @Override
@@ -325,12 +248,106 @@ public class PlayerActivity extends AppCompatActivity {
         mFloatingActionFavButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                MusicLibrary.get(getApplicationContext()).toggleFavorite(mCurrentSongId);
-                MusicLibrary.get(getApplicationContext()).printLibrary();
+                MusicLibrary.getInstance(getApplicationContext()).toggleFavorite(mCurrentSongId);
                 updateUi();
-
             }
         });
 
+    }
+
+    private void updateSongDisplayInfo(Song song) {
+        mSongArtist.setText(song.getArtist());
+        mSongTitle.setText(song.getTitle());
+    }
+
+    /**
+     * Updates the seekbar every 100 milliseconds
+     */
+    public void updateProgressBar() {
+        mSeekBarHandler.postDelayed(mUpdateTimeTask, 100);
+    }
+
+    /**
+     * Runnable that converts duration of song to mm:ss format.
+     */
+    private Runnable mUpdateTimeTask = new Runnable() {
+
+        @Override
+        public void run() {
+
+            if(mCleffApp.getService() != null && mCleffApp.getService().isPlaying()) {
+                int totalDuration = mCleffApp.getService().getDuration();
+                int currentDuration = mCleffApp.getService().getMPCurrentPosition();
+                // Displaying Total Duration time
+                //mSongTotalDuration.setText("" + MusicUtils.milliSecondsToTimer(totalDuration));
+                //int max_time = MusicUtils.millisecondsToTime(totalDuration);
+                int cur_time = Utils.millisecondsToTime(currentDuration);
+
+                //Timber.d(MusicUtils.milliSecondsToTimer(totalDuration));
+               // Timber.d(MusicUtils.milliSecondsToTimer(currentDuration));
+               // Timber.d(Integer.toString(cur_time));
+                // Displaying time completed playing
+               // mSongCurrentDuration.setText("" + MusicUtils.milliSecondsToTimer(currentDuration));
+
+                // Updating progress bar
+                int seekBarProgress = (int) (Utils.getProgressPercentage(currentDuration, totalDuration));
+                mDiscreteSeekBar.setProgress(seekBarProgress);
+                //mDiscreteSeekBar.setIndicatorFormatter("%04d");
+               // mDiscreteSeekBar.setMax(max_time);
+                // Running this thread after 100 milliseconds
+                mSeekBarHandler.postDelayed(this, 100);
+            }
+        }
+    };
+
+    private void updateUi() {
+        updateMusicControls();
+        updateFavoriteButton();
+    }
+
+    private void updateMusicControls() {
+        if(mPlayerState.equals(CleffApp.MUSIC_IDLE)) {
+
+        } else if(mPlayerState.equals(CleffApp.MUSIC_PLAYING)) {
+
+            mToggleButton.setImageResource(R.drawable.ic_player_pause_circle_outline);
+
+        } else if(mPlayerState.equals(CleffApp.MUSIC_PAUSED)) {
+
+            mToggleButton.setImageResource(R.drawable.ic_player_orange_play_circle_outline);
+
+        }
+    }
+
+    private void updateFavoriteButton() {
+        if (MusicLibrary.getInstance(getApplicationContext()).isSongFavorited(mCurrentSongId)) {
+            mFloatingActionFavButton.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.white)));
+            mFloatingActionFavButton.setImageResource(R.drawable.ic_player_favorite_full);
+            Timber.d("Song with ID: " + Integer.toString(mCurrentSongId) + " Favorited");
+        } else {
+            mFloatingActionFavButton.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.hot_red)));
+            mFloatingActionFavButton.setImageResource(R.drawable.ic_player_favorite);
+
+            Timber.d("Song with ID: " + Integer.toString(mCurrentSongId) + " Unfavorited");
+        }
+    }
+
+
+    @Subscribe
+    public void onMusicDataSetChanged(MusicDataChangedEvent event) {
+        mSongs = event.songs;
+    }
+
+
+    @OnClick(R.id.player_toggle_button)
+    public void playerToggle() {
+        mCleffApp.getService().togglePlayer();
+    }
+
+
+    @Subscribe
+    public void onMusicStateChange(MusicStateChangeEvent event) {
+        mPlayerState = event.musicState;
+        updateUi();
     }
 }

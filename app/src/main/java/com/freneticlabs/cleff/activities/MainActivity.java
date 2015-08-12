@@ -1,5 +1,6 @@
 package com.freneticlabs.cleff.activities;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
@@ -14,8 +15,11 @@ import com.freneticlabs.cleff.R;
 import com.freneticlabs.cleff.fragments.AlbumDetailFragment;
 import com.freneticlabs.cleff.fragments.BuildLibraryTaskFragment;
 import com.freneticlabs.cleff.fragments.LibraryPagerFragment;
+import com.freneticlabs.cleff.models.ActivityResultBus;
 import com.freneticlabs.cleff.models.MusicLibrary;
+import com.freneticlabs.cleff.models.events.ActivityResultEvent;
 import com.freneticlabs.cleff.models.events.AlbumInfoSelectedEvent;
+import com.freneticlabs.cleff.models.events.MusicDataChangedEvent;
 import com.squareup.otto.Subscribe;
 
 import butterknife.Bind;
@@ -68,7 +72,7 @@ public class MainActivity extends AppCompatActivity implements
         super.onPause();
         CleffApp.getEventBus().unregister(this);
         CleffApp.activityPaused();
-        MusicLibrary.get(this).saveLibrary();
+        MusicLibrary.getInstance(this).saveLibrary();
     }
 
     @Override
@@ -77,7 +81,13 @@ public class MainActivity extends AppCompatActivity implements
         CleffApp.getEventBus().register(this);
         mCleffApp.getPlaybackManager().initPlayback();
         CleffApp.activityResumed();
-        MusicLibrary.get(this).loadLibrary();
+        MusicLibrary.getInstance(this).loadLibrary();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        ActivityResultBus.getActivityResultBus().postQueue(new ActivityResultEvent(requestCode, resultCode, data));
     }
 
     public void setUpMainView() {

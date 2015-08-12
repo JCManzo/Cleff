@@ -36,32 +36,54 @@ public class MusicLibrary {
     private static final String ARTISTS_FILE = "artists.json";
 
     public MusicLibrary(Context context) {
+        Timber.d("Constructor called");
         mContext = context;
-        mSongs = new ArrayList<>();
-        mAlbums = new ArrayList<>();
-        mArtists = new ArrayList<>();
+        mSongs = new ArrayList<Song>();
+        mAlbums = new ArrayList<Album>();
+        mArtists = new ArrayList<Artist>();
 
         mCleffApp = (CleffApp.getCleffApp());
 
     }
 
+    /**
+     * Returns a single instance of this class
+     * @param context
+     * @return
+     */
+    public static MusicLibrary getInstance(Context context) {
+        if(sMusicLibrary == null) {
+            sMusicLibrary = new MusicLibrary(context.getApplicationContext());
+
+        }
+        return sMusicLibrary;
+    }
+
+    /**
+     * Adds {@param song} to the songs dataset
+     *
+     * @param song is the song to be added
+     */
     public void addSong(Song song) {
             mSongs.add(song);
     }
 
+    /**
+     * Adds {@album album} to the album dataset
+     *
+     * @param album is the album to be added
+     */
     public void addAlbum(Album album) {
             mAlbums.add(album);
     }
 
+    /**
+     * Adds {@artist artist} to the artist dataset
+     *
+     * @param artist is the artist to be added
+     */
     public void addArtist(Artist artist) {
             mArtists.add(artist);
-    }
-
-    public static MusicLibrary get(Context context) {
-        if(sMusicLibrary == null) {
-            sMusicLibrary = new MusicLibrary(context.getApplicationContext());
-        }
-        return sMusicLibrary;
     }
 
     public ArrayList<Song> getAllSongs() {
@@ -107,18 +129,15 @@ public class MusicLibrary {
     public void toggleFavorite(int songId) {
         for(Song song : mSongs) {
             if (song.getId() == songId) {
-                int index = mSongs.indexOf(song);
-
                 if (song.getFavorited()) {
                     song.setFavorited(false);
                 } else {
                     song.setFavorited(true);
-
                 }
-
+                int index = mSongs.indexOf(song);
                 mSongs.set(index, song);
                 CleffApp.getEventBus().post(new MusicDataChangedEvent(mSongs));
-
+                printLibrary();
                 Timber.d("Updating song with: " + song.getFavorited());
             }
         }
@@ -134,12 +153,11 @@ public class MusicLibrary {
     }
 
     public void printLibrary() {
-        StringBuilder str = new StringBuilder();
-
         for (Song song : mSongs) {
             Timber.d(song.toString());
         }
     }
+
     /**
      * Saves all music data to JSON files.
      *

@@ -46,7 +46,7 @@ public class ArtistsFragment extends Fragment {
         mContext = getActivity().getApplicationContext();
         mCleffApp = (CleffApp)getActivity().getApplication();
         mSettings = mCleffApp.getAppPreferences();
-        mArtists = new ArrayList<Artist>(MusicLibrary.get(mContext).getArtists());
+        mArtists = new ArrayList<Artist>(MusicLibrary.getInstance(mContext).getAllArtists());
     }
 
     @Override

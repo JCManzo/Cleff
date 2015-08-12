@@ -50,7 +50,7 @@ public class AlbumsFragment extends Fragment {
         mContext = getActivity().getApplicationContext();
         mCleffApp = (CleffApp)getActivity().getApplication();
         mSettings = mCleffApp.getAppPreferences();
-        mAlbums = new ArrayList<Album>(MusicLibrary.get(mContext).getAlbums());
+        mAlbums = new ArrayList<Album>(MusicLibrary.getInstance(mContext).getAllAlbums());
     }
 
     @Override

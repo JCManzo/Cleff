@@ -10,6 +10,7 @@ import android.view.WindowManager;
 import com.freneticlabs.cleff.R;
 
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import timber.log.Timber;
 
@@ -17,6 +18,17 @@ import timber.log.Timber;
  * Created by jcmanzo on 12/27/14.
  */
 public class Utils {
+    private static final AtomicInteger resultCodeCounter = new AtomicInteger();
+
+    /**
+     * This function uses and AtomicInteger to generate
+     * an atomic counter.
+     *
+     * @return a random integer code
+     */
+    public static int getRandomRequestCode() {
+       return resultCodeCounter.incrementAndGet();
+    }
 
     public static int calculateInSampleSize(
             BitmapFactory.Options options, int reqWidth, int reqHeight) {
@@ -56,7 +68,6 @@ public class Utils {
         // First decode with inJustDecodeBounds=true to check dimensions
         final BitmapFactory.Options options = new BitmapFactory.Options();
         options.inJustDecodeBounds = true;
-        bitmap = BitmapFactory.decodeByteArray(art, 0, art.length, options);
 
         // Calculate inSampleSize
         options.inSampleSize = calculateInSampleSize(options, reqWidth, reqHeight);
