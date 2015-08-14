@@ -1,6 +1,7 @@
 package com.freneticlabs.cleff.activities;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.os.Bundle;
@@ -18,9 +19,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
-import butterknife.Bind;
-import butterknife.ButterKnife;
-import butterknife.OnClick;
+
 import com.freneticlabs.cleff.CleffApp;
 import com.freneticlabs.cleff.R;
 import com.freneticlabs.cleff.fragments.PlayerFragment;
@@ -31,8 +30,14 @@ import com.freneticlabs.cleff.models.events.MusicStateChangeEvent;
 import com.freneticlabs.cleff.models.events.SongSelectedEvent;
 import com.freneticlabs.cleff.utils.Utils;
 import com.squareup.otto.Subscribe;
-import java.util.ArrayList;
+
 import org.adw.library.widgets.discreteseekbar.DiscreteSeekBar;
+
+import java.util.ArrayList;
+
+import butterknife.Bind;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
 import timber.log.Timber;
 
 public class PlayerActivity extends AppCompatActivity {
@@ -46,7 +51,7 @@ public class PlayerActivity extends AppCompatActivity {
   private static String mPlayerState = CleffApp.MUSIC_IDLE;
 
   private CleffApp mCleffApp;
-
+  private Context mContext;
   private int mCurrentSongId = 0;
 
   @Bind(R.id.toolbar) Toolbar mToolbar;
@@ -139,7 +144,6 @@ public class PlayerActivity extends AppCompatActivity {
         return mSongs.size();
       }
     };
-
     mViewPager.setAdapter(mPagerAdapter);
   }
 
