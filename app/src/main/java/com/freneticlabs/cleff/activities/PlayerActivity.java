@@ -6,7 +6,9 @@ import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -19,7 +21,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
-
+import butterknife.Bind;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
 import com.freneticlabs.cleff.CleffApp;
 import com.freneticlabs.cleff.R;
 import com.freneticlabs.cleff.fragments.PlayerFragment;
@@ -30,14 +34,8 @@ import com.freneticlabs.cleff.models.events.MusicStateChangeEvent;
 import com.freneticlabs.cleff.models.events.SongSelectedEvent;
 import com.freneticlabs.cleff.utils.Utils;
 import com.squareup.otto.Subscribe;
-
-import org.adw.library.widgets.discreteseekbar.DiscreteSeekBar;
-
 import java.util.ArrayList;
-
-import butterknife.Bind;
-import butterknife.ButterKnife;
-import butterknife.OnClick;
+import org.adw.library.widgets.discreteseekbar.DiscreteSeekBar;
 import timber.log.Timber;
 
 public class PlayerActivity extends AppCompatActivity {
@@ -55,6 +53,7 @@ public class PlayerActivity extends AppCompatActivity {
   private int mCurrentSongId = 0;
 
   @Bind(R.id.toolbar) Toolbar mToolbar;
+  @Bind(R.id.player_coord_layout) CoordinatorLayout mCoordinatorLayout;
   @Bind(R.id.player_activity_pager) ViewPager mViewPager;
   @Bind(R.id.seekBar) DiscreteSeekBar mDiscreteSeekBar;
   @Bind(R.id.player_song_title) TextView mSongTitle;
@@ -233,8 +232,9 @@ public class PlayerActivity extends AppCompatActivity {
     mFloatingActionFavButton.setOnClickListener(new View.OnClickListener() {
       @Override public void onClick(View view) {
         MusicLibrary.getInstance(getApplicationContext()).toggleFavorite(mCurrentSongId);
-
         updatePlayerUi();
+        showFavoriteEvent();
+
       }
     });
   }
@@ -306,11 +306,24 @@ public class PlayerActivity extends AppCompatActivity {
     if (MusicLibrary.getInstance(getApplicationContext()).isSongFavorited(mCurrentSongId)) {
       mFloatingActionFavButton.setBackgroundTintList(
           ColorStateList.valueOf(getResources().getColor(R.color.white)));
-      mFloatingActionFavButton.setImageResource(R.drawable.ic_player_favorite_full);
+      mFloatingActionFavButton.setImageResource(R.drawable.ic_player_action_favorite);
+
     } else {
       mFloatingActionFavButton.setBackgroundTintList(
           ColorStateList.valueOf(getResources().getColor(R.color.hot_red)));
-      mFloatingActionFavButton.setImageResource(R.drawable.ic_player_favorite);
+      mFloatingActionFavButton.setImageResource(R.drawable.ic_player_action_unfavorite);
+    }
+  }
+
+  private void showFavoriteEvent() {
+    if (MusicLibrary.getInstance(getApplicationContext()).isSongFavorited(mCurrentSongId)) {
+      Snackbar.make(mCoordinatorLayout, getString(R.string.player_unfavorite),
+          Snackbar.LENGTH_LONG).show();
+
+    } else {
+      Snackbar.make(mCoordinatorLayout, getString(R.string.player_favorite),
+          Snackbar.LENGTH_LONG).show();
+
     }
   }
 
@@ -328,7 +341,6 @@ public class PlayerActivity extends AppCompatActivity {
     mSongs = event.songs;
     notifyDataChange();
   }
-
 
   @Subscribe public void onMusicStateChange(MusicStateChangeEvent event) {
     mPlayerState = event.musicState;
